@@ -43,7 +43,9 @@ main{width:min(1160px,94vw);margin:24px auto 60px}.intro{display:flex;justify-co
 <main>
 <section class="intro"><div><div class="tag">第一章 / 消失的病歷</div><h2>病房裡的三瓶藥</h2><p>找線索、排藥瓶，解開病房電子鎖。</p></div><div class="status"><span class="dot" id="stateDot"></span><span id="stateText">病房封鎖中</span></div></section>
 <div class="layout">
-<section class="room" aria-label="病房場景">\n<img class="room-photo" id="roomPhoto" src="https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-ward.jpg" alt="小安提供的陰暗病房圖片，畫面有病床與窗簾"><div class="room-shade" aria-hidden="true"></div>\n<button class="interact i-scene" data-scene-switch>切換病房照片</button>
+<section class="room" aria-label="病房場景">
+<img class="room-photo" id="roomPhoto" src="https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-ward.jpg" alt="小安提供的陰暗病房圖片，畫面有病床與窗簾"><div class="room-shade" aria-hidden="true"></div>
+<button class="interact i-scene" data-scene-switch>切換病房照片</button>
 <div class="window" aria-hidden="true"></div><div class="clock" aria-label="時鐘停在凌晨三點十七分">3:17<small>停住了</small></div>
 <div class="bed" aria-hidden="true"><div class="pillow"></div><div class="patient">⌁</div></div>
 <div class="door" aria-hidden="true"></div><div class="desk" aria-hidden="true"></div><div class="graffiti">NO.02 已經醒了……</div>
@@ -63,7 +65,9 @@ main{width:min(1160px,94vw);margin:24px auto 60px}.intro{display:flex;justify-co
 <div class="modal" id="modal" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="dialog-top"><h2 id="dialogTitle"></h2><button class="close" id="close">關閉</button></div><div id="dialogBody"></div></section></div>
 <script>
 const modal=document.querySelector("#modal"), title=document.querySelector("#dialogTitle"), body=document.querySelector("#dialogBody"), feedback=document.querySelector("#feedback");
-const roomScenes=[{src:"https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-ward.jpg",alt:"小安提供的陰暗病房圖片，畫面有病床與窗簾",name:"病房近景"},{src:"https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-wardroom.jpg",alt:"小安提供的病房全景圖片，畫面有多張病床與窗戶",name:"病房全景"}];\nlet sceneIndex=0;\nlet fragments=new Set(), collected=[], solvedOrder=false, unlocked=false, chosenBottle=null, slots=[null,null,null], digits="";
+const roomScenes=[{src:"https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-ward.jpg",alt:"小安提供的陰暗病房圖片，畫面有病床與窗簾",name:"病房近景"},{src:"https://raw.githubusercontent.com/BYun35/ABCDE/A/assets/act1-wardroom.jpg",alt:"小安提供的病房全景圖片，畫面有多張病床與窗戶",name:"病房全景"}];
+let sceneIndex=0;
+let fragments=new Set(), collected=[], solvedOrder=false, unlocked=false, chosenBottle=null, slots=[null,null,null], digits="";
 const bottleData=[
  {id:"white",name:"白色藥瓶",drug:"記憶穩定劑",time:"03:00",digit:"3"},
  {id:"blue",name:"藍色藥瓶",drug:"神經抑制劑",time:"03:10",digit:"1"},
