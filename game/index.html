@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10151b">
+<title>時空密室｜病房 03:17</title>
+<style>
+:root{color-scheme:dark;--ink:#e9e2d2;--muted:#b7b0a2;--gold:#d7ae67;--line:#5a5144;--panel:#1c232b;--teal:#8fc5bd;--red:#e28d7d}
+*{box-sizing:border-box}body{margin:0;background:#10151b;color:var(--ink);font:16px/1.55 system-ui,"Noto Sans TC",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px clamp(16px,4vw,48px);border-bottom:1px solid #343b42;background:#141a21}
+h1{font-size:1.1rem;letter-spacing:.08em;margin:0}.tag{color:var(--gold);font-size:.8rem;letter-spacing:.12em}
+main{width:min(1160px,94vw);margin:24px auto 60px}.intro{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}.intro h2{margin:4px 0;font-size:clamp(1.35rem,3vw,2rem)}.intro p{margin:0;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.8fr);gap:18px}
+.room{position:relative;min-height:480px;overflow:hidden;border:1px solid #55534b;border-radius:12px;background:linear-gradient(#202a31 0 62%,#4e4b43 62% 64%,#282b2c 64%);box-shadow:0 20px 60px #0007}
+.window{position:absolute;left:7%;top:10%;width:25%;height:31%;border:8px solid #786f5c;background:linear-gradient(120deg,#18232c,#27333b 54%,#172029);box-shadow:inset 0 0 22px #080e15}
+.window:before,.window:after{content:"";position:absolute;background:#786f5c}.window:before{width:6px;height:100%;left:50%}.window:after{height:6px;width:100%;top:50%}
+.clock{position:absolute;right:8%;top:8%;width:90px;height:90px;border:4px solid #c8b98e;border-radius:50%;background:#ded4b8;color:#242421;display:grid;place-items:center;font:bold 1.3rem Georgia,serif;box-shadow:0 4px 20px #0008}
+.clock small{position:absolute;top:57px;font:10px system-ui;color:#514c40}
+.bed{position:absolute;left:28%;top:46%;width:42%;height:16%;border:8px solid #b1a58a;border-radius:10px 18px 2px 2px;background:#d4c9ad;box-shadow:0 18px 0 #736d5e}
+.pillow{position:absolute;left:8%;top:14%;width:25%;height:65%;border-radius:16px;background:#eee5d0}
+.patient{position:absolute;left:43%;top:12%;font-size:2rem;filter:grayscale(1);opacity:.72}
+.door{position:absolute;right:5%;bottom:6%;width:18%;height:49%;border:7px solid #706653;border-bottom:0;background:linear-gradient(90deg,#493d31,#655442);border-radius:5px 5px 0 0}
+.door:after{content:"";position:absolute;right:14%;top:52%;width:9px;height:9px;border-radius:50%;background:#dfba6b}
+.desk{position:absolute;left:7%;bottom:12%;width:28%;height:14%;border:4px solid #675b48;background:#544a3c;border-radius:5px}
+.desk:after{content:"";position:absolute;left:12%;right:12%;top:100%;height:46px;border-left:5px solid #675b48;border-right:5px solid #675b48}
+.graffiti{position:absolute;left:41%;top:22%;color:#c56e60;font:bold .85rem cursive;transform:rotate(-5deg);text-shadow:0 1px #120d0d}
+.interact{position:absolute;border:1px dashed #dfc48799;background:#15191dbb;border-radius:7px;padding:5px 9px;color:#f1d69d;font-size:.78rem;backdrop-filter:blur(3px)}
+.interact:hover{background:#51452fbf}.i-clock{right:6%;top:25%}.i-bed{left:39%;top:65%}.i-desk{left:10%;bottom:5%}.i-wall{left:41%;top:34%}.i-door{right:7%;bottom:3%}.i-jar{left:14%;bottom:28%}
+.side{display:flex;flex-direction:column;gap:14px}.card{background:var(--panel);border:1px solid #3b434a;border-radius:12px;padding:16px}.card h3{font-size:1rem;margin:0 0 10px}.card p{color:var(--muted);font-size:.9rem;margin:0}.status{display:flex;gap:9px;align-items:center}.dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.actions{display:grid;gap:8px}.action{width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid #50565a;background:#252d34}.action:hover{border-color:var(--gold);background:#30383c}.primary{background:#66502c;border-color:#a8874c;text-align:center}.primary:hover{background:#796033}
+.inventory{min-height:50px;color:var(--muted);font-size:.9rem}.chip{display:inline-block;margin:3px;padding:4px 8px;border-radius:999px;background:#33443f;color:#bde0d5;font-size:.8rem}
+#feedback{min-height:26px;color:var(--teal);font-size:.9rem;margin-top:6px}.modal[hidden]{display:none}.modal{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:#05080cbb}
+.dialog{width:min(620px,100%);max-height:min(85vh,800px);overflow:auto;background:#1b2229;border:1px solid #8b7956;border-radius:14px;box-shadow:0 24px 80px #000b;padding:clamp(18px,4vw,30px)}
+.dialog-top{display:flex;justify-content:space-between;align-items:center;gap:12px}.dialog h2{font-size:1.35rem;margin:0}.close{border:1px solid #59616a;border-radius:8px;background:#28313a;padding:6px 12px}.dialog p{color:#d3cbbb}.bottles,.slots,.keys{display:grid;gap:9px}.bottles{grid-template-columns:repeat(3,1fr);margin:16px 0}.slots{grid-template-columns:repeat(3,1fr)}.bottle,.slot,.key{border:1px solid #62615a;border-radius:9px;background:#252d33;padding:12px 8px;text-align:center}.bottle[aria-pressed=true],.slot[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 2px #d7ae6733}.bottle small{display:block;color:var(--muted)}.slot{min-height:62px}.keys{grid-template-columns:repeat(3,1fr);max-width:300px;margin:14px auto}.key{font-size:1.15rem}.key:hover{background:#3a4449}.display{font:2rem ui-monospace,monospace;text-align:center;letter-spacing:.35em;padding:10px;background:#11171c;border-radius:8px}.fragment-list{display:grid;gap:8px;margin:14px 0}.fragment{padding:12px;border-left:3px solid var(--gold);background:#252d33}.muted{color:var(--muted)!important}.success{color:var(--teal)!important}.warn{color:var(--red)!important}.footer-note{font-size:.8rem;color:var(--muted);margin-top:14px}
+@media(max-width:780px){main{margin-top:16px}.layout{grid-template-columns:1fr}.room{min-height:410px}.side{display:grid;grid-template-columns:1fr 1fr}.side .card:first-child{grid-column:1/-1}}
+@media(max-width:520px){header{padding:12px 16px}.intro{display:block}.room{min-height:380px}.clock{width:68px;height:68px;font-size:1rem}.clock small{top:43px;font-size:8px}.bed{left:25%;width:49%;top:50%}.door{width:22%;right:3%}.window{left:5%;width:28%;height:32%}.graffiti{font-size:.7rem}.interact{font-size:.68rem;padding:4px 6px}.i-clock{right:2%;top:25%}.i-wall{left:37%}.side{grid-template-columns:1fr}.side .card:first-child{grid-column:auto}.bottles{grid-template-columns:1fr}.bottle{padding:9px}}
+</style>
+</head>
+<body>
+<header><div><div class="tag">時空密室・第一關</div><h1>WARD 03:17</h1></div><span class="tag">小星｜網頁與機關</span></header>
+<main>
+<section class="intro"><div><div class="tag">第一章 / 消失的病歷</div><h2>病房裡的三瓶藥</h2><p>找線索、排藥瓶，解開病房電子鎖。</p></div><div class="status"><span class="dot" id="stateDot"></span><span id="stateText">病房封鎖中</span></div></section>
+<div class="layout">
+<section class="room" aria-label="病房場景">
+<div class="window" aria-hidden="true"></div><div class="clock" aria-label="時鐘停在凌晨三點十七分">3:17<small>停住了</small></div>
+<div class="bed" aria-hidden="true"><div class="pillow"></div><div class="patient">⌁</div></div>
+<div class="door" aria-hidden="true"></div><div class="desk" aria-hidden="true"></div><div class="graffiti">NO.02 已經醒了……</div>
+<button class="interact i-clock" data-open="clock">查看時鐘</button>
+<button class="interact i-bed" data-open="fragments">病床・病歷碎片</button>
+<button class="interact i-desk" data-open="bottles">床頭櫃・藥瓶</button>
+<button class="interact i-wall" data-open="graffiti">查看塗鴉</button>
+<button class="interact i-door" data-open="lock">病房門・電子鎖</button>
+<button class="interact i-jar" data-open="jar">角落・玻璃藥罐</button>
+</section>
+<aside class="side">
+<section class="card"><h3>目前狀況</h3><p id="objective">先調查病房裡的物件。病歷會告訴你藥瓶排列方式。</p><div id="feedback" role="status" aria-live="polite"></div></section>
+<section class="card"><h3>線索</h3><div class="actions"><button class="action" data-open="bottles">查看三瓶藥標籤</button><button class="action" data-open="fragments">查看病歷碎片</button><button class="action" data-open="calendar">查看日曆</button><button class="action" data-open="puzzle">排列藥瓶</button></div></section>
+<section class="card"><h3>物品</h3><div class="inventory" id="inventory">尚未取得物品。</div><button class="action" data-open="inventory">查看已取得線索</button></section>
+</aside>
+</div></main>
+<div class="modal" id="modal" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="dialog-top"><h2 id="dialogTitle"></h2><button class="close" id="close">關閉</button></div><div id="dialogBody"></div></section></div>
+<script>
+const modal=document.querySelector("#modal"), title=document.querySelector("#dialogTitle"), body=document.querySelector("#dialogBody"), feedback=document.querySelector("#feedback");
+let fragments=new Set(), collected=[], solvedOrder=false, unlocked=false, chosenBottle=null, slots=[null,null,null], digits="";
+const bottleData=[
+ {id:"white",name:"白色藥瓶",drug:"記憶穩定劑",time:"03:00",digit:"3"},
+ {id:"blue",name:"藍色藥瓶",drug:"神經抑制劑",time:"03:10",digit:"1"},
+ {id:"yellow",name:"黃色藥瓶",drug:"清醒誘導劑",time:"03:17",digit:"7"}
+];
+const fragmentText=[
+"病人編號：NO. 02。記憶清除程序：完成。",
+"藥物依序於 03:00、03:10、03:17 服用。請依時間排列藥瓶，讀取藥序數字。",
+"病人照片與醒來的主角完全相同。護理站門禁卡須帶離病房。"
+];
+function open(name){modal.hidden=false; title.textContent=""; body.innerHTML="";
+const closeButton=document.querySelector("#close");
+if(name==="clock"){title.textContent="停住的時鐘";body.innerHTML="<p>時鐘指著凌晨 <strong>3:17</strong>。秒針卡住了，背面刻著「NO.02」。</p><p class='muted'>這個時間也出現在日曆和病歷中。</p>";}
+if(name==="bottles"){title.textContent="托盤上的三瓶藥";body.innerHTML="<p>每瓶都標著服用時間與藥序數字。依時間由早到晚排列，再讀取藥序數字。</p><div class='fragment-list'>"+bottleData.map(b=>"<div class='fragment'><strong>"+b.name+"｜"+b.drug+"</strong><br><span class='muted'>服用時間 "+b.time+"　藥序 "+b.digit+"</span></div>").join("")+"</div><button class='action primary' data-open='puzzle'>開始排列藥瓶</button>";}
+if(name==="fragments"){title.textContent="病歷碎片（"+fragments.size+"/3）";body.innerHTML="<p>抽屜、床底和床邊各有一片。點下方按鈕搜尋下一片。</p><button class='action primary' id='findFragment'>搜尋病歷碎片</button><div class='fragment-list'>"+[...fragments].map(i=>"<div class='fragment'>"+fragmentText[i]+"</div>").join("")+"</div>"+(fragments.size===3?"<p class='success'>三片病歷已拼合。完整病歷已收進線索。</p>":"");}
+if(name==="calendar"){title.textContent="被撕毀的日曆";body.innerHTML="<p>日曆停在三月，17 日被紅筆圈起來。背面寫著：</p><blockquote>「03:17。這不是醒來的時間，是病歷裡最後一項服藥時間。」</blockquote><p class='muted'>日曆線索已記錄。</p>";if(!collected.includes("日曆線索"))collected.push("日曆線索");}
+if(name==="graffiti"){title.textContent="牆上塗鴉";body.innerHTML="<blockquote>「NO.02 已經醒了。別相信照片，也別把牆上的時間直接當成答案。」</blockquote><p>塗鴉提醒你：密碼要從病歷和藥瓶推理，不能只抄時鐘。</p>";if(!collected.includes("塗鴉線索"))collected.push("塗鴉線索");}
+if(name==="puzzle"){title.textContent="依服藥時間排列藥瓶";body.innerHTML="<p>先選一瓶，再選一個位置。由早到晚排列，然後檢查。</p><div class='slots'>"+slots.map((id,i)=>{let b=bottleData.find(x=>x.id===id);return "<button class='slot' data-slot='"+i+"' aria-pressed='"+(chosenBottle===i)+"'>"+(b?b.name+"<br>"+b.time:"第 "+(i+1)+" 格")+"</button>"}).join("")+"</div><div class='bottles'>"+bottleData.map(b=>"<button class='bottle' data-bottle='"+b.id+"'>"+b.name+"<small>"+b.time+"・藥序 "+b.digit+"</small></button>").join("")+"</div><button class='action primary' id='checkOrder'>檢查排列</button><div id='puzzleResult' role='status' aria-live='polite'>"+(solvedOrder?"<p class='success'>排列正確！密碼是 317。</p>":"")+"</div>";}
+if(name==="lock"){title.textContent="病房電子鎖";body.innerHTML="<p>輸入三位數密碼。</p><div class='display' id='display'>"+digits.padEnd(3,"•")+"</div><div class='keys'>"+["1","2","3","4","5","6","7","8","9","清除","0","確認"].map(k=>"<button class='key' data-key='"+k+"'>"+k+"</button>").join("")+"</div><div id='lockResult' role='status' aria-live='polite'></div>"+(unlocked?"<p class='success'>門鎖已開。你可以離開病房了。</p>":"");}
+if(name==="jar"){title.textContent="角落的玻璃藥罐";body.innerHTML=collected.includes("護理站門禁卡")?"<p>藥罐已打開，裡面空了。門禁卡已收在物品區。</p>":"<p>不透明藥罐與托盤上的藥瓶不同。你打開罐子，發現裡面有一張卡。</p><button class='action primary' id='takeCard'>取得護理站門禁卡</button>";}
+if(name==="inventory"){title.textContent="線索與物品";body.innerHTML="<div class='fragment-list'>"+(collected.length?collected.map(x=>"<div class='fragment'>"+x+"</div>").join(""):"<p class='muted'>目前還沒有取得線索或物品。</p>")+"</div>";}
+modal.hidden=false;closeButton.focus();}
+document.addEventListener("click",e=>{
+const opener=e.target.closest("[data-open]");if(opener){open(opener.dataset.open);return}
+if(e.target.id==="close"||e.target===modal){modal.hidden=true;return}
+if(e.target.id==="findFragment"){let next=[0,1,2].find(i=>!fragments.has(i));if(next!==undefined){fragments.add(next);if(fragments.size===3&&!collected.includes("完整病歷"))collected.push("完整病歷");open("fragments")}return}
+if(e.target.matches("[data-bottle]")){chosenBottle=e.target.dataset.bottle;document.querySelectorAll("[data-bottle]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.bottle===chosenBottle));feedback.textContent="已選取"+bottleData.find(b=>b.id===chosenBottle).name+"，再選位置。";return}
+if(e.target.matches("[data-slot]")){let i=Number(e.target.dataset.slot);if(chosenBottle){slots[i]=chosenBottle;chosenBottle=null;open("puzzle")}else if(slots[i]){chosenBottle=slots[i];slots[i]=null;open("puzzle")}return}
+if(e.target.id==="checkOrder"){let ids=["white","blue","yellow"];let ok=slots.every((v,i)=>v===ids[i]);solvedOrder=ok;let result=document.querySelector("#puzzleResult");result.innerHTML=ok?"<p class='success'>排列正確！服藥時間由早到晚是 03:00 → 03:10 → 03:17。藥序數字是 <strong>3 → 1 → 7</strong>，密碼：<strong>317</strong>。</p>":"<p class='warn'>順序不符合病歷，請依服用時間由早到晚排列。你可以重新選擇藥瓶。</p>";if(ok&&!collected.includes("密碼 317"))collected.push("密碼 317");return}
+if(e.target.matches("[data-key]")){let k=e.target.dataset.key;let result=document.querySelector("#lockResult");if(k==="清除"){digits="";}else if(k==="確認"){if(digits.length!==3){result.textContent="請輸入三位數密碼。"}else if(digits==="317"){unlocked=true;result.innerHTML="<p class='success'>喀嚓。電子鎖解除，病房門開了。</p>";document.querySelector("#stateText").textContent="病房門已開";document.querySelector("#stateDot").style.background="var(--teal)";document.querySelector("#objective").textContent="門已打開。找找角落的玻璃藥罐，裡面可能有下一區的門禁卡。";}else{result.innerHTML="<p class='warn'>密碼不符，請重新檢查病歷。你可以再試一次。</p>";digits="";}}else if(digits.length<3){digits+=k;}let d=document.querySelector("#display");if(d)d.textContent=digits.padEnd(3,"•");return}
+if(e.target.id==="takeCard"){if(!collected.includes("護理站門禁卡"))collected.push("護理站門禁卡");open("jar");feedback.textContent="已取得護理站門禁卡。";return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!modal.hidden)modal.hidden=true;});
+modal.addEventListener("click",e=>{if(e.target===modal)modal.hidden=true});
+function refreshInventory(){let el=document.querySelector("#inventory");el.innerHTML=collected.length?collected.map(x=>"<span class='chip'>"+x+"</span>").join(""):"尚未取得物品。"}
+setInterval(refreshInventory,250);
+</script></body></html>
