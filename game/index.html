@@ -86,7 +86,7 @@ if(name==="lock"){title.textContent="病房電子鎖";body.innerHTML="<p>輸入�
 if(name==="jar"){title.textContent="角落的玻璃藥罐";body.innerHTML=collected.includes("護理站門禁卡")?"<p>藥罐已打開，裡面空了。門禁卡已收在物品區。</p>":"<p>不透明藥罐與托盤上的藥瓶不同。你打開罐子，發現裡面有一張卡。</p><button class='action primary' id='takeCard'>取得護理站門禁卡</button>";}
 if(name==="inventory"){title.textContent="線索與物品";body.innerHTML="<div class='fragment-list'>"+(collected.length?collected.map(x=>"<div class='fragment'>"+x+"</div>").join(""):"<p class='muted'>目前還沒有取得線索或物品。</p>")+"</div>";}
 modal.hidden=false;closeButton.focus();}
-document.addEventListener("click",e=>{
+document.addEventListener("click",e=>{if(e.target.closest("[data-scene-switch]")){sceneIndex=(sceneIndex+1)%roomScenes.length;const photo=document.querySelector("#roomPhoto");photo.src=roomScenes[sceneIndex].src;photo.alt=roomScenes[sceneIndex].alt;feedback.textContent="已切換圖片："+roomScenes[sceneIndex].name+"。";return}
 const opener=e.target.closest("[data-open]");if(opener){open(opener.dataset.open);return}
 if(e.target.id==="close"||e.target===modal){modal.hidden=true;return}
 if(e.target.id==="findFragment"){let next=[0,1,2].find(i=>!fragments.has(i));if(next!==undefined){fragments.add(next);if(fragments.size===3&&!collected.includes("完整病歷"))collected.push("完整病歷");open("fragments")}return}
