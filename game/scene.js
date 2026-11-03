@@ -342,10 +342,10 @@
     canvas.dataset.cameraZ=camera.position.z.toFixed(3);
     updateNearby(now);
     const centered=targetAt(new T.Vector2(0,0));
-    aimed=centered&&nearbyTargets.includes(centered)?centered:nearbyTargets[0]||centered;
+    aimed=I.chooseTarget(centered,nearbyTargets);
     document.getElementById("interact-target").disabled=state.ended;
     const reach=aimed&&N.withinReach(player,aimed.location);
-    prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／點擊：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
+    prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
     const angle=((yaw*180/Math.PI)%360+360)%360;
     const facing=angle<45||angle>=315?"北":angle<135?"西":angle<225?"南":"東";
     walk.textContent="面向"+facing+" · "+(player.z>2?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":"病房中央");

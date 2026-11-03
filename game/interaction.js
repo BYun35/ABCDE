@@ -13,5 +13,12 @@
    if(kind==="bottle-C")return state.tool&&!state.keycard?"open-bottle":"inspect-bottles";
    return "inspect";
  }
- return {nearby,action};
+ function chooseTarget(centered,available){
+   // available 已完成距離、可見性與遮擋檢查，並按距離排序。
+   if(centered&&centered.fragment&&available.includes(centered))return centered;
+   const paper=available.find(t=>t.fragment);
+   if(paper)return paper;
+   return centered&&available.includes(centered)?centered:available[0]||centered||null;
+ }
+ return {nearby,action,chooseTarget};
 });
