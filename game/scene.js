@@ -147,19 +147,23 @@
   target(calendar,"牆上日曆",()=>inspect("calendar"),{x:-4.8,z:-2.2});
   const graffiti=sign(4.89,1.8,-1,2.2,.75,"月亮 → 時鐘 → 太陽",-Math.PI/2);
   target(graffiti,"牆面塗鴉",()=>inspect("graffiti"),{x:4.8,z:-1});
-  const clock=cylinder(0,2.65,-5.83,.4,.4,.10,0xd3cfad);clock.rotation.x=Math.PI/2;
+  const clock=cylinder(0,2.65,-5.83,.42,.42,.10,0x34443c);clock.rotation.x=Math.PI/2;
   const clockFace=new T.Group();clockFace.position.set(0,2.65,-5.75);scene.add(clockFace);
+  const face=new T.Mesh(new T.CircleGeometry(C.faceRadius,48),new T.MeshBasicMaterial({color:0xe4ddc8,side:T.DoubleSide}));
+  face.position.z=.008;clockFace.add(face);
+  const bezel=new T.Mesh(new T.TorusGeometry(C.bezelRadius,.022,10,48),new T.MeshBasicMaterial({color:0x27352f}));
+  bezel.position.z=.025;clockFace.add(bezel);
   for(let i=0;i<12;i++){
     const angle=i*Math.PI/6;
-    const tick=box(Math.sin(angle)*.335,Math.cos(angle)*.335,0,.025,i%3===0?.075:.045,.012,0x38433d,clockFace);
+    const tick=box(Math.sin(angle)*.295,Math.cos(angle)*.295,.04,i%3===0?.038:.024,i%3===0?.09:.055,.012,0x283630,clockFace);
     tick.rotation.z=-angle;
   }
   const hands=C.angles(3,17);
-  const hourHand=box(0,.105,.018,.045,.21,.018,0x283530,clockFace);
+  const hourHand=box(0,C.hourLength/2,.055,C.hourWidth,C.hourLength,.02,0x24322d,clockFace);
   hourHand.rotation.z=-hands.hour;
-  const minuteHand=box(0,.155,.032,.025,.31,.018,0x283530,clockFace);
+  const minuteHand=box(0,C.minuteLength/2,.07,C.minuteWidth,C.minuteLength,.016,C.minuteColor,clockFace);
   minuteHand.rotation.z=-hands.minute;
-  sphere(0,0,.05,.035,0x283530,clockFace);
+  sphere(0,0,.09,.032,0x24322d,clockFace);
   target(clock,"停止的時鐘",()=>inspect("clock"),{x:0,z:-5.8});
   // 垃圾桶與可拾取的碎片。
   cylinder(3.5,.4,2.8,.34,.28,.8,0x667b73);
