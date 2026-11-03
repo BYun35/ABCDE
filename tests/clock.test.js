@@ -16,3 +16,13 @@ test("病房圓形時鐘使用指針呈現 3:17，沒有把時間印成數位字
   assert.match(scene, /minuteHand/);
   assert.doesNotMatch(scene, /sign\(0,\s*2\.65,\s*-5\.76,[^\n]*3:17/);
 });
+
+test("時鐘面清楚可辨，分針比時針長，時針比分針寬", () => {
+  assert.ok(Clock.faceRadius >= 0.34);
+  assert.ok(Clock.minuteLength - Clock.hourLength >= 0.08);
+  assert.ok(Clock.hourWidth > Clock.minuteWidth);
+  const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
+  assert.match(scene, /CircleGeometry/);
+  assert.match(scene, /TorusGeometry/);
+  assert.match(scene, /minuteColor/);
+});
