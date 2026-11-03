@@ -4,7 +4,7 @@
   if(typeof module==="object"&&module.exports)module.exports=api;
   if(root)root.WardOpening=api;
 })(typeof globalThis==="object"?globalThis:this,function(){
-  const wakeDuration=1.8,totalDuration=3.6;
+  const wakeDuration=3.5,totalDuration=7;
   const scenes={
     wake:"頭部傳來一陣劇痛。你從病床上醒來，發現病房裡的設備早已停止運作。",
     reveal:"你看向身旁的病床，上面躺著一名和你長相完全相同的人。他的手腕標著 NO.02。"

@@ -4,11 +4,11 @@
   const notice=document.getElementById("scene-feedback");
   if(!host)return;
   function tell(message){notice.textContent=message;}
-  if(!window.THREE||!window.WardNavigation||!window.WardAvatar||!window.WardOpening||!window.WardInteraction){
+  if(!window.THREE||!window.WardNavigation||!window.WardAvatar||!window.WardOpening||!window.WardClock||!window.WardInteraction){
     tell("3D 場景未能載入。請重新整理；你仍可使用右側的線索與操作完成第一關。");
     host.dataset.ready="error";return;
   }
-  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,O=window.WardOpening,I=window.WardInteraction;
+  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,O=window.WardOpening,C=window.WardClock,I=window.WardInteraction;
   const player={x:N.OPENING_START.x,z:N.OPENING_START.z};
   let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
@@ -148,8 +148,19 @@
   const graffiti=sign(4.89,1.8,-1,2.2,.75,"月亮 → 時鐘 → 太陽",-Math.PI/2);
   target(graffiti,"牆面塗鴉",()=>inspect("graffiti"),{x:4.8,z:-1});
   const clock=cylinder(0,2.65,-5.83,.4,.4,.10,0xd3cfad);clock.rotation.x=Math.PI/2;
-  const clockFace=sign(0,2.65,-5.76,.65,.32,"3:17");
-  target(clockFace,"停止的時鐘",()=>inspect("clock"),{x:0,z:-5.8});
+  const clockFace=new T.Group();clockFace.position.set(0,2.65,-5.75);scene.add(clockFace);
+  for(let i=0;i<12;i++){
+    const angle=i*Math.PI/6;
+    const tick=box(Math.sin(angle)*.335,Math.cos(angle)*.335,0,.025,i%3===0?.075:.045,.012,0x38433d,clockFace);
+    tick.rotation.z=-angle;
+  }
+  const hands=C.angles(3,17);
+  const hourHand=box(0,.105,.018,.045,.21,.018,0x283530,clockFace);
+  hourHand.rotation.z=-hands.hour;
+  const minuteHand=box(0,.155,.032,.025,.31,.018,0x283530,clockFace);
+  minuteHand.rotation.z=-hands.minute;
+  sphere(0,0,.05,.035,0x283530,clockFace);
+  target(clock,"停止的時鐘",()=>inspect("clock"),{x:0,z:-5.8});
   // 垃圾桶與可拾取的碎片。
   cylinder(3.5,.4,2.8,.34,.28,.8,0x667b73);
   cylinder(3.5,.805,2.8,.30,.30,.015,0x17231f);
