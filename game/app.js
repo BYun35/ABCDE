@@ -109,7 +109,7 @@
     state = result.state;
     if (state.tool) inventory.add("小型拆卸工具");
     renderInventory();
-    say(result.message);
+    say(state.tool ? result.message + " 紙條寫著：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message);
     renderState();
   });
 
