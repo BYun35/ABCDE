@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜第一關：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=2">
 <script src="game.js?v=1" defer></script>
-<script src="app.js?v=3" defer></script>
+<script src="app.js?v=4" defer></script>
 </head>
 <body>
 <header>
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="cabinet" aria-hidden="true"></div><div class="bin" aria-hidden="true"></div>
-      <div class="door" aria-hidden="true"></div><div class="reader" aria-hidden="true">刷卡</div>
+      <div class="door" aria-hidden="true"></div><button class="reader" id="scene-reader" type="button" aria-label="在病房感應器使用門禁卡">刷卡</button>
       <button class="hotspot hs-bed" data-inspect="warning">床墊下</button>
       <button class="hotspot hs-bottles" data-inspect="bottles">藥瓶</button>
       <button class="hotspot hs-clock" data-inspect="clock">時鐘</button>
@@ -93,7 +93,7 @@
         <h3>床頭櫃密碼鎖</h3>
         <form class="row" id="pin-form">
           <label for="pin">輸入三位數密碼</label>
-          <input id="pin" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
+          <input id="pin" inputmode="numeric" autocomplete="off" required maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
         <p id="drawer-feedback" role="status" aria-live="polite"></p>
