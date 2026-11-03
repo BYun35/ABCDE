@@ -4,11 +4,13 @@
   const notice=document.getElementById("scene-feedback");
   if(!host)return;
   function tell(message){notice.textContent=message;}
-  if(!window.THREE||!window.WardNavigation){
+  if(!window.THREE||!window.WardNavigation||!window.WardAvatar){
     tell("3D 場景未能載入。請重新整理；你仍可使用右側的線索與操作完成第一關。");
     host.dataset.ready="error";return;
   }
-  const T=window.THREE,N=window.WardNavigation;
+  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar;
+  const player={x:N.START.x,z:N.START.z};
+  let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false});}
   catch(error){tell("這個瀏覽器無法顯示 3D。請使用支援 WebGL 的瀏覽器；右側操作仍可使用。");host.dataset.ready="error";return;}
@@ -26,7 +28,10 @@
   scene.background=new T.Color(0x101c1e);
   scene.fog=new T.Fog(0x142123,8,22);
   const camera=new T.PerspectiveCamera(66,1,.06,35);
-  camera.position.set(N.START.x,1.65,N.START.z);
+  camera.position.set(N.START.x,2.4,5.6);
+  const avatar=A.create(T);scene.add(avatar.root);
+  avatar.root.position.set(player.x,0,player.z);
+  const followRay=new T.Raycaster(),followFocus=new T.Vector3();
   scene.add(new T.HemisphereLight(0xc2e4e2,0x464336,1.65));
   const ceilingLight=new T.PointLight(0xd8e7ce,65,16,2);
   ceilingLight.position.set(0,3.1,-.7);ceilingLight.castShadow=true;
@@ -169,13 +174,28 @@
     if(next.ended){door.rotation.y=-1.25;door.position.x=3.6;keys.clear();document.exitPointerLock?.();}
   }};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
-  let yaw=0,pitch=-.07,drag=null,dragMoved=false,aimed=null,last=performance.now();
+  let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
   const prompt=document.getElementById("target-prompt"),walk=document.getElementById("walk-status");
-  function orient(){camera.rotation.set(pitch,yaw,0,"YXZ");}
+  function orient(){
+    followFocus.set(player.x,1.15,player.z);
+    const desired=A.cameraPosition(player,yaw,pitch);
+    const destination=new T.Vector3(desired.x,desired.y,desired.z);
+    const offset=destination.clone().sub(followFocus),length=offset.length();
+    followRay.set(followFocus,offset.normalize());followRay.far=length;
+    const hit=followRay.intersectObjects(scene.children,true).find(h=>{
+      let obj=h.object;
+      while(obj){if(!obj.visible||obj.userData.player)return false;obj=obj.parent;}
+      return h.distance>.12;
+    });
+    if(hit)destination.copy(followFocus).addScaledVector(offset,Math.max(.35,hit.distance-.16));
+    camera.position.copy(destination);camera.lookAt(followFocus);
+    avatar.root.visible=camera.position.distanceTo(followFocus)>.65;
+    camera.updateMatrixWorld();
+  }
   function targetAt(point){
     ray.setFromCamera(point,camera);
     const hits=ray.intersectObjects(scene.children,true).filter(h=>{
-      let obj=h.object;while(obj){if(!obj.visible)return false;obj=obj.parent;}return true;
+      let obj=h.object;while(obj){if(!obj.visible||obj.userData.player)return false;obj=obj.parent;}return true;
     });
     for(const hit of hits){
       let obj=hit.object;
@@ -187,11 +207,15 @@
   function activate(t){
     if(state.ended)return;
     if(!t){tell("請對準藥瓶、日曆、紙條、抽屜或感應器，再點擊或按 E。");return;}
-    if(!N.withinReach(camera.position,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
+    if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
     t.action();
   }
   function advance(f,r,d){
-    const p=N.move(camera.position,yaw,f,r,d);camera.position.x=p.x;camera.position.z=p.z;
+    const p=N.move(player,yaw,f,r,d);
+    const dx=p.x-player.x,dz=p.z-player.z,moved=Math.hypot(dx,dz);
+    if(moved>.0001){travel+=moved;heading=Math.atan2(-dx,-dz);lastMovement=performance.now();}
+    player.x=p.x;player.z=p.z;
+    avatar.root.position.set(player.x,0,player.z);
   }
   function keyDirection(){
     return {f:Number(keys.has("w")||keys.has("arrowup"))-Number(keys.has("s")||keys.has("arrowdown")),
@@ -224,7 +248,7 @@
       if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;
       yaw-=dx*.004;pitch-=dy*.004;drag={x:e.clientX,y:e.clientY};
     }else return;
-    pitch=Math.max(-1.15,Math.min(1.15,pitch));orient();
+    pitch=Math.max(-.85,Math.min(.30,pitch));orient();
   });
   window.addEventListener("pointerup",()=>{drag=null;});
   canvas.addEventListener("click",e=>{
@@ -236,7 +260,7 @@
   });
   document.getElementById("enter-room").addEventListener("click",()=>{
     document.getElementById("walk-instructions").hidden=true;
-    canvas.focus({preventScroll:true});tell("你已進入病房。WASD 移動、拖曳轉向；靠近物件點擊或按 E。");
+    canvas.focus({preventScroll:true});tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
   });
   document.getElementById("lock-mouse").addEventListener("click",()=>{
     canvas.focus({preventScroll:true});
@@ -271,13 +295,22 @@
     const dt=Math.min((now-last)/1000,.05);last=now;
     const moving=keyDirection();
     if(!state.ended&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*2.3);
+    const walking=!state.ended&&now-lastMovement<160;
+    walkBlend+=(Number(walking)-walkBlend)*Math.min(1,dt*12);
+    if(walkBlend<.001)walkBlend=0;
+    avatar.update(travel,walkBlend,heading,dt);orient();
+    canvas.dataset.walking=String(walking);
+    canvas.dataset.walkBlend=walkBlend.toFixed(3);
+    canvas.dataset.travel=travel.toFixed(3);
+    canvas.dataset.cameraX=camera.position.x.toFixed(3);
+    canvas.dataset.cameraZ=camera.position.z.toFixed(3);
     aimed=targetAt(new T.Vector2(0,0));
-    const reach=aimed&&N.withinReach(camera.position,aimed.location);
+    const reach=aimed&&N.withinReach(player,aimed.location);
     prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／點擊：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
     const angle=((yaw*180/Math.PI)%360+360)%360;
     const facing=angle<45||angle>=315?"北":angle<135?"西":angle<225?"南":"東";
-    walk.textContent="面向"+facing+" · "+(camera.position.z>2?"病房入口":camera.position.x<-2.8?"床頭櫃附近":camera.position.x>2.5?"病房右側":"病房中央");
-    canvas.dataset.x=camera.position.x.toFixed(3);canvas.dataset.z=camera.position.z.toFixed(3);canvas.dataset.yaw=yaw.toFixed(3);
+    walk.textContent="面向"+facing+" · "+(player.z>2?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":"病房中央");
+    canvas.dataset.x=player.x.toFixed(3);canvas.dataset.z=player.z.toFixed(3);canvas.dataset.yaw=yaw.toFixed(3);
     renderer.render(scene,camera);requestAnimationFrame(frame);
   }
   host.dataset.ready="true";

@@ -9,13 +9,14 @@
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js" defer></script>
-<script src="scene.js" defer></script>
+<script src="avatar.js" defer></script>
+<script src="scene.js?v=avatar1" defer></script>
 <script src="app.js?v=3d1" defer></script>
 </head>
 <body>
 <header>
   <div><div class="brand">時空密室・第一關</div><h1>消失的病歷</h1></div>
-  <div class="header-note">第一人稱探索 · 病房</div>
+  <div class="header-note">第三人稱探索 · 病房</div>
 </header>
 <main>
   <section class="intro">
@@ -32,7 +33,7 @@
           <div id="walk-instructions" class="walk-instructions">
             <span class="eyebrow">消失的病歷</span>
             <h2>這裡，有另一個你。</h2>
-            <p>WASD／方向鍵走動<br>按住滑鼠拖曳轉向，或鎖定滑鼠<br>靠近物件後點擊，或對準後按 E</p>
+            <p>WASD／方向鍵控制人物走動<br>按住滑鼠拖曳轉動跟隨鏡頭，或鎖定滑鼠<br>靠近物件後點擊，或對準後按 E</p>
             <button id="enter-room" class="primary" type="button">進入病房</button>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
