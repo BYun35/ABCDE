@@ -103,13 +103,10 @@
   }
   box(-2,1.02,-1.48,2,.55,.06,0x688f8b);
   box(-2,.92,1.48,2,.35,.06,0x688f8b);
-  const patient=new T.Group();scene.add(patient);
-  sphere(-2,1.12,-.94,.22,0x9a9781,patient);
-  box(-2,1.08,-.22,.72,.25,1.0,0x4d7474,patient);
-  box(-2,1.04,.67,.65,.18,.82,0x718a7c,patient);
-  box(-2.5,1.03,-.15,.17,.14,1.08,0xaaa48d,patient);
-  box(-1.5,1.03,-.15,.17,.14,1.08,0xaaa48d,patient);
-  const wrist=sign(-1.5,1.12,.23,.33,.13,"NO.02");wrist.rotation.x=-Math.PI/2;
+  const patientModel=A.createPatient(T);
+  const patient=patientModel.root;
+  patient.position.set(-2,1.05,.95);scene.add(patient);
+  const wrist=sign(-2.35,1.17,.16,.28,.11,"NO.02");wrist.rotation.x=-Math.PI/2;
   target(patient,"床上病人",()=>inspect("patient"),{x:-2,z:0});
   const mattress=scene.children.find(m=>m.isMesh&&m.position.x===-2&&m.position.y===.79);
   target(mattress,"床墊下的警告",()=>inspect("warning"),{x:-2,z:1.3});

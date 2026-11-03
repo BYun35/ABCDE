@@ -49,6 +49,7 @@
      arm.rotation.z=i===0?-.13:.13;
    });
    const shadow=new T.Mesh(new T.CircleGeometry(.4,32),new T.MeshBasicMaterial({color:0x071411,transparent:true,opacity:.2,depthWrite:false}));
+   shadow.name="ground-shadow";
    shadow.rotation.x=-Math.PI/2;shadow.position.y=.012;root.add(shadow);
    function update(travel,blend,heading,dt){
      const p=pose(travel,blend);
@@ -62,5 +63,13 @@
    }
    return {root,update};
  }
- return {pose,cameraPosition,create};
+ function createPatient(T){
+   const model=create(T);
+   model.root.userData.player=false;
+   model.root.rotation.x=-Math.PI/2;
+   model.root.rotation.y=Math.PI;
+   model.root.getObjectByName("ground-shadow").visible=false;
+   return model;
+ }
+ return {pose,cameraPosition,create,createPatient};
 });
