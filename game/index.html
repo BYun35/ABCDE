@@ -7,7 +7,7 @@
 <title>時空密室｜第一關：消失的病歷</title>
 <link rel="stylesheet" href="style.css?v=1">
 <script src="game.js?v=1" defer></script>
-<script src="app.js?v=1" defer></script>
+<script src="app.js?v=2" defer></script>
 </head>
 <body>
 <header>
@@ -92,6 +92,7 @@
           <input id="pin" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
+        <p id="drawer-feedback" role="status" aria-live="polite"></p>
         <div id="drawer-actions" class="row" hidden>
           <button class="secondary" id="take-tool">打開抽屜並取出工具</button>
         </div>
@@ -101,12 +102,14 @@
         <h3>藥瓶 C 瓶底</h3>
         <p>取得抽屜裡的工具後，可以拆開瓶底。</p>
         <div class="row"><button class="secondary" id="open-bottle">用工具拆開瓶底</button></div>
+        <p id="bottle-feedback" role="status" aria-live="polite"></p>
       </section>
 
       <section class="card">
         <h3>病房門感應器</h3>
         <p>門需要護理站門禁卡才能打開。</p>
         <div class="row"><button class="secondary" id="open-door">使用門禁卡</button></div>
+        <p id="door-feedback" role="status" aria-live="polite"></p>
       </section>
 
       <section class="card ending" id="ending" tabindex="-1" hidden>
