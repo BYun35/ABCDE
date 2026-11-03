@@ -88,12 +88,17 @@
    const shadow=new T.Mesh(new T.CircleGeometry(.4,32),new T.MeshBasicMaterial({color:0x071411,transparent:true,opacity:.2,depthWrite:false}));
    shadow.name="ground-shadow";
    shadow.rotation.x=-Math.PI/2;shadow.position.y=.012;root.add(shadow);
-   function update(travel,blend,heading,dt){
+   function update(travel,blend,heading,dt,wakeProgress=1){
+     const waking=Math.max(0,Math.min(1,wakeProgress));
      const p=pose(travel,blend);
      leftLeg.rotation.x=p.leftLeg;rightLeg.rotation.x=p.rightLeg;
-     leftArm.rotation.x=p.leftArm;rightArm.rotation.x=p.rightArm;
+     leftArm.rotation.x=p.leftArm-.72*(1-waking);rightArm.rotation.x=p.rightArm-.72*(1-waking);
      knees[0].rotation.x=p.leftKnee;knees[1].rotation.x=p.rightKnee;
      body.position.y=p.bob;
+     body.rotation.x=0;
+     root.scale.y=1;
+     root.rotation.x=-Math.PI/2*(1-waking);
+     root.position.y=1.05*(1-waking);
      const diff=Math.atan2(Math.sin(heading-root.rotation.y),Math.cos(heading-root.rotation.y));
      root.rotation.y+=diff*Math.min(1,dt*12);
      root.userData.walkBlend=blend;

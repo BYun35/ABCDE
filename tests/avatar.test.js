@@ -81,7 +81,7 @@ test("醒來動畫由病床上的躺姿起身到正常站姿",()=>{
  assert.ok(Math.abs(player.root.rotation.x+Math.PI/2)<.001,"開場一開始人物應平躺在病床上");
  assert.ok(player.root.position.y>.9,"躺姿需位於床墊高度");
  player.update(0,0,0,.016,1);
- assert.equal(player.root.rotation.x,0,"醒來動畫結束時人物恢復站姿");
+ assert.ok(Math.abs(player.root.rotation.x)<.001,"醒來動畫結束時人物恢復站姿");
  assert.equal(player.root.position.y,0,"站姿落在地面");
 });
 

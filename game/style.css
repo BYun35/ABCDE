@@ -61,11 +61,12 @@ main{width:min(1600px,96vw)}
 .walk-instructions h2{font-size:clamp(1.6rem,3vw,2.6rem);letter-spacing:.05em;color:#f0e8d4}
 .walk-instructions p{color:#d0d4c7;line-height:1.9}
 .walk-instructions button{padding:12px 35px}
-.awakening-scene{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:linear-gradient(180deg,#101719c9,#101719ed);backdrop-filter:blur(3px);animation:awakening-in .35s ease-out}
+.awakening-scene{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:linear-gradient(180deg,#1017196e,#101719a8);backdrop-filter:blur(1.5px);pointer-events:none;animation:awakening-in .35s ease-out}
 .awakening-scene h2{font-size:clamp(1.6rem,3vw,2.6rem);color:#f0e8d4}
 .awakening-scene p{max-width:34rem;color:#d0d4c7;line-height:1.9}
-.awakening-scene button{padding:12px 35px}
+.awakening-caption{display:inline-block;color:#e3d5b3;font-size:.8rem;letter-spacing:.08em;animation:awakening-pulse 1.2s ease-in-out infinite alternate}
 @keyframes awakening-in{from{opacity:0}to{opacity:1}}
+@keyframes awakening-pulse{from{opacity:.55}to{opacity:1}}
 .target-prompt{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:90%;text-align:center;background:#102121e8;color:#f0dfb7;padding:8px 16px;border:1px solid #8d895c88;border-radius:7px;pointer-events:none;font-size:.85rem}
 .scene-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid #405453}
 .scene-toolbar button{font-size:.8rem}

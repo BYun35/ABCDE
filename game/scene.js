@@ -9,7 +9,7 @@
     host.dataset.ready="error";return;
   }
   const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,O=window.WardOpening,I=window.WardInteraction;
-  const player={x:N.START.x,z:N.START.z};
+  const player={x:N.OPENING_START.x,z:N.OPENING_START.z};
   let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false});}
@@ -30,7 +30,8 @@
   const camera=new T.PerspectiveCamera(66,1,.06,35);
   camera.position.set(N.START.x,2.4,5.6);
   const avatar=A.create(T);scene.add(avatar.root);
-  avatar.root.position.set(player.x,0,player.z);
+  avatar.root.position.set(player.x,1.05,player.z);
+  avatar.root.rotation.x=-Math.PI/2;
   const followRay=new T.Raycaster(),followFocus=new T.Vector3();
   scene.add(new T.HemisphereLight(0xc2e4e2,0x464336,1.65));
   const ceilingLight=new T.PointLight(0xd8e7ce,65,16,2);
@@ -101,6 +102,16 @@
     cylinder(x,.3,z,.045,.045,.6,0x526e69);
     cylinder(x,.1,z,.1,.1,.07,0x202b29).rotation.z=Math.PI/2;
   }
+  // 主角醒來用的另一張病床，和床上 NO.02 人物的病床並排。
+  box(.25,.59,0,1.8,.16,3,0x62706a);
+  box(.25,.79,0,1.66,.27,2.8,0xb5c3b7);
+  box(.25,.97,-1.05,.95,.18,.55,0xd6ded0);
+  for(const x of [-.48,.98])for(const z of [-1.25,1.25]){
+    cylinder(x,.3,z,.045,.045,.6,0x526e69);
+    cylinder(x,.1,z,.1,.1,.07,0x202b29).rotation.z=Math.PI/2;
+  }
+  box(.25,1.02,-1.48,1.8,.55,.06,0x688f8b);
+  box(.25,.92,1.48,1.8,.35,.06,0x688f8b);
   box(-2,1.02,-1.48,2,.55,.06,0x688f8b);
   box(-2,.92,1.48,2,.35,.06,0x688f8b);
   const patientModel=A.createPatient(T);
@@ -179,10 +190,10 @@
   }};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
-  let opening=O.create(),introComplete=false;
+  let opening=O.create(),introComplete=false,openingPhase="idle",wakeProgress=1;
   const prompt=document.getElementById("target-prompt"),walk=document.getElementById("walk-status");
   function orient(){
-    followFocus.set(player.x,1.15,player.z);
+    followFocus.set(player.x,1.05+.1*wakeProgress,player.z);
     const desired=A.cameraPosition(player,yaw,pitch);
     const destination=new T.Vector3(desired.x,desired.y,desired.z);
     const offset=destination.clone().sub(followFocus),length=offset.length();
@@ -194,7 +205,7 @@
     });
     if(hit)destination.copy(followFocus).addScaledVector(offset,Math.max(.35,hit.distance-.16));
     camera.position.copy(destination);camera.lookAt(followFocus);
-    avatar.root.visible=introComplete&&camera.position.distanceTo(followFocus)>.65;
+    avatar.root.visible=(introComplete||opening.started)&&camera.position.distanceTo(followFocus)>.65;
     camera.updateMatrixWorld();
   }
   function targetAt(point){
@@ -297,26 +308,13 @@
     document.getElementById("walk-instructions").hidden=true;
     const scene=document.getElementById("awakening-scene");
     scene.hidden=false;
-    document.getElementById("awakening-continue").focus({preventScroll:true});
-    advanceOpening();
+    opening=O.start();openingPhase="wake";wakeProgress=0;
+    player.x=N.OPENING_START.x;player.z=N.OPENING_START.z;
+    avatar.root.position.set(player.x,1.05,player.z);avatar.root.rotation.x=-Math.PI/2;
+    document.getElementById("awakening-title").textContent="你醒來了";
+    document.getElementById("awakening-text").textContent="頭部傳來一陣劇痛。你從病床上醒來，發現病房裡的設備早已停止運作。";
+    tell("頭部傳來一陣劇痛。你從病床上醒來……");
   });
-  function advanceOpening(){
-    const result=O.advance(opening);opening=result.state;
-    const text=document.getElementById("awakening-text");
-    if(result.done){
-      introComplete=true;
-      document.getElementById("awakening-scene").hidden=true;
-      canvas.focus({preventScroll:true});
-      tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
-      return;
-    }
-    text.textContent=result.text;
-    document.getElementById("awakening-title").textContent=opening.stage===0?"你醒來了":"床上還有另一個你";
-    document.getElementById("awakening-continue").textContent=opening.stage===1?"開始探索":"繼續";
-    tell(result.text);
-    document.getElementById("awakening-continue").focus({preventScroll:true});
-  }
-  document.getElementById("awakening-continue").addEventListener("click",advanceOpening);
   document.getElementById("lock-mouse").addEventListener("click",()=>{
     canvas.focus({preventScroll:true});
     try{
@@ -352,12 +350,48 @@
   new ResizeObserver(resize).observe(host);resize();orient();
   function frame(now){
     const dt=Math.min((now-last)/1000,.05);last=now;
+    if(opening.started){
+      const result=O.tick(opening,dt);opening=result.state;wakeProgress=result.progress;
+      if(result.phase!==openingPhase&&result.phase==="reveal"){
+        openingPhase="reveal";
+        document.getElementById("awakening-title").textContent="床上還有另一個你";
+        document.getElementById("awakening-text").textContent=result.text;
+        document.getElementById("scene-feedback").textContent=result.text;
+      }
+      if(result.phase==="reveal"){
+        const progress=Math.max(0,Math.min(1,(opening.elapsed-O.wakeDuration)/(O.totalDuration-O.wakeDuration)));
+        const before={x:player.x,z:player.z};
+        if(progress<.5){
+          player.x=N.OPENING_START.x;player.z=N.OPENING_START.z+(.9*progress*2);heading=Math.PI;
+        }else{
+          player.z=N.START.z;player.x=N.OPENING_START.x+(N.START.x-N.OPENING_START.x)*((progress-.5)*2);heading=-Math.PI/2;
+        }
+        const step=Math.hypot(player.x-before.x,player.z-before.z);
+        if(step>.0001){travel+=step;lastMovement=now;}
+        yaw=-Math.PI/2*progress;
+        avatar.root.position.x=player.x;avatar.root.position.z=player.z;
+      }
+      if(result.done){
+        introComplete=true;openingPhase="done";wakeProgress=1;
+        player.x=N.START.x;player.z=N.START.z;heading=-Math.PI/2;yaw=-Math.PI/2;
+        avatar.root.position.set(player.x,0,player.z);
+        document.getElementById("awakening-scene").hidden=true;
+        tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
+        canvas.focus({preventScroll:true});
+      }
+    }
     const moving=keyDirection();
     if(introComplete&&!state.ended&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*2.3);
     const walking=!state.ended&&now-lastMovement<160;
     walkBlend+=(Number(walking)-walkBlend)*Math.min(1,dt*12);
     if(walkBlend<.001)walkBlend=0;
-    avatar.update(travel,walkBlend,heading,dt);orient();
+    avatar.update(travel,walkBlend,heading,dt,wakeProgress);orient();
+    if(opening.started){
+      const shake=(1-wakeProgress)*.025;
+      camera.position.x+=Math.sin(now*.035)*shake;
+      camera.position.y+=Math.cos(now*.043)*shake;
+      camera.lookAt(followFocus);
+    }
     canvas.dataset.walking=String(walking);
     canvas.dataset.walkBlend=walkBlend.toFixed(3);
     canvas.dataset.travel=travel.toFixed(3);
@@ -371,7 +405,7 @@
     prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
     const angle=((yaw*180/Math.PI)%360+360)%360;
     const facing=angle<45||angle>=315?"北":angle<135?"西":angle<225?"南":"東";
-    walk.textContent="面向"+facing+" · "+(player.z>2?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":"病房中央");
+    walk.textContent="面向"+facing+" · "+(player.z>2.8?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":player.x>1.3&&player.z>1.6?"病床旁":"病房中央");
     canvas.dataset.x=player.x.toFixed(3);canvas.dataset.z=player.z.toFixed(3);canvas.dataset.yaw=yaw.toFixed(3);
     renderer.render(scene,camera);requestAnimationFrame(frame);
   }

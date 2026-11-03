@@ -4,9 +4,12 @@
   if(typeof module==="object"&&module.exports)module.exports=api;
   if(root)root.WardNavigation=api;
 })(typeof globalThis==="object"?globalThis:this,function(){
-  const START={x:0,z:4.4};
+  // 演出從新床上的躺姿開始，結束後站在床邊可走動的位置。
+  const OPENING_START={x:.25,z:.95};
+  const START={x:1.8,z:1.85};
   const OBSTACLES=[
     {x:-2,z:0,w:2,d:3},
+    {x:.25,z:0,w:1.8,d:3},
     {x:-3.6,z:-3.4,w:1.4,d:1.0},
     {x:3.5,z:2.8,w:.65,d:.65}
   ];
@@ -30,5 +33,5 @@
     return p;
   }
   function withinReach(player,point){return Math.hypot(player.x-point.x,player.z-point.z)<=2.4;}
-  return {START,OBSTACLES,canStand,move,withinReach};
+  return {START,OPENING_START,OBSTACLES,canStand,move,withinReach};
 });

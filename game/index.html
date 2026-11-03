@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=qa2">
+<link rel="stylesheet" href="style.css?v=bedwake2">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
-<script src="navigation.js" defer></script>
-<script src="avatar.js?v=wrist1" defer></script>
-<script src="opening.js?v=opening1" defer></script>
+<script src="navigation.js?v=bedwake2" defer></script>
+<script src="avatar.js?v=bedwake2" defer></script>
+<script src="opening.js?v=bedwake2" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
-<script src="scene.js?v=paper1" defer></script>
+<script src="scene.js?v=bedwake2" defer></script>
 <script src="app.js?v=3d1" defer></script>
 </head>
 <body>
@@ -29,7 +29,7 @@
   <div class="layout">
     <section class="scene-column" aria-label="3D 病房探索">
       <div class="scene-shell">
-        <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病房入口</output></div>
+        <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病床旁</output></div>
         <div id="ward-viewport">
           <div class="crosshair" aria-hidden="true">+</div>
           <div id="walk-instructions" class="walk-instructions">
@@ -42,7 +42,7 @@
             <span class="eyebrow">消失的病歷</span>
             <h2 id="awakening-title">你醒來了</h2>
             <p id="awakening-text"></p>
-            <button id="awakening-continue" class="primary" type="button">繼續</button>
+            <span class="awakening-caption">畫面恢復中……</span>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
         </div>
