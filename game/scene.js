@@ -4,11 +4,11 @@
   const notice=document.getElementById("scene-feedback");
   if(!host)return;
   function tell(message){notice.textContent=message;}
-  if(!window.THREE||!window.WardNavigation||!window.WardAvatar||!window.WardInteraction){
+  if(!window.THREE||!window.WardNavigation||!window.WardAvatar||!window.WardOpening||!window.WardInteraction){
     tell("3D 場景未能載入。請重新整理；你仍可使用右側的線索與操作完成第一關。");
     host.dataset.ready="error";return;
   }
-  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,I=window.WardInteraction;
+  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,O=window.WardOpening,I=window.WardInteraction;
   const player={x:N.START.x,z:N.START.z};
   let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
@@ -179,6 +179,7 @@
   }};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
+  let opening=O.create(),introComplete=false;
   const prompt=document.getElementById("target-prompt"),walk=document.getElementById("walk-status");
   function orient(){
     followFocus.set(player.x,1.15,player.z);
@@ -193,7 +194,7 @@
     });
     if(hit)destination.copy(followFocus).addScaledVector(offset,Math.max(.35,hit.distance-.16));
     camera.position.copy(destination);camera.lookAt(followFocus);
-    avatar.root.visible=camera.position.distanceTo(followFocus)>.65;
+    avatar.root.visible=introComplete&&camera.position.distanceTo(followFocus)>.65;
     camera.updateMatrixWorld();
   }
   function targetAt(point){
@@ -234,6 +235,7 @@
     for(const t of nearbyTargets){const b=document.createElement("button");b.type="button";b.className="secondary";b.textContent=t.name;b.addEventListener("click",()=>activate(t));nearbyEl.append(b);}
   }
   function activate(t){
+    if(!introComplete){tell("先看完醒來的片段，再開始探索病房。");return;}
     if(state.ended)return;
     if(!t){tell("請對準藥瓶、日曆、紙條、抽屜或感應器，再點擊或按 E。");return;}
     if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
@@ -257,6 +259,7 @@
     const key=e.key.toLowerCase();
     if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","e"].includes(key)){
       e.preventDefault();
+      if(!introComplete)return;
       if(state.ended)return;
       if(key==="e"){if(!e.repeat)activate(aimed);return;}
       if(!keys.has(key)){
@@ -292,8 +295,28 @@
   });
   document.getElementById("enter-room").addEventListener("click",()=>{
     document.getElementById("walk-instructions").hidden=true;
-    canvas.focus({preventScroll:true});tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
+    const scene=document.getElementById("awakening-scene");
+    scene.hidden=false;
+    document.getElementById("awakening-continue").focus({preventScroll:true});
+    advanceOpening();
   });
+  function advanceOpening(){
+    const result=O.advance(opening);opening=result.state;
+    const text=document.getElementById("awakening-text");
+    if(result.done){
+      introComplete=true;
+      document.getElementById("awakening-scene").hidden=true;
+      canvas.focus({preventScroll:true});
+      tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
+      return;
+    }
+    text.textContent=result.text;
+    document.getElementById("awakening-title").textContent=opening.stage===0?"你醒來了":"床上還有另一個你";
+    document.getElementById("awakening-continue").textContent=opening.stage===1?"開始探索":"繼續";
+    tell(result.text);
+    document.getElementById("awakening-continue").focus({preventScroll:true});
+  }
+  document.getElementById("awakening-continue").addEventListener("click",advanceOpening);
   document.getElementById("lock-mouse").addEventListener("click",()=>{
     canvas.focus({preventScroll:true});
     try{
@@ -308,7 +331,7 @@
   document.addEventListener("pointerlockerror",()=>tell("此環境未允許鎖定滑鼠，拖曳場景也能轉向。"));
   document.querySelectorAll("[data-walk]").forEach(button=>{
     button.addEventListener("pointerdown",e=>{
-      e.preventDefault();if(state.ended)return;
+      e.preventDefault();if(!introComplete||state.ended)return;
       const k=button.dataset.walk;
       if(k==="turn-left")yaw+=.22;
       else if(k==="turn-right")yaw-=.22;
@@ -330,7 +353,7 @@
   function frame(now){
     const dt=Math.min((now-last)/1000,.05);last=now;
     const moving=keyDirection();
-    if(!state.ended&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*2.3);
+    if(introComplete&&!state.ended&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*2.3);
     const walking=!state.ended&&now-lastMovement<160;
     walkBlend+=(Number(walking)-walkBlend)*Math.min(1,dt*12);
     if(walkBlend<.001)walkBlend=0;
@@ -343,7 +366,7 @@
     updateNearby(now);
     const centered=targetAt(new T.Vector2(0,0));
     aimed=I.chooseTarget(centered,nearbyTargets);
-    document.getElementById("interact-target").disabled=state.ended;
+    document.getElementById("interact-target").disabled=state.ended||!introComplete;
     const reach=aimed&&N.withinReach(player,aimed.location);
     prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
     const angle=((yaw*180/Math.PI)%360+360)%360;

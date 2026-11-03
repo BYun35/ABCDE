@@ -67,6 +67,7 @@ B 使用者已確認規格：317、卡片藏在藥瓶 C，玩家與第一關床�
 | T-I05 | interaction.test.js：櫃旁按 E 優先拾取可用碎片，不被準星命中的密碼鎖搶走 | MECH-01、3D-03；使用者回報 | 準星命中櫃體、附近有碎片時，目標改選可拾取碎片 |
 | T-I06 | interaction.test.js：拾取優先仍受距離、遮擋及已收集條件限制 | MECH-01、3D-03 | 過遠、被擋或已收集碎片不會搶走正常櫃體互動 |
 | T-I07 | interaction.test.js：收完附近碎片後 E 恢復準星或最近物件，瞄準碎片仍可選取 | MECH-01、3D-03 | 瞄準碎片優先，無碎片時回到一般目標，沒有物件回傳空值 |
+| T-O01 | opening.test.js：醒來開場先呈現主角甦醒，再揭示床上相同人物的 NO.02 | VIS-01、3D-02 | 依序檢查醒來文字、相同外貌與 NO.02，再確認開場完成才開始探索 |
 
 ### 前次文件修復重跑結果（764ab6f）
 
@@ -86,7 +87,15 @@ node --test tests/game.test.js tests/ui.test.js tests/navigation.test.js tests/a
 
 ### 歷史測試順序與實際試玩
 
-最新修正：床頭櫃附近 E 拾取（2026-11-03）。新增 T-I05～07，先執行出現 4 過、3 失敗，獨立提交 [233d3ca](https://github.com/BYun35/ABCDE/commit/233d3ca76cddfd5b2e1b20bacaf8e03e71b61d6f) 後才實作。相同完整測試命令最新為 **27 項通過、0 項失敗**。
+醒來開場（2026-11-03）：新增 T-O01，缺少開場模組時失敗，獨立提交 [f3129ef](https://github.com/BYun35/ABCDE/commit/f3129efaa3fd269aaaf6978c494be8fcf046cca5) 後才實作。完整測試命令更新為：
+
+```sh
+node --test tests/game.test.js tests/ui.test.js tests/navigation.test.js tests/avatar.test.js tests/interaction.test.js tests/opening.test.js
+```
+
+**28 項通過，0 項失敗。** Three.js 顯示舊版發行檔提示。瀏覽器確認進入病房後先出現醒來文字，再出現床上相同人物與 NO.02，按「開始探索」後才解鎖走動與場景互動。A 分支僅作為唯讀劇情參考，沒有修改。
+
+同日較早的床頭櫃附近 E 拾取修正：新增 T-I05～07，先執行出現 4 過、3 失敗，獨立提交 [233d3ca](https://github.com/BYun35/ABCDE/commit/233d3ca76cddfd5b2e1b20bacaf8e03e71b61d6f) 後才實作。當時完整測試為 27 項通過、0 項失敗；已由本輪 28 項結果涵蓋重跑。
 
 實際重現舊版：新遊戲從入口沿左側走道到床頭櫃，附近清單已列出櫃後病歷碎片，E 卻開密碼輸入欄。修正版同一路線第一次 E 正常收碎片，背包為 1/3、場景焦點保留；第二次 E 才開密碼欄。瀏覽器沒有程式錯誤。只重驗該路線與焦點，不把本輪宣稱為完整通關或團隊驗收。直接點櫃體依舊可以輸入密碼，不增加收齊碎片才能輸入的限制。
 

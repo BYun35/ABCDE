@@ -10,6 +10,7 @@
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js" defer></script>
 <script src="avatar.js?v=wrist1" defer></script>
+<script src="opening.js?v=opening1" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
 <script src="scene.js?v=paper1" defer></script>
 <script src="app.js?v=3d1" defer></script>
@@ -34,8 +35,14 @@
           <div id="walk-instructions" class="walk-instructions">
             <span class="eyebrow">消失的病歷</span>
             <h2>這裡，有另一個你。</h2>
-            <p>WASD／方向鍵控制人物走動<br>按住滑鼠拖曳轉動跟隨鏡頭，或鎖定滑鼠<br>靠近物件後點擊，或對準後按 E</p>
+            <p>先看看你醒來後發生了什麼，再開始探索病房。</p>
             <button id="enter-room" class="primary" type="button">進入病房</button>
+          </div>
+          <div id="awakening-scene" class="awakening-scene" role="dialog" aria-modal="true" aria-labelledby="awakening-title" hidden>
+            <span class="eyebrow">消失的病歷</span>
+            <h2 id="awakening-title">你醒來了</h2>
+            <p id="awakening-text"></p>
+            <button id="awakening-continue" class="primary" type="button">繼續</button>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
         </div>
