@@ -23,3 +23,20 @@ test("靠牆時跟隨鏡頭仍在病房內",()=>{
  assert.ok(c.y>=.4&&c.y<=3.25);
  }}
 });
+
+test("床上人物與玩家共用外觀，床上人物使用躺姿",()=>{
+ const T=require("../game/vendor/three.min.js");
+ const player=Avatar.create(T),patient=Avatar.createPatient(T);
+ function shape(root){
+   const shapes=[];
+   root.traverse(o=>{if(o.isMesh&&o.name!=="ground-shadow")shapes.push({
+     geometry:o.geometry.type,parameters:o.geometry.parameters,
+     color:o.material.color.getHex(),scale:o.scale.toArray()
+   });});
+   return shapes;
+ }
+ assert.deepEqual(shape(patient.root),shape(player.root));
+ assert.equal(patient.root.rotation.x,-Math.PI/2);
+ assert.equal(patient.root.userData.player,false);
+ assert.equal(patient.root.getObjectByName("ground-shadow").visible,false);
+});
