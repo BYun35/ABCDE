@@ -26,8 +26,9 @@
     fragments: "病歷碎片說明：NO. 02 病人依午夜前、午夜後、清晨的順序接受三次藥物測試。真正的答案藏在時間的先後之中。"
   };
 
-  function say(message) {
+  function say(message, targetId) {
     feedback.textContent = message;
+    if (targetId) document.getElementById(targetId).textContent = message;
   }
 
   function renderInventory() {
@@ -99,7 +100,7 @@
     const input = document.getElementById("pin");
     const result = Game.submitCode(state, input.value);
     state = result.state;
-    say(result.message);
+    say(result.message, "drawer-feedback");
     input.value = "";
     renderState();
   });
@@ -109,7 +110,7 @@
     state = result.state;
     if (state.tool) inventory.add("小型拆卸工具");
     renderInventory();
-    say(state.tool ? result.message + " 紙條寫著：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message);
+    say(state.tool ? result.message + " 紙條寫著：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message, "drawer-feedback");
     renderState();
   });
 
@@ -118,14 +119,14 @@
     state = result.state;
     if (state.keycard) inventory.add("護理站門禁卡");
     renderInventory();
-    say(result.message);
+    say(result.message, "bottle-feedback");
     renderState();
   });
 
   document.getElementById("open-door").addEventListener("click", () => {
     const result = Game.openDoor(state);
     state = result.state;
-    say(result.message);
+    say(result.message, "door-feedback");
     renderState();
     if (state.ended) {
       ending.focus({ preventScroll: true });
