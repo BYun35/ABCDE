@@ -7,6 +7,10 @@ test("起點可站立，牆外與病床內不可進入", () => {
   assert.equal(Nav.canStand(Nav.START), true);
   for (const p of [{x:5,z:0},{x:0,z:6},{x:-2,z:0}]) assert.equal(Nav.canStand(p), false);
 });
+test("主角醒來床與原病床都有碰撞，演出後起點可站立", () => {
+  assert.equal(Nav.canStand({x:.25,z:0}),false);
+  assert.equal(Nav.canStand(Nav.START),true);
+});
 test("向前、側移與轉向後的移動方向一致", () => {
   let p=Nav.move(Nav.START,0,1,0,1);
   assert.ok(p.z<Nav.START.z);
