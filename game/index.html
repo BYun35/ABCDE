@@ -7,7 +7,7 @@
 <title>時空密室｜第一關：消失的病歷</title>
 <link rel="stylesheet" href="style.css?v=1">
 <script src="game.js?v=1" defer></script>
-<script src="app.js?v=2" defer></script>
+<script src="app.js?v=3" defer></script>
 </head>
 <body>
 <header>
@@ -17,12 +17,13 @@
 <main>
   <section class="intro">
     <div><div class="eyebrow">病房・凌晨 3:17</div><h2>你在陌生的病房醒來</h2></div>
-    <p>探索線索，找出病人編號，再離開病房。</p>
+    <p>探索線索，解開抽屜取得工具，找出門禁卡離開病房。</p>
   </section>
 
   <div class="layout">
     <section class="room" aria-label="陰暗的醫院病房">
-      <div class="room-label">無窗病房</div>\n      <div class="light" aria-hidden="true"></div>
+      <div class="room-label">無窗病房</div>
+      <div class="light" aria-hidden="true"></div>
       <div class="crack" aria-hidden="true"></div>
       <div class="clock" aria-label="時鐘停在凌晨三點十七分">3:17<small>停止</small></div>
       <div class="graffiti" aria-hidden="true">☾　◷　☼</div>
@@ -60,11 +61,13 @@
           <button class="action" data-inspect="fragments">查看病歷內容</button>
           <button class="action" data-inspect="patient">查看床上病人</button>
         </div>
+        <p id="explore-feedback" role="status" aria-live="polite"></p>
       </section>
 
       <section class="card">
         <h3>病歷碎片</h3>
         <p>床墊下、床頭櫃後方和垃圾桶旁各有一片。</p>
+        <p id="fragment-feedback" role="status" aria-live="polite"></p>
         <div class="fragment-list">
           <div class="fragment"><span>床墊下</span><button data-fragment="bed">拾取</button></div>
           <div class="fragment"><span>床頭櫃後方</span><button data-fragment="cabinet">拾取</button></div>
@@ -82,6 +85,7 @@
           <select id="order-3" aria-label="第三瓶"><option value="">第三瓶</option><option>A</option><option>B</option><option>C</option></select>
           <button class="primary" type="submit">確認順序</button>
         </form>
+        <p id="order-feedback" role="status" aria-live="polite"></p>
         <p class="row">推導出的密碼：<strong id="derived-code">尚未解出</strong></p>
       </section>
 
