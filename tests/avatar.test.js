@@ -74,3 +74,14 @@ test("手腕編號跟隨手臂走路動畫與床上人物的躺姿",()=>{
  assert.ok(Math.abs(lying.getWorldPosition(new T.Vector3()).y)<.2,"識別帶隨躺姿旋轉，不浮在原站姿高度");
 });
 
+test("醒來動畫由蜷縮姿勢展開到正常站姿",()=>{
+ const T=require("../game/vendor/three.min.js");
+ const player=Avatar.create(T);
+ player.update(0,0,0,.016,0);
+ assert.ok(player.root.scale.y<1,"開場一開始人物應呈現蜷縮姿勢");
+ const beginning=player.root.scale.y;
+ player.update(0,0,0,.016,1);
+ assert.equal(player.root.scale.y,1,"醒來動畫結束時人物恢復站姿");
+ assert.ok(beginning<player.root.scale.y);
+});
+
