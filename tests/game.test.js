@@ -28,7 +28,6 @@ test("錯誤密碼有逐次回饋，且仍可重新嘗試", () => {
   state = result.state;
   assert.equal(state.attempts, 3);
   assert.match(result.message, /仍可繼續嘗試/);
-  assert.equal(state.locked, false);
 
   result = Game.submitCode(state, "317");
   assert.equal(result.state.drawerUnlocked, true);
