@@ -70,6 +70,26 @@
     const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:textureText(text),side:T.DoubleSide}));
     m.position.set(x,y,z);m.rotation.y=rotation;scene.add(m);return m;
   }
+  function clockDialTexture(){
+    const size=1024,center=size/2,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+    const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#e9e5d7";ctx.fillRect(0,0,size,size);
+    ctx.strokeStyle="#b5b1a6";ctx.lineWidth=8;ctx.beginPath();ctx.arc(center,center,492,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<C.minuteTickCount;i++){
+      const angle=i*Math.PI*2/C.minuteTickCount-Math.PI/2;
+      const major=i%5===0,inner=major?420:458,outer=482;
+      ctx.strokeStyle="#171815";ctx.lineWidth=major?8:3;ctx.lineCap="square";
+      ctx.beginPath();ctx.moveTo(center+Math.cos(angle)*inner,center+Math.sin(angle)*inner);
+      ctx.lineTo(center+Math.cos(angle)*outer,center+Math.sin(angle)*outer);ctx.stroke();
+    }
+    ctx.fillStyle="#171815";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.font="bold 100px Georgia, serif";
+    C.numerals.forEach((label,index)=>{
+      const angle=index*Math.PI/6-Math.PI/2,radius=330;
+      ctx.fillText(label,center+Math.cos(angle)*radius,center+Math.sin(angle)*radius);
+    });
+    const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;return texture;
+  }
   const targets=[];
   function target(mesh,name,action,location){
     const data={id:String(targets.length),mesh,name,action,location:location||{x:mesh.position.x,z:mesh.position.z}};
@@ -147,23 +167,25 @@
   target(calendar,"牆上日曆",()=>inspect("calendar"),{x:-4.8,z:-2.2});
   const graffiti=sign(4.89,1.8,-1,2.2,.75,"月亮 → 時鐘 → 太陽",-Math.PI/2);
   target(graffiti,"牆面塗鴉",()=>inspect("graffiti"),{x:4.8,z:-1});
-  const clock=cylinder(0,2.65,-5.83,.42,.42,.10,0x34443c);clock.rotation.x=Math.PI/2;
+  const clock=cylinder(0,2.65,-5.83,.55,.55,.12,0x252b28);clock.rotation.x=Math.PI/2;
   const clockFace=new T.Group();clockFace.position.set(0,2.65,-5.75);scene.add(clockFace);
-  const face=new T.Mesh(new T.CircleGeometry(C.faceRadius,48),new T.MeshBasicMaterial({color:0xe4ddc8,side:T.DoubleSide}));
+  const face=new T.Mesh(new T.CircleGeometry(C.faceRadius,64),new T.MeshBasicMaterial({map:clockDialTexture(),side:T.DoubleSide}));
   face.position.z=.008;clockFace.add(face);
-  const bezel=new T.Mesh(new T.TorusGeometry(C.bezelRadius,.022,10,48),new T.MeshBasicMaterial({color:0x27352f}));
+  const bezel=new T.Mesh(new T.TorusGeometry(C.bezelRadius,.028,12,64),new T.MeshBasicMaterial({color:0x151816}));
   bezel.position.z=.025;clockFace.add(bezel);
-  for(let i=0;i<12;i++){
-    const angle=i*Math.PI/6;
-    const tick=box(Math.sin(angle)*.295,Math.cos(angle)*.295,.04,i%3===0?.038:.024,i%3===0?.09:.055,.012,0x283630,clockFace);
-    tick.rotation.z=-angle;
-  }
   const hands=C.angles(3,17);
-  const hourHand=box(0,C.hourLength/2,.055,C.hourWidth,C.hourLength,.02,0x24322d,clockFace);
+  function clockHand(length,width,color,z){
+    const shape=new T.Shape();
+    shape.moveTo(-width/2,0);shape.lineTo(-width*.34,length*.68);shape.lineTo(0,length);
+    shape.lineTo(width*.34,length*.68);shape.lineTo(width/2,0);shape.closePath();
+    const hand=new T.Mesh(new T.ShapeGeometry(shape),new T.MeshBasicMaterial({color,side:T.DoubleSide}));
+    hand.position.z=z;clockFace.add(hand);return hand;
+  }
+  const hourHand=clockHand(C.hourLength,C.hourWidth,0x171815,.045);
   hourHand.rotation.z=-hands.hour;
-  const minuteHand=box(0,C.minuteLength/2,.07,C.minuteWidth,C.minuteLength,.016,C.minuteColor,clockFace);
+  const minuteHand=clockHand(C.minuteLength,C.minuteWidth,C.minuteColor,.06);
   minuteHand.rotation.z=-hands.minute;
-  sphere(0,0,.09,.032,0x24322d,clockFace);
+  sphere(0,0,.085,.035,0x171815,clockFace);
   target(clock,"停止的時鐘",()=>inspect("clock"),{x:0,z:-5.8});
   // 垃圾桶與可拾取的碎片。
   cylinder(3.5,.4,2.8,.34,.28,.8,0x667b73);

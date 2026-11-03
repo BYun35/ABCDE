@@ -5,13 +5,15 @@
   if(root)root.WardClock=api;
 })(typeof globalThis==="object"?globalThis:this,function(){
   const design={
-    faceRadius:.35,
-    bezelRadius:.385,
-    hourLength:.21,
-    minuteLength:.33,
-    hourWidth:.055,
-    minuteWidth:.028,
-    minuteColor:0x9a473d
+    numerals:["12","1","2","3","4","5","6","7","8","9","10","11"],
+    minuteTickCount:60,
+    faceRadius:.50,
+    bezelRadius:.525,
+    hourLength:.275,
+    minuteLength:.425,
+    hourWidth:.064,
+    minuteWidth:.032,
+    minuteColor:0x211f1b
   };
   function angles(hour,minute){
     const minuteValue=((minute%60)+60)%60;
