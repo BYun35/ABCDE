@@ -20,11 +20,12 @@ function setup() {
     return nodes.get(id);
   }
   const inspect = el("inspect-fragments", { inspect: "fragments" });
+  const inspections = [inspect, ...["calendar", "graffiti", "clock"].map(key => el("inspect-" + key, { inspect: key }))];
   const parts = ["bed", "cabinet", "bin"].map(id => el("fragment-" + id, { fragment: id }));
   const document = {
     getElementById: el,
     createElement: () => ({ textContent: "" }),
-    querySelectorAll: selector => selector === "[data-inspect]" ? [inspect] : parts
+    querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),
     { window: { EscapeRoomGame: Game }, document, Set });
@@ -72,4 +73,28 @@ test("排序與線索在操作區顯示回饋，道具仍可依序通關", () =>
   click("take-tool"); click("open-bottle"); click("open-door");
   assert.equal(el("ending").hidden, false);
   assert.match(el("door-feedback").textContent, /第一關結束/);
+});
+
+test("日曆與病歷保留規格中的完整時間線索", () => {
+  const { el, click, parts } = setup();
+  click("inspect-calendar");
+  const calendar = el("explore-feedback").textContent;
+  assert.match(calendar, /2 月 1 日：午夜前/);
+  assert.match(calendar, /2 月 3 日：午夜後/);
+  assert.match(calendar, /2 月 7 日：清晨/);
+  parts.forEach(part => part.events.click());
+  click("inspect-fragments");
+  assert.match(el("explore-feedback").textContent, /若順序錯誤，記憶恢復程序將無法啟動/);
+  assert.match(el("explore-feedback").textContent, /請勿相信牆上的時間/);
+});
+
+test("病房畫面的感應器和下方按鈕都能刷卡", () => {
+  const { el, click } = setup();
+  click("scene-reader");
+  assert.equal(el("ending").hidden, true);
+  assert.match(el("door-feedback").textContent, /需要門禁卡/);
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader");
+  assert.equal(el("ending").hidden, false);
 });
