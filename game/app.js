@@ -127,7 +127,10 @@
     state = result.state;
     say(result.message);
     renderState();
-    if (state.ended) ending.focus();
+    if (state.ended) {
+      ending.focus({ preventScroll: true });
+      ending.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 
   renderInventory();
