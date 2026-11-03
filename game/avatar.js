@@ -17,6 +17,41 @@
      y:Math.max(.4,Math.min(3.25,1.15-Math.sin(pitch)*distance)),
      z:Math.max(-5.78,Math.min(5.78,p.z+Math.cos(yaw)*flat))};
  }
+ function createIdBand(T){
+   const band=new T.Group();band.name="patient-id-band";
+   band.userData.patientId="NO.02";
+   const paper=new T.MeshStandardMaterial({color:0xf5df9c,roughness:.75});
+   const ink=new T.MeshBasicMaterial({color:0x10292b});
+   band.add(new T.Mesh(new T.CylinderGeometry(.116,.116,.135,24),paper));
+   // 以幾何筆畫繪字，不依賴外部字型或圖片；正反兩面皆可辨認。
+   const glyphs={
+     N:[[0,0,0,1],[0,1,1,0],[1,0,1,1]],
+     O:[[0,0,0,1],[0,1,1,1],[1,1,1,0],[1,0,0,0]],
+     ".":[[.45,0,.55,0]],
+     "0":[[0,0,0,1],[0,1,1,1],[1,1,1,0],[1,0,0,0]],
+     "2":[[0,1,1,1],[1,1,1,.5],[1,.5,0,.5],[0,.5,0,0],[0,0,1,0]]
+   };
+   for(const facing of [0,Math.PI]){
+     const label=new T.Group();label.name="patient-id-label";
+     label.userData.text="NO.02";label.rotation.y=facing;
+     label.position.z=facing===0?.123:-.123;band.add(label);
+     const backing=new T.Mesh(new T.BoxGeometry(.226,.098,.008),paper);
+     backing.position.z=-.006;label.add(backing);
+     // 背板放在獨立節點，文字節點僅包含五個字元。
+     band.attach(backing);
+     [...label.userData.text].forEach((char,index)=>{
+       const letter=new T.Group();letter.name="id-char-"+index;
+       letter.position.set(-.098+index*.041,-.031,0);label.add(letter);
+       for(const [x1,y1,x2,y2] of glyphs[char]){
+         const dx=(x2-x1)*.032,dy=(y2-y1)*.062;
+         const stroke=new T.Mesh(new T.BoxGeometry(Math.max(.005,Math.hypot(dx,dy)),.005,.003),ink);
+         stroke.position.set((x1+x2)*.016,(y1+y2)*.031,0);
+         stroke.rotation.z=Math.atan2(dy,dx);letter.add(stroke);
+       }
+     });
+   }
+   return band;
+ }
  function create(T){
    const root=new T.Group();root.userData.player=true;
    const body=new T.Group();root.add(body);
@@ -44,10 +79,12 @@
      sphere(leg,0,-.75,-.045,.13,.94,.69,1.55);
    });
    const leftArm=joint(-.34,1.39,0),rightArm=joint(.34,1.39,0);
+   leftArm.name="left-arm";rightArm.name="right-arm";
    [leftArm,rightArm].forEach((arm,i)=>{
      capsule(arm,0,-.30,0,.10,.44,1,1,1);
      arm.rotation.z=i===0?-.13:.13;
    });
+   const idBand=createIdBand(T);idBand.position.y=-.53;leftArm.add(idBand);
    const shadow=new T.Mesh(new T.CircleGeometry(.4,32),new T.MeshBasicMaterial({color:0x071411,transparent:true,opacity:.2,depthWrite:false}));
    shadow.name="ground-shadow";
    shadow.rotation.x=-Math.PI/2;shadow.position.y=.012;root.add(shadow);

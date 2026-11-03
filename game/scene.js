@@ -106,7 +106,6 @@
   const patientModel=A.createPatient(T);
   const patient=patientModel.root;
   patient.position.set(-2,1.05,.95);scene.add(patient);
-  const wrist=sign(-2.35,1.17,.16,.28,.11,"NO.02");wrist.rotation.x=-Math.PI/2;
   target(patient,"床上病人",()=>inspect("patient"),{x:-2,z:0});
   const mattress=scene.children.find(m=>m.isMesh&&m.position.x===-2&&m.position.y===.79);
   target(mattress,"床墊下的警告",()=>inspect("warning"),{x:-2,z:1.3});
