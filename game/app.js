@@ -56,7 +56,10 @@
   document.querySelectorAll("[data-inspect]").forEach((button) => {
     button.addEventListener("click", () => {
       const key = button.dataset.inspect;
-      say(clues[key] || "這裡暫時沒有其他線索。");
+      const message = key === "fragments" && fragments.size < 3
+        ? "病歷尚未完整（" + fragments.size + "/3）。請找齊床墊下、床頭櫃後方和垃圾桶旁的碎片。"
+        : clues[key] || "這裡暫時沒有其他線索。";
+      say(message, "explore-feedback");
     });
   });
 
@@ -68,9 +71,12 @@
         return;
       }
       fragments.add(id);
+      inventory.delete("病歷碎片 " + (fragments.size - 1) + "/3");
       inventory.add("病歷碎片 " + fragments.size + "/3");
       renderInventory();
-      say("你收起一片病歷碎片。");
+      say(fragments.size === 3
+        ? "病歷碎片已收齊（3/3），請按「查看病歷內容」閱讀拼合後的線索。"
+        : "你收起一片病歷碎片（" + fragments.size + "/3）。", "fragment-feedback");
       button.textContent = "已收集";
       button.disabled = true;
     });
@@ -87,12 +93,12 @@
     if (!code) {
       codeDiscovered = false;
       derivedCodeEl.textContent = "尚未解出";
-      say("順序不對。回想午夜前、午夜後和清晨的先後。");
+      say("順序不對。回想午夜前、午夜後和清晨的先後。", "order-feedback");
       return;
     }
     codeDiscovered = true;
     derivedCodeEl.textContent = code;
-    say("時間順序正確。密碼是 " + code + "。");
+    say("時間順序正確。密碼是 " + code + "。請在下方的床頭櫃密碼鎖輸入。", "order-feedback");
   });
 
   document.getElementById("pin-form").addEventListener("submit", (event) => {
