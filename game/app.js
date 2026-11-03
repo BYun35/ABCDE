@@ -5,7 +5,6 @@
   if (!Game) return;
 
   let state = Game.createInitialState();
-  let codeDiscovered = false;
   const fragments = new Set();
   const inventory = new Set();
 
@@ -18,12 +17,12 @@
   const clues = {
     warning: "床墊下有一張泛黃紙條：「如果你已經醒來，千萬不要相信那個和你長得一模一樣的人。你只有一次機會離開這裡。」",
     patient: "床上躺著一名與你長相完全相同的男性。他的手腕上標示著 NO. 02。",
-    bottles: "藥瓶 A：S-17，午夜前服用，數字 3；瓶底寫著「第一個記憶，從夜晚開始。」藥瓶 B：M-02，午夜後服用，數字 1；瓶身寫著「越過零點之後，第一件事就是確認時間。」藥瓶 C：X-00，清晨服用，數字 7；瓶底刻著「最後一次，不代表結束。」",
-    calendar: "二月日曆圈出 1 日、3 日、7 日；背面寫著：「不要按照日期排列，要按照一天之中的時間排列。」",
-    graffiti: "牆面畫著月亮、時鐘和太陽，分別寫著「結束前」、「越過零點」和「新的開始」。",
-    clock: "時鐘停在凌晨 3:17。它看起來像時間，也可能是某種答案。",
+    bottles: "藥瓶 A：鎮靜劑 S-17，口服，請於午夜前服用。標籤數字：3。瓶底：「第一個記憶，從夜晚開始。」\n\n藥瓶 B：記憶抑制劑 M-02，口服，請於午夜後服用。標籤數字：1。瓶身背面：「越過零點之後，第一件事就是確認時間。」\n\n藥瓶 C：實驗用藥 X-00，口服，請於清晨服用。標籤數字：7。瓶底：「最後一次，不代表結束。」",
+    calendar: "二月日曆有三個紅圈：\n2 月 1 日：午夜前，第一次服藥。\n2 月 3 日：午夜後，第二次服藥。\n2 月 7 日：清晨，最後一次服藥。\n\n背面寫著：「不要按照日期排列，要按照一天之中的時間排列。」",
+    graffiti: "牆面有三個手繪符號：\n月亮：「結束前」。\n時鐘：「越過零點」。\n太陽：「新的開始」。\n\n三個符號下方各有一個被塗黑的數字位置。",
+    clock: "時鐘停在凌晨 3:17，已停止運作。",
     door: "病房門裝有電子鎖，目前無法打開。門口的感應器需要護理站門禁卡。",
-    fragments: "病歷碎片說明：NO. 02 病人依午夜前、午夜後、清晨的順序接受三次藥物測試。真正的答案藏在時間的先後之中。"
+    fragments: "拼合後的病歷：「NO. 02 病人於實驗前接受三次藥物測試。藥物依序為：午夜前、午夜後、清晨。若順序錯誤，記憶恢復程序將無法啟動。」\n\n紅筆圈起的文字：「請勿相信牆上的時間，真正的答案藏在時間的先後之中。」"
   };
 
   function say(message, targetId) {
@@ -91,12 +90,10 @@
     ];
     const code = Game.deriveCode(order);
     if (!code) {
-      codeDiscovered = false;
       derivedCodeEl.textContent = "尚未解出";
       say("順序不對。回想午夜前、午夜後和清晨的先後。", "order-feedback");
       return;
     }
-    codeDiscovered = true;
     derivedCodeEl.textContent = code;
     say("時間順序正確。密碼是 " + code + "。請在下方的床頭櫃密碼鎖輸入。", "order-feedback");
   });
@@ -129,7 +126,7 @@
     renderState();
   });
 
-  document.getElementById("open-door").addEventListener("click", () => {
+  function useKeycard() {
     const result = Game.openDoor(state);
     state = result.state;
     say(result.message, "door-feedback");
@@ -138,7 +135,10 @@
       ending.focus({ preventScroll: true });
       ending.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  });
+  }
+
+  document.getElementById("open-door").addEventListener("click", useKeycard);
+  document.getElementById("scene-reader").addEventListener("click", useKeycard);
 
   renderInventory();
   renderState();
