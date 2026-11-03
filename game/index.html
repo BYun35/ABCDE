@@ -4,48 +4,58 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
-<title>時空密室｜第一關：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=2">
+<title>時空密室｜3D 病房：消失的病歷</title>
+<link rel="stylesheet" href="style.css?v=3d1">
 <script src="game.js?v=1" defer></script>
-<script src="app.js?v=4" defer></script>
+<script src="vendor/three.min.js" defer></script>
+<script src="navigation.js" defer></script>
+<script src="scene.js" defer></script>
+<script src="app.js?v=3d1" defer></script>
 </head>
 <body>
 <header>
   <div><div class="brand">時空密室・第一關</div><h1>消失的病歷</h1></div>
-  <div class="header-note">靜態網頁｜直接以瀏覽器開啟</div>
+  <div class="header-note">第一人稱探索 · 病房</div>
 </header>
 <main>
   <section class="intro">
     <div><div class="eyebrow">病房・凌晨 3:17</div><h2>你在陌生的病房醒來</h2></div>
-    <p>探索線索，解開抽屜取得工具，找出門禁卡離開病房。</p>
+    <p>在病房裡走動，找出線索，揭開自己的身分。</p>
   </section>
 
   <div class="layout">
-    <section class="room" aria-label="陰暗的醫院病房">
-      <div class="room-label">無窗病房</div>
-      <div class="light" aria-hidden="true"></div>
-      <div class="crack" aria-hidden="true"></div>
-      <div class="clock" aria-label="時鐘停在凌晨三點十七分">3:17<small>停止</small></div>
-      <div class="graffiti" aria-hidden="true">☾　◷　☼</div>
-      <div class="bottles" aria-hidden="true"><span class="bottle"></span><span class="bottle"></span><span class="bottle"></span></div>
-      <div class="bed" aria-hidden="true">
-        <div class="pillow"></div>
-        <div class="patient">
-          <span class="patient-head"></span><span class="patient-body"></span>
-          <span class="patient-arm"></span><span class="patient-leg"></span><span class="patient-leg two"></span>
-          <span class="wrist">NO. 02</span>
+    <section class="scene-column" aria-label="3D 病房探索">
+      <div class="scene-shell">
+        <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病房入口</output></div>
+        <div id="ward-viewport">
+          <div class="crosshair" aria-hidden="true">+</div>
+          <div id="walk-instructions" class="walk-instructions">
+            <span class="eyebrow">消失的病歷</span>
+            <h2>這裡，有另一個你。</h2>
+            <p>WASD／方向鍵走動<br>按住滑鼠拖曳轉向，或鎖定滑鼠<br>靠近物件後點擊，或對準後按 E</p>
+            <button id="enter-room" class="primary" type="button">進入病房</button>
+          </div>
+          <div id="target-prompt" class="target-prompt">正在準備病房…</div>
         </div>
+        <div class="scene-toolbar">
+          <button id="lock-mouse" class="secondary" type="button">鎖定滑鼠</button>
+          <button id="interact-target" class="primary" type="button">與準星物件互動</button>
+          <span>Esc 釋放滑鼠 · 操作線索時可離開場景</span>
+        </div>
+        <div class="walk-buttons" aria-label="觸控移動與轉向">
+          <button data-walk="turn-left" type="button" aria-label="向左轉">↶ 左轉</button>
+          <button data-walk="forward" type="button" aria-label="向前走">↑ 前進</button>
+          <button data-walk="turn-right" type="button" aria-label="向右轉">右轉 ↷</button>
+          <button data-walk="left" type="button" aria-label="向左走">← 左移</button>
+          <button data-walk="back" type="button" aria-label="向後走">↓ 後退</button>
+          <button data-walk="right" type="button" aria-label="向右走">右移 →</button>
+        </div>
+        <p id="scene-feedback" role="status" aria-live="polite">正在載入立體病房。</p>
       </div>
-      <div class="cabinet" aria-hidden="true"></div><div class="bin" aria-hidden="true"></div>
-      <div class="door" aria-hidden="true"></div><button class="reader" id="scene-reader" type="button" aria-label="在病房感應器使用門禁卡">刷卡</button>
-      <button class="hotspot hs-bed" data-inspect="warning">床墊下</button>
-      <button class="hotspot hs-bottles" data-inspect="bottles">藥瓶</button>
-      <button class="hotspot hs-clock" data-inspect="clock">時鐘</button>
-      <button class="hotspot hs-cabinet" data-inspect="calendar">床頭櫃</button>
-      <button class="hotspot hs-door" data-inspect="door">病房門</button>
     </section>
 
-    <aside class="side">
+    <aside class="side" aria-label="線索筆記與道具操作">
+      <div class="notebook-title"><span class="eyebrow">探索筆記</span><h2>線索與背包</h2><p>點場景物件查看線索，也可在這裡閱讀與操作。</p></div>
       <section class="card">
         <h3>目前線索</h3>
         <p id="feedback" role="status" aria-live="polite">找找床墊、藥瓶、日曆和牆上的塗鴉。</p>
@@ -112,7 +122,7 @@
       <section class="card">
         <h3>病房門感應器</h3>
         <p>門需要護理站門禁卡才能打開。</p>
-        <div class="row"><button class="secondary" id="open-door">使用門禁卡</button></div>
+        <div class="row"><button class="secondary" id="open-door">使用門禁卡</button><button id="scene-reader" class="secondary" type="button" aria-label="在病房感應器使用門禁卡">刷卡</button></div>
         <p id="door-feedback" role="status" aria-live="polite"></p>
       </section>
 
@@ -130,6 +140,6 @@
     </aside>
   </div>
 </main>
-<footer>所有線索與機關依 BRIEF.md 第一關內容；目前不含存檔或未指定的關卡。</footer>
+<footer>第一關・消失的病歷　｜　WASD 移動 · 滑鼠拖曳轉向 · E 互動　｜　進度僅保留於本次開啟期間。</footer>
 </body>
 </html>

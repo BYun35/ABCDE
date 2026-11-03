@@ -27,6 +27,8 @@
 
   function say(message, targetId) {
     feedback.textContent = message;
+    const sceneFeedback = document.getElementById("scene-feedback");
+    if (sceneFeedback) sceneFeedback.textContent = message;
     if (targetId) document.getElementById(targetId).textContent = message;
   }
 
@@ -50,6 +52,7 @@
   function renderState() {
     drawerActions.hidden = !state.drawerUnlocked || state.tool;
     ending.hidden = !state.ended;
+    if (window.Ward3D) window.Ward3D.sync(state, [...fragments]);
   }
 
   document.querySelectorAll("[data-inspect]").forEach((button) => {
@@ -78,6 +81,7 @@
         : "你收起一片病歷碎片（" + fragments.size + "/3）。", "fragment-feedback");
       button.textContent = "已收集";
       button.disabled = true;
+      renderState();
     });
   });
 
