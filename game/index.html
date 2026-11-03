@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111318">
+<title>時空密室｜第一關：消失的病歷</title>
+<link rel="stylesheet" href="style.css">
+<script src="game.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header>
+  <div><div class="brand">時空密室・第一關</div><h1>消失的病歷</h1></div>
+  <div class="header-note">靜態網頁｜直接以瀏覽器開啟</div>
+</header>
+<main>
+  <section class="intro">
+    <div><div class="eyebrow">病房・凌晨 3:17</div><h2>你在陌生的病房醒來</h2></div>
+    <p>探索線索，找出病人編號，再離開病房。</p>
+  </section>
+
+  <div class="layout">
+    <section class="room" aria-label="陰暗的醫院病房">
+      <div class="light" aria-hidden="true"></div>
+      <div class="crack" aria-hidden="true"></div>
+      <div class="clock" aria-label="時鐘停在凌晨三點十七分">3:17<small>停止</small></div>
+      <div class="graffiti" aria-hidden="true">☾　◷　☼</div>
+      <div class="bottles" aria-hidden="true"><span class="bottle"></span><span class="bottle"></span><span class="bottle"></span></div>
+      <div class="bed" aria-hidden="true">
+        <div class="pillow"></div>
+        <div class="patient">
+          <span class="patient-head"></span><span class="patient-body"></span>
+          <span class="patient-arm"></span><span class="patient-leg"></span><span class="patient-leg two"></span>
+          <span class="wrist">NO. 02</span>
+        </div>
+      </div>
+      <div class="cabinet" aria-hidden="true"></div><div class="bin" aria-hidden="true"></div>
+      <div class="door" aria-hidden="true"></div><div class="reader" aria-hidden="true">刷卡</div>
+      <button class="hotspot hs-bed" data-inspect="warning">床墊下</button>
+      <button class="hotspot hs-bottles" data-inspect="bottles">藥瓶</button>
+      <button class="hotspot hs-clock" data-inspect="clock">時鐘</button>
+      <button class="hotspot hs-cabinet" data-inspect="calendar">床頭櫃</button>
+      <button class="hotspot hs-door" data-inspect="patient">病房門</button>
+    </section>
+
+    <aside class="side">
+      <section class="card">
+        <h3>目前線索</h3>
+        <p id="feedback" role="status" aria-live="polite">找找床墊、藥瓶、日曆和牆上的塗鴉。</p>
+      </section>
+
+      <section class="card">
+        <h3>病房探索</h3>
+        <div class="actions">
+          <button class="action" data-inspect="warning">查看警告紙條</button>
+          <button class="action" data-inspect="bottles">查看藥瓶標籤</button>
+          <button class="action" data-inspect="calendar">查看日曆</button>
+          <button class="action" data-inspect="graffiti">查看牆面塗鴉</button>
+          <button class="action" data-inspect="fragments">查看病歷內容</button>
+          <button class="action" data-inspect="patient">查看床上病人</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>病歷碎片</h3>
+        <p>床墊下、床頭櫃後方和垃圾桶旁各有一片。</p>
+        <div class="fragment-list">
+          <div class="fragment"><span>床墊下</span><button data-fragment="bed">拾取</button></div>
+          <div class="fragment"><span>床頭櫃後方</span><button data-fragment="cabinet">拾取</button></div>
+          <div class="fragment"><span>垃圾桶旁</span><button data-fragment="bin">拾取</button></div>
+        </div>
+        <div class="inventory" id="inventory" aria-label="背包"></div>
+      </section>
+
+      <section class="card">
+        <h3>排列服藥時間</h3>
+        <p>依「午夜前 → 午夜後 → 清晨」排列藥瓶。</p>
+        <form class="row" id="order-form">
+          <select id="order-1" aria-label="第一瓶"><option value="">第一瓶</option><option>A</option><option>B</option><option>C</option></select>
+          <select id="order-2" aria-label="第二瓶"><option value="">第二瓶</option><option>A</option><option>B</option><option>C</option></select>
+          <select id="order-3" aria-label="第三瓶"><option value="">第三瓶</option><option>A</option><option>B</option><option>C</option></select>
+          <button class="primary" type="submit">確認順序</button>
+        </form>
+        <p class="row">推導出的密碼：<strong id="derived-code">尚未解出</strong></p>
+      </section>
+
+      <section class="card">
+        <h3>床頭櫃密碼鎖</h3>
+        <form class="row" id="pin-form">
+          <label for="pin">輸入三位數密碼</label>
+          <input id="pin" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
+          <button class="primary" type="submit">解鎖抽屜</button>
+        </form>
+        <div id="drawer-actions" class="row" hidden>
+          <button class="secondary" id="take-tool">打開抽屜並取出工具</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>藥瓶 C 瓶底</h3>
+        <p>取得抽屜裡的工具後，可以拆開瓶底。</p>
+        <div class="row"><button class="secondary" id="open-bottle">用工具拆開瓶底</button></div>
+      </section>
+
+      <section class="card">
+        <h3>病房門感應器</h3>
+        <p>門需要護理站門禁卡才能打開。</p>
+        <div class="row"><button class="secondary" id="open-door">使用門禁卡</button></div>
+      </section>
+
+      <section class="card ending" id="ending" tabindex="-1" hidden>
+        <h3>第一關完成</h3>
+        <p>隔壁病房的病床上躺著另一名相同外貌的男人，手腕標示著：</p>
+        <blockquote>NO. 01</blockquote>
+        <p>你低頭看見自己的手腕標示著 NO. 02。走廊廣播響起：</p>
+        <blockquote>「實驗樣本 NO. 02 已離開病房。請護理站立即確認原始個體狀態。」</blockquote>
+        <p>第二關：護理站——被篡改的記錄。</p>
+      </section>
+    </aside>
+  </div>
+</main>
+<footer>所有線索與機關依 BRIEF.md 第一關內容；目前不含存檔或未指定的關卡。</footer>
+</body>
+</html>
