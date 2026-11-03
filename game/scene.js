@@ -4,11 +4,11 @@
   const notice=document.getElementById("scene-feedback");
   if(!host)return;
   function tell(message){notice.textContent=message;}
-  if(!window.THREE||!window.WardNavigation||!window.WardAvatar){
+  if(!window.THREE||!window.WardNavigation||!window.WardAvatar||!window.WardInteraction){
     tell("3D 場景未能載入。請重新整理；你仍可使用右側的線索與操作完成第一關。");
     host.dataset.ready="error";return;
   }
-  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar;
+  const T=window.THREE,N=window.WardNavigation,A=window.WardAvatar,I=window.WardInteraction;
   const player={x:N.START.x,z:N.START.z};
   let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
@@ -71,7 +71,7 @@
   }
   const targets=[];
   function target(mesh,name,action,location){
-    const data={mesh,name,action,location:location||{x:mesh.position.x,z:mesh.position.z}};
+    const data={id:String(targets.length),mesh,name,action,location:location||{x:mesh.position.x,z:mesh.position.z}};
     mesh.userData.target=data;targets.push(data);return data;
   }
   function inspect(key){document.querySelector('[data-inspect="'+key+'"]')?.click();}
@@ -114,7 +114,10 @@
   const cabinet=box(-3.6,.55,-3.4,1.4,1.1,1,0x887e64);
   box(-3.6,.62,-2.886,1.24,.025,.025,0x473e30);
   box(-3.6,.38,-2.85,.25,.055,.06,0xc0ac71);
-  target(cabinet,"床頭櫃密碼鎖",()=>{
+  const cabinetTarget=target(cabinet,"床頭櫃密碼鎖",()=>{
+    const action=I.action("cabinet",state);
+    if(action==="take-tool"){click("take-tool");return;}
+    if(action==="read-note"){tell("抽屜已打開。紙條：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」");return;}
     const pin=document.getElementById("pin");pin.focus();pin.scrollIntoView({block:"center",behavior:"smooth"});
     tell("請在密碼鎖輸入三位數密碼。");
   },{x:-3.6,z:-3.4});
@@ -124,7 +127,10 @@
     cylinder(0,.2,0,.12,.12,.4,color,g);cylinder(0,.45,0,.09,.09,.1,0xd5d0b9,g);
     const label=new T.Mesh(new T.PlaneGeometry(.19,.16),new T.MeshBasicMaterial({map:textureText(["A","B","C"][i])}));
     label.position.set(0,.22,.124);g.add(label);
-    target(g,"藥瓶 "+["A","B","C"][i],()=>inspect("bottles"),{x:g.position.x,z:g.position.z});bottles.push(g);
+    target(g,"藥瓶 "+["A","B","C"][i],()=>{
+      if(i===2&&I.action("bottle-C",state)==="open-bottle")click("open-bottle");
+      else inspect("bottles");
+    },{x:g.position.x,z:g.position.z});bottles.push(g);
   });
   sign(-3.6,1.85,-5.88,1.9,.5,"藥物測試記錄");
   const calendar=sign(-4.89,1.9,-2.2,1.1,1.2,"2 月\n① ③ ⑦",Math.PI/2);
@@ -143,7 +149,7 @@
     const p=new T.Group();p.position.set(x,.04,z);p.rotation.y=.3;scene.add(p);
     box(0,0,0,.34,.025,.46,0xefe0b7,p);
     for(let i=0;i<3;i++)box(0,.016,-.1+i*.08,.22,.004,.012,0x786e50,p);
-    const data=target(p,"病歷碎片",()=>{
+    const data=target(p,"拾取"+({bed:"床墊下",cabinet:"床頭櫃後方",bin:"垃圾桶旁"}[id])+"的病歷碎片",()=>{
       document.querySelector('[data-fragment="'+id+'"]')?.click();
     },{x,z});data.fragment=id;paperTargets.push(data);
   });
@@ -161,12 +167,14 @@
   const drawer=box(-3.6,.33,-2.83,.8,.3,.06,0x776b4f);drawer.visible=false;
   target(drawer,"抽屜：取出工具與紙條",()=>click("take-tool"),{x:-3.6,z:-3.4});
   const bottleBase=box(-3.15,1.17,-3.15,.24,.06,.24,0xc8af78);
-  target(bottleBase,"藥瓶 C 瓶底：使用工具",()=>click("open-bottle"),{x:-3.15,z:-3.15});
+  bottleBase.userData.target=bottles[2].userData.target;
   let state={ended:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
     state=next;fragmentIds=ids;
     paperTargets.forEach(t=>{t.mesh.visible=!fragmentIds.includes(t.fragment);});
     drawer.visible=next.drawerUnlocked&&!next.tool;
+    cabinetTarget.name=next.drawerUnlocked?(next.tool?"抽屜：重讀紙條":"抽屜：取出工具與紙條"):"床頭櫃密碼鎖";
+    bottles[2].userData.target.name=next.tool&&!next.keycard?"藥瓶 C：用工具拆開瓶底":next.keycard?"藥瓶 C：查看標籤（門禁卡已取出）":"藥瓶 C：查看標籤";
     if(next.keycard)readerLight.material=mat(0x8edbb7);
     if(next.ended){door.rotation.y=-1.25;door.position.x=3.6;keys.clear();document.exitPointerLock?.();}
   }};
@@ -201,11 +209,39 @@
     }
     return null;
   }
+  const nearbyEl=document.getElementById("nearby-actions");
+  const sightRay=new T.Raycaster(),eye=new T.Vector3(),anchorPoint=new T.Vector3(),bounds=new T.Box3();
+  let nearbyTargets=[],nearbyKey="",nextNearbyCheck=0;
+  function owner(object){let obj=object;while(obj){if(obj.userData.target)return obj.userData.target;obj=obj.parent;}return null;}
+  function shown(object){let obj=object;while(obj){if(!obj.visible||obj.userData.player)return false;obj=obj.parent;}return true;}
+  function hasSight(t){
+    if(!shown(t.mesh))return false;
+    bounds.setFromObject(t.mesh);bounds.getCenter(anchorPoint);
+    eye.set(player.x,1.4,player.z);
+    const vector=anchorPoint.clone().sub(eye),length=vector.length();
+    if(length<.05)return true;
+    sightRay.set(eye,vector.normalize());sightRay.far=length+.05;
+    const hit=sightRay.intersectObjects(scene.children,true).find(h=>shown(h.object));
+    return !hit||owner(hit.object)===t;
+  }
+  function updateNearby(now){
+    if(now<nextNearbyCheck)return;nextNearbyCheck=now+160;
+    scene.updateMatrixWorld(true);
+    nearbyTargets=state.ended?[]:I.nearby(player,targets.map(t=>Object.assign(t,{visible:t.mesh.visible})),hasSight);
+    const key=nearbyTargets.map(t=>t.id+":"+t.name).join("|");
+    if(key===nearbyKey)return;nearbyKey=key;
+    nearbyEl.replaceChildren();
+    if(!nearbyTargets.length){const note=document.createElement("span");note.textContent=state.ended?"第一關完成。":"靠近物件後，這裡會列出可操作的項目。";nearbyEl.append(note);return;}
+    for(const t of nearbyTargets){const b=document.createElement("button");b.type="button";b.className="secondary";b.textContent=t.name;b.addEventListener("click",()=>activate(t));nearbyEl.append(b);}
+  }
   function activate(t){
     if(state.ended)return;
     if(!t){tell("請對準藥瓶、日曆、紙條、抽屜或感應器，再點擊或按 E。");return;}
     if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
+    if(!hasSight(t)){tell("物件被遮住了，請換個位置靠近。");return;}
     t.action();
+    if(!state.ended&&document.activeElement?.id!=="pin")canvas.focus({preventScroll:true});
+    nextNearbyCheck=0;
   }
   function advance(f,r,d){
     const p=N.move(player,yaw,f,r,d);
@@ -223,7 +259,7 @@
     if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","e"].includes(key)){
       e.preventDefault();
       if(state.ended)return;
-      if(key==="e"){if(!e.repeat)activate(targetAt(new T.Vector2(0,0)));return;}
+      if(key==="e"){if(!e.repeat)activate(aimed);return;}
       if(!keys.has(key)){
         keys.add(key);const d=keyDirection();advance(d.f,d.r,.14);
       }
@@ -282,6 +318,10 @@
     });
   });
   document.getElementById("interact-target").addEventListener("click",()=>activate(aimed));
+  document.getElementById("return-to-room").addEventListener("click",()=>{
+    document.querySelector(".scene-column").scrollIntoView({block:"start",behavior:"smooth"});
+    canvas.focus({preventScroll:true});
+  });
   function resize(){
     const w=host.clientWidth,h=host.clientHeight;
     if(!w||!h)return;
@@ -301,7 +341,10 @@
     canvas.dataset.travel=travel.toFixed(3);
     canvas.dataset.cameraX=camera.position.x.toFixed(3);
     canvas.dataset.cameraZ=camera.position.z.toFixed(3);
-    aimed=targetAt(new T.Vector2(0,0));
+    updateNearby(now);
+    const centered=targetAt(new T.Vector2(0,0));
+    aimed=centered&&nearbyTargets.includes(centered)?centered:nearbyTargets[0]||centered;
+    document.getElementById("interact-target").disabled=state.ended;
     const reach=aimed&&N.withinReach(player,aimed.location);
     prompt.textContent=state.ended?"第一關完成":aimed?(reach?"E／點擊：":"靠近查看：")+aimed.name:"移動探索病房，對準物件查看";
     const angle=((yaw*180/Math.PI)%360+360)%360;

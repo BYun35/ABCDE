@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=3d1">
+<link rel="stylesheet" href="style.css?v=qa2">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js" defer></script>
 <script src="avatar.js" defer></script>
-<script src="scene.js?v=avatar1" defer></script>
+<script src="interaction.js" defer></script>
+<script src="scene.js?v=qa2" defer></script>
 <script src="app.js?v=3d1" defer></script>
 </head>
 <body>
@@ -43,6 +44,7 @@
           <button id="interact-target" class="primary" type="button">與準星物件互動</button>
           <span>Esc 釋放滑鼠 · 操作線索時可離開場景</span>
         </div>
+        <div class="nearby-panel"><h3>附近可互動物件</h3><div id="nearby-actions" role="group" aria-label="附近可互動物件"><span>靠近物件後，這裡會列出可操作的項目。</span></div></div>
         <div class="walk-buttons" aria-label="觸控移動與轉向">
           <button data-walk="turn-left" type="button" aria-label="向左轉">↶ 左轉</button>
           <button data-walk="forward" type="button" aria-label="向前走">↑ 前進</button>
@@ -107,6 +109,7 @@
           <input id="pin" inputmode="numeric" autocomplete="off" required maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
+        <button id="return-to-room" class="secondary" type="button">返回病房繼續探索</button>
         <p id="drawer-feedback" role="status" aria-live="polite"></p>
         <div id="drawer-actions" class="row" hidden>
           <button class="secondary" id="take-tool">打開抽屜並取出工具</button>

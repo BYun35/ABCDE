@@ -76,3 +76,9 @@ main{width:min(1600px,96vw)}
 .card p{overflow-wrap:anywhere}
 @media(max-width:1000px){.layout{grid-template-columns:1fr}.scene-column{position:relative;top:auto}.side{max-height:none;overflow:visible;padding:0}#ward-viewport{height:55vh;min-height:360px}.scene-toolbar span{width:100%}}
 @media(prefers-reduced-motion:reduce){.light{animation:none}*{scroll-behavior:auto!important}}
+
+.nearby-panel{padding:0 14px 12px}.nearby-panel h3{font-size:.85rem;color:var(--gold);margin:0 0 6px}
+#nearby-actions{display:flex;gap:6px;flex-wrap:wrap;min-height:35px}
+#nearby-actions button{font-size:.8rem;padding:7px 10px}
+#nearby-actions span{font-size:.8rem;color:var(--muted)}
+#return-to-room{margin-top:10px;font-size:.8rem}
