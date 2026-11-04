@@ -350,12 +350,22 @@
       document.querySelector('[data-fragment="'+id+'"]')?.click();
     },{x,z});data.fragment=id;paperTargets.push(data);
   });
-  // 右前方的門與可操作感應器。
-  const door=box(3,1.32,-5.83,1.6,2.64,.15,0x5f6d65);
-  sign(3,2.9,-5.72,1.8,.42,"護理站方向");
-  box(3,1.65,-5.72,.8,.45,.035,0x1d3939);
-  sphere(3.53,1.1,-5.68,.06,0xbba770);
-  target(door,"病房門",()=>inspect("door"),{x:3,z:-5.7});
+  // 病房出口：固定門框、右側鉸鏈與向外旋開的門片。
+  const doorwayZ=-5.83,doorHingeX=3.8;
+  box(2.2,1.32,doorwayZ,.14,2.64,.28,0x59675f);
+  box(3.8,1.32,doorwayZ,.14,2.64,.28,0x59675f);
+  box(3,2.64,doorwayZ,1.74,.14,.28,0x59675f);
+  for(const y of [.22,2.42])cylinder(doorHingeX,y,doorwayZ,.055,.055,.13,0xc2ad79);
+  const doorPivot=new T.Group();doorPivot.position.set(doorHingeX,0,doorwayZ);buildGroup.add(doorPivot);
+  const doorLeaf=box(-.8,1.32,0,1.58,2.56,.13,0x53635b,doorPivot);
+  box(-.8,1.32,.072,1.35,2.28,.018,0x394a44,doorPivot);
+  box(-.8,2.25,.085,1.35,.035,.02,0x718078,doorPivot);
+  box(-.8,.39,.085,1.35,.035,.02,0x718078,doorPivot);
+  box(-1.43,1.48,.12,.16,.28,.1,0x253632,doorPivot);
+  const doorHandle=cylinder(-1.43,1.48,.19,.035,.035,.13,0xc6ab69,doorPivot);doorHandle.rotation.x=Math.PI/2;
+  const door=target(doorLeaf,"病房門",()=>inspect("door"),{x:3,z:-5.7});
+  let doorProgress=0;
+  sign(3,2.92,-5.69,1.8,.36,"護理站方向");
   const readerFrame=box(1.96,1.37,-5.635,.39,.56,.055,0x52645c);
   const reader=box(1.96,1.35,-5.72,.3,.46,.16,0x1e3634);
   const readerLight=box(1.96,1.46,-5.625,.2,.055,.02,0xe7bb68);
@@ -448,7 +458,8 @@
     cabinetTarget.name=next.drawerUnlocked?(next.tool?"抽屜：重讀紙條":"抽屜：取出工具與紙條"):"床頭櫃密碼鎖";
     bottles[2].userData.target.name=next.tool&&!next.keycard?"藥瓶 C：用工具拆開瓶底":next.keycard?"藥瓶 C：查看標籤（門禁卡已取出）":"藥瓶 C：查看標籤";
     if(next.keycard)readerLight.material=mat(0x8edbb7);
-    if(next.ended){door.rotation.y=-Math.PI/2;door.position.x=4.0;keys.clear();document.exitPointerLock?.();}
+    if(!next.doorOpen){doorProgress=0;doorPivot.rotation.y=0;}
+    if(next.ended){keys.clear();document.exitPointerLock?.();}
   },enterNursingStation(){
     if(activeLevel==="nursing")return;
     closeNotebook();
@@ -559,7 +570,7 @@
     nextNearbyCheck=0;
   }
   function movementLocked(){
-    return activeLevel==="ward"?state.ended&&!state.doorOpen:nursingState.complete;
+    return activeLevel==="ward"?state.ended&&(!state.doorOpen||doorProgress<.995):nursingState.complete;
   }
   function advance(f,r,d){
     const p=activeNavigation.move(player,yaw,f,r,d,activeLevel==="ward"&&state.doorOpen);
@@ -713,6 +724,11 @@
       }
     }
     const moving=keyDirection();
+    if(activeLevel==="ward"&&state.doorOpen){
+      doorProgress=Math.min(1,doorProgress+dt*1.05);
+      const eased=1-Math.pow(1-doorProgress,3);
+      doorPivot.rotation.y=-Math.PI*.5*eased;
+    }
     const controlsLocked=movementLocked();
     if(introComplete&&!controlsLocked&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*1.45);
     const walking=!controlsLocked&&now-lastMovement<160;
@@ -744,7 +760,7 @@
     aimed=I.chooseTarget(centered,nearbyTargets);
     document.getElementById("interact-target").disabled=controlsLocked||state.ended||!introComplete;
     const reach=aimed&&activeNavigation.withinReach(player,aimed.location);
-    prompt.textContent=activeLevel==="ward"&&state.ended&&state.doorOpen?"門已打開，慢慢走過門口前往護理站。":controlsLocked?(activeLevel==="ward"?"第一關完成":"第二關完成"):aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:(activeLevel==="ward"?"移動探索病房，對準物件查看":"移動探索護理站，靠近物件按 E");
+    prompt.textContent=activeLevel==="ward"&&state.ended&&state.doorOpen?(doorProgress<.995?"門正在開啟，請稍候……":"門已打開，慢慢走過門口前往護理站。"):controlsLocked?(activeLevel==="ward"?"第一關完成":"第二關完成"):aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:(activeLevel==="ward"?"移動探索病房，對準物件查看":"移動探索護理站，靠近物件按 E");
     const angle=((yaw*180/Math.PI)%360+360)%360;
     const facing=angle<45||angle>=315?"北":angle<135?"西":angle<225?"南":"東";
     walk.textContent="面向"+facing+" · "+(activeLevel==="ward"?(player.z>2.8?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":player.x>1.3&&player.z>1.6?"病床旁":"病房中央"):(player.z>3.5?"護理站入口":player.z<-4?"電梯區":player.x<-2.2?"值班表／抽屜旁":player.z>-.7?"病歷桌前":"護理站中央"));
