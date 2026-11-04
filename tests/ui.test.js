@@ -206,4 +206,5 @@ test("抽屜裡檔案與電梯卡的標籤不會擋住物件互動", () => {
   const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
   assert.match(scene, /fileLabel\.userData\.target=fileTarget/);
   assert.match(scene, /cardLabel\.userData\.target=cardTarget/);
+  assert.match(scene, /keypadParts\.forEach\(part=>part\.userData\.target=keypadTarget\)/);
 });
