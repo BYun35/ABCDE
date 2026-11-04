@@ -6,6 +6,11 @@
 
   let state = Game.createInitialState();
   const fragments = new Set();
+  const fragmentText = {
+    bed: "NO. 02 病人於實驗前接受三次藥物測試。",
+    cabinet: "藥物依序為：午夜前、午夜後、清晨。",
+    bin: "若順序錯誤，記憶恢復程序將無法啟動。\n\n紅筆圈起的文字：「請勿相信牆上的時間，真正的答案藏在時間的先後之中。」"
+  };
   const inventory = new Set();
 
   const feedback = document.getElementById("feedback");
@@ -81,11 +86,9 @@
       inventory.delete("病歷碎片 " + (fragments.size - 1) + "/3");
       inventory.add("病歷碎片 " + fragments.size + "/3");
       renderInventory();
-      const message = fragments.size === 3
-        ? "病歷碎片已收齊（3/3），拼合後的病歷：\n\n「NO. 02 病人於實驗前接受三次藥物測試。藥物依序為：午夜前、午夜後、清晨。若順序錯誤，記憶恢復程序將無法啟動。」\n\n紅筆圈起的文字：「請勿相信牆上的時間，真正的答案藏在時間的先後之中。」"
-        : "你收起一片病歷碎片（" + fragments.size + "/3）。";
-      say(message, "fragment-feedback");
-      showItemPopup("病歷碎片（" + fragments.size + "/3）", message);
+      const message = "紙片內容：\n\n" + fragmentText[id];
+      say("你收起一片病歷碎片（" + fragments.size + "/3）。", "fragment-feedback");
+      showItemPopup("病歷碎片（" + fragments.size + "/3）", message, "fragment");
       button.textContent = "已收集";
       button.disabled = true;
       renderState();
