@@ -40,7 +40,7 @@ function setup() {
 }
 
 test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
-  const { el, click, parts } = setup();
+  const { el, click, parts, popups } = setup();
   click("inspect-fragments");
   assert.match(el("feedback").textContent, /0\/3/);
   assert.doesNotMatch(el("feedback").textContent, /NO\. 02 病人/);
@@ -49,6 +49,8 @@ test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
   assert.match(el("feedback").textContent, /1\/3/);
   parts[1].events.click();
   parts[2].events.click();
+  assert.match(popups[2].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.match(popups[2].message, /真正的答案藏在時間的先後之中/);
   click("inspect-fragments");
   assert.match(el("feedback").textContent, /NO\. 02 病人/);
 });
