@@ -423,19 +423,30 @@
   const keypadLabel=sign(keypadX,1.76,keypadZ+.32,.8,.2,"實驗日期");
   const keypadTarget=target(keypad,"實驗日期輸入裝置",()=>window.Ward3D?.openNursingPanel("cassette-panel","實驗日期輸入裝置"),NN.TARGETS.keypad);
   keypadParts.push(keypadLabel);keypadParts.forEach(part=>part.userData.target=keypadTarget);
-  const desk=box(0,.86,-1.7,4.25,.18,1.72,0x716448);
-  for(const x of [-1.9,1.9])for(const z of [-2.35,-1.05])box(x,.43,z,.14,.82,.14,0x536059);
-  box(0,.74,-2.42,2.0,.16,.32,0x8c7b58);
-  const drawerTray=box(-2.82,.52,-2.35,.95,.09,.9,0x756746);drawerTray.visible=false;
-  const drawerFace=box(-2.82,.65,-1.77,.64,.34,.1,0x927c53);drawerFace.visible=false;
-  const drawerKnob=box(-2.82,.66,-1.70,.15,.04,.04,0xd3bc78);
+  const desk=box(0,.86,-1.7,5.8,.18,1.72,0x716448);
+  // 桌下櫃體支撐左側桌面，右側以桌腳支撐，抽屜不會懸在桌外。
+  for(const z of [-2.35,-1.05])box(2.62,.43,z,.14,.82,.14,0x536059);
+  const cabinetX=-2.45,cabinetZ=-1.7;
+  box(cabinetX-.43,.42,cabinetZ,.08,.68,.96,0x505b54);
+  box(cabinetX+.43,.42,cabinetZ,.08,.68,.96,0x505b54);
+  box(cabinetX,.42,cabinetZ-.44,.82,.68,.08,0x505b54);
+  box(cabinetX,.12,cabinetZ,.82,.08,.9,0x626b60);
+  box(cabinetX,.70,cabinetZ+.43,.82,.1,.1,0x626b60);
+  box(cabinetX,.18,cabinetZ+.43,.82,.1,.1,0x626b60);
+  const drawerAssembly=new T.Group();drawerAssembly.position.x=cabinetX;buildGroup.add(drawerAssembly);
+  const drawerTray=box(0,.33,-1.64,.72,.06,.72,0x756746,drawerAssembly);
+  box(-.33,.42,-1.64,.06,.18,.72,0x756746,drawerAssembly);
+  box(.33,.42,-1.64,.06,.18,.72,0x756746,drawerAssembly);
+  box(0,.42,-1.97,.72,.18,.06,0x756746,drawerAssembly);
+  const drawerFace=box(0,.49,-1.20,.78,.27,.08,0x927c53,drawerAssembly);
+  const drawerPull=cylinder(0,.51,-1.145,.022,.022,.22,0xd3bc78,drawerAssembly);drawerPull.rotation.z=Math.PI/2;
   const drawerTarget=target(drawerFace,"打開桌下隱藏抽屜",()=>document.getElementById("open-nurse-drawer").click(),NN.TARGETS.drawer);
-  const fileProp=box(NN.TARGETS.file.x,.63,NN.TARGETS.file.z,.36,.035,.4,0xd7c9a5);fileProp.visible=false;
-  const fileLabel=sign(NN.TARGETS.file.x,.86,NN.TARGETS.file.z+.2,.38,.16,"NO.02");fileLabel.visible=false;
+  const fileProp=box(NN.TARGETS.file.x,.42,NN.TARGETS.file.z,.36,.035,.4,0xd7c9a5);fileProp.visible=false;
+  const fileLabel=sign(NN.TARGETS.file.x,.64,NN.TARGETS.file.z+.2,.38,.16,"NO.02");fileLabel.visible=false;
   const fileTarget=target(fileProp,"閱讀 NO.02 實驗檔案",()=>document.getElementById("read-nurse-file").click(),NN.TARGETS.file);
   fileLabel.userData.target=fileTarget;
-  const cardProp=box(NN.TARGETS.elevatorCard.x,.65,NN.TARGETS.elevatorCard.z,.38,.045,.52,0xe0bd62);cardProp.visible=false;
-  const cardLabel=sign(NN.TARGETS.elevatorCard.x,.91,NN.TARGETS.elevatorCard.z+.24,.58,.2,"電梯卡");cardLabel.visible=false;
+  const cardProp=box(NN.TARGETS.elevatorCard.x,.44,NN.TARGETS.elevatorCard.z,.38,.045,.48,0xe0bd62);cardProp.visible=false;
+  const cardLabel=sign(NN.TARGETS.elevatorCard.x,.64,NN.TARGETS.elevatorCard.z+.22,.58,.2,"電梯卡");cardLabel.visible=false;
   const cardTarget=target(cardProp,"取得地下研究區電梯卡",()=>document.getElementById("take-elevator-card").click(),NN.TARGETS.elevatorCard);
   cardLabel.userData.target=cardTarget;
   // 電梯與刷卡器放在房間另一端，必須拿到卡才能完成第二關。
@@ -448,7 +459,7 @@
     if(nursingState.elevatorCard)document.getElementById("use-elevator-card").click();
     else window.Ward3D?.openNursingPanel("nurse-elevator-panel","地下研究區電梯");
   },NN.TARGETS.elevatorReader);
-  const nursingProps={cassetteProp,cassetteLabel,drawerTray,drawerFace,drawerKnob,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
+  const nursingProps={cassetteProp,cassetteLabel,drawerAssembly,drawerFace,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
   buildGroup=wardRoom;buildingLevel="ward";
   let state={ended:false},nursingState={complete:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
@@ -479,10 +490,9 @@
     nursingState=next;
     nursingProps.cassetteProp.visible=next.cassetteFound;
     nursingProps.cassetteLabel.visible=next.cassetteFound;
-    nursingProps.drawerFace.visible=next.drawerUnlocked;
-    nursingProps.drawerFace.position.z=next.drawerOpen?-2.55:-1.77;
-    nursingProps.drawerKnob.position.z=nursingProps.drawerFace.position.z+.07;
-    nursingProps.drawerTray.visible=next.drawerOpen;
+    nursingProps.drawerFace.visible=true;
+    nursingProps.drawerAssembly.position.z=next.drawerOpen ? 0.65 : 0;
+    drawerTarget.location.z=next.drawerOpen ? NN.TARGETS.drawer.z : -1.2;
     nursingProps.fileProp.visible=next.drawerOpen&&!next.fileRead;
     nursingProps.fileLabel.visible=next.drawerOpen&&!next.fileRead;
     nursingProps.cardProp.visible=next.drawerOpen&&!next.elevatorCard;
@@ -497,6 +507,14 @@
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
   let opening=O.create(),introComplete=false,openingPhase="idle",wakeProgress=1;
   const prompt=document.getElementById("target-prompt"),walk=document.getElementById("walk-status");
+  function finishOpening(skipped=false){
+    opening={elapsed:O.totalDuration,started:false};openingPhase="done";wakeProgress=1;introComplete=true;
+    player.x=N.START.x;player.z=N.START.z;heading=-Math.PI/2;yaw=-Math.PI/2;
+    avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;
+    document.getElementById("awakening-scene").hidden=true;
+    tell(skipped?"醒來演出已略過。你已進入病房，可以開始探索。":"你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
+    canvas.focus({preventScroll:true});
+  }
   function orient(){
     followFocus.set(player.x,1.05+.1*wakeProgress,player.z);
     const desired=activeLevel==="nursing"?{
@@ -668,6 +686,7 @@
   interactionDialogClose?.addEventListener("click",closeInteractionDialog);
   interactionDialog?.addEventListener("click",e=>{if(e.target===interactionDialog)closeInteractionDialog();});
   document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&opening.started){e.preventDefault();finishOpening(true);return;}
     if(e.key==="Escape"&&!document.getElementById("nursing-station").hidden){
       e.preventDefault();document.getElementById("close-nursing-panel").click();return;
     }
@@ -715,12 +734,7 @@
         avatar.root.position.x=player.x;avatar.root.position.z=player.z;
       }
       if(result.done){
-        introComplete=true;openingPhase="done";wakeProgress=1;
-        player.x=N.START.x;player.z=N.START.z;heading=-Math.PI/2;yaw=-Math.PI/2;
-        avatar.root.position.set(player.x,0,player.z);
-        document.getElementById("awakening-scene").hidden=true;
-        tell("你已進入病房。WASD 控制人物走動，拖曳轉動跟隨鏡頭；靠近物件點擊或按 E。");
-        canvas.focus({preventScroll:true});
+        finishOpening();
       }
     }
     const moving=keyDirection();
