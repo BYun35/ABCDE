@@ -89,6 +89,8 @@
     if (!state.ended) return;
     gameLayout.hidden = true;
     nursingStation.hidden = false;
+    document.documentElement.classList.add("nursing-mode");
+    document.body.classList.add("nursing-mode");
     document.getElementById("page-brand").textContent = "時空密室・第二關";
     document.getElementById("page-title").textContent = "被篡改的記錄";
     document.getElementById("header-note").textContent = "資料調查 · 護理站";
