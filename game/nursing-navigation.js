@@ -7,9 +7,11 @@
   const BOUNDS = { minX: -5.7, maxX: 5.7, minZ: -6.7, maxZ: 6.7 };
   const START = { x: 0, z: 2.4 };
   const OBSTACLES = [
-    { x: 0, z: -1.7, w: 4, d: 1.6 },
-    { x: -5.25, z: -3.35, w: 1.15, d: 1.2 },
-    { x: 4.15, z: 1.05, w: 1.15, d: .72 },
+    // The desktop extends past the support legs and includes the tape recorder side.
+    { x: 0, z: -1.7, w: 5.4, d: 1.95 },
+    // The date keypad and open hidden drawer are solid props too.
+    { x: 3.65, z: -.72, w: .9, d: .35 },
+    { x: -2.82, z: -2.3, w: .95, d: .9 },
     { x: 4.75, z: -6.82, w: 1.8, d: .16 }
   ];
   const TARGETS = {

@@ -362,12 +362,7 @@
   // 值班表、三份病歷與錄音設備都作為可瞄準的 3D 物件。
   const scheduleBoard=sign(-4.15,2.05,-6.86,2.9,1.42,"護理師值班表\n2/15 16-24 林\n2/17 00-08 王\n2/17 08-16 陳");
   target(scheduleBoard,"護理師值班表",()=>window.Ward3D?.openNursingPanel("nurse-record-panel","護理師值班表與病歷"),NN.TARGETS.schedule);
-  // 醫療收納櫃與診療車提供房間深度和遮擋。
-  box(-5.25,1.12,-3.35,1.15,2.15,1.2,0x56645e);
-  for(let y=.55;y<2;y+=.55){box(-5.25,y,-2.72,1.02,.035,.04,0x9b9a82);box(-5.25,y,-2.68,.16,.05,.04,0xb9ab7c);}
-  const trolley=box(4.15,.72,1.05,1.15,.12,.72,0x73847a);trolley.userData.decoration=true;
-  for(const x of [3.7,4.6])for(const z of [.78,1.32])cylinder(x,.2,z,.055,.055,.34,0x4d5c54);
-  box(4.15,.94,1.05,1.05,.08,.66,0x91a096);
+  // 只保留劇情中會調查或操作的護理站物件。
   const recordLetters=["A","B","C"],recordDetails=["2/15 23:50 林","2/17 02:20 陳","2/17 08:40 陳"];
   const recordColors=[0xddd0af,0xc9d1c0,0xd8c6a2];
   const recordMeshes=[];
@@ -404,8 +399,8 @@
   const fileLabel=sign(NN.TARGETS.file.x,.86,NN.TARGETS.file.z+.2,.38,.16,"NO.02");fileLabel.visible=false;
   const fileTarget=target(fileProp,"閱讀 NO.02 實驗檔案",()=>document.getElementById("read-nurse-file").click(),NN.TARGETS.file);
   fileLabel.userData.target=fileTarget;
-  const cardProp=box(NN.TARGETS.elevatorCard.x,.63,NN.TARGETS.elevatorCard.z,.28,.035,.4,0xc3a658);cardProp.visible=false;
-  const cardLabel=sign(NN.TARGETS.elevatorCard.x,.86,NN.TARGETS.elevatorCard.z+.2,.42,.16,"電梯卡");cardLabel.visible=false;
+  const cardProp=box(NN.TARGETS.elevatorCard.x,.65,NN.TARGETS.elevatorCard.z,.38,.045,.52,0xe0bd62);cardProp.visible=false;
+  const cardLabel=sign(NN.TARGETS.elevatorCard.x,.91,NN.TARGETS.elevatorCard.z+.24,.58,.2,"電梯卡");cardLabel.visible=false;
   const cardTarget=target(cardProp,"取得地下研究區電梯卡",()=>document.getElementById("take-elevator-card").click(),NN.TARGETS.elevatorCard);
   cardLabel.userData.target=cardTarget;
   // 電梯與刷卡器放在房間另一端，必須拿到卡才能完成第二關。
