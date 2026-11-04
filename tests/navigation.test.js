@@ -63,10 +63,27 @@ test("護理站的收納櫃、推車與電梯門都是實體障礙", () => {
   }
 });
 
+test("護理站桌面、錄音帶、日期裝置與抽屜都不能穿過", () => {
+  for (const point of [
+    { x: 0, z: -1.7 },
+    { x: 2.4, z: -1.55 },
+    { x: 3.65, z: -.72 },
+    { x: -2.82, z: -2.3 }
+  ]) {
+    assert.equal(NursingNav.canStand(point), false, JSON.stringify(point));
+  }
+  const approaches = [
+    { x: 2.4, z: -2.9 },
+    { x: 3.65, z: 1.0 },
+    { x: -2.82, z: -3.3 }
+  ];
+  for (const point of approaches) assert.equal(NursingNav.canStand(point), true, JSON.stringify(point));
+});
+
 test("抽屜裡的電梯卡放在桌外可見且可走近的位置", () => {
   const card = NursingNav.TARGETS.elevatorCard;
-  assert.equal(NursingNav.canStand(card), true, "卡片模型不能埋在桌子或其他碰撞區裡");
-  const approach = { x: -2.8, z: -2.9 };
+  assert.equal(NursingNav.canStand(card), false, "玩家不能走進抽屜裡的卡片位置");
+  const approach = { x: -2.8, z: -3.3 };
   assert.equal(NursingNav.canStand(approach), true);
   assert.equal(NursingNav.withinReach(approach, card), true);
 });
