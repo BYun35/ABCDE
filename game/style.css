@@ -275,8 +275,20 @@ main{width:100%;height:calc(100vh - 64px);height:calc(100svh - 64px);min-height:
 .transcript{white-space:pre-wrap;overflow-wrap:anywhere;margin:16px 0;padding:18px;border-left:4px solid var(--gold);border-radius:6px;background:#121918;color:#f5efdd;font:600 1rem/1.85 system-ui,"Noto Sans TC",sans-serif}.file-transcript{font-size:1.05rem}.nursing-ending{grid-column:1/-1;text-align:center;border-color:#bf815f;background:linear-gradient(145deg,#382923,#1b201e)}
 @media(max-width:760px){.nursing-grid{grid-template-columns:1fr}.record-card{grid-template-columns:1fr}.record-card button{justify-self:start}.date-form{grid-template-columns:1fr}.date-form label{grid-column:auto}.nurse-table{font-size:.82rem}.nurse-table th,.nurse-table td{padding:7px 4px}}
 
-/* 第二關內容超過一個視窗高度，切換後恢復整頁捲動。 */
-html.nursing-mode,body.nursing-mode{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
-body.nursing-mode{display:block}
-body.nursing-mode main{height:auto;min-height:calc(100vh - 64px);min-height:calc(100svh - 64px);flex:none;overflow:visible;padding:0 16px 40px}
-body.nursing-mode .nursing-station{margin-top:18px}
+/* 第二關沿用全螢幕 3D 操作；只有靠近機關時才打開對應的文字面板。 */
+html.nursing-mode,body.nursing-mode{width:100%;height:100%;min-height:100%;overflow:hidden}
+body.nursing-mode{display:flex;flex-direction:column}
+body.nursing-mode header{height:64px;min-height:64px;flex:0 0 64px}
+body.nursing-mode main{width:100%;height:calc(100vh - 64px);height:calc(100svh - 64px);min-height:0;flex:1;margin:0;overflow:hidden;padding:0}
+body.nursing-mode .layout,body.nursing-mode .scene-column,body.nursing-mode .scene-shell{width:100%;height:100%;min-height:0;margin:0}
+body.nursing-mode .scene-column{position:relative}
+body.nursing-mode .scene-shell{position:relative;overflow:hidden;border:0;border-radius:0;box-shadow:none}
+body.nursing-mode #ward-viewport{position:absolute;inset:0;width:100%;height:100%;min-height:0;overflow:hidden}
+body.nursing-mode .nursing-station{position:fixed;z-index:10;top:78px;right:18px;width:min(540px,calc(100vw - 36px));max-height:calc(100vh - 96px);max-height:calc(100svh - 96px);overflow-y:auto;overscroll-behavior:contain;margin:0;padding:16px;border-color:#9e8c60;background:linear-gradient(150deg,#1c2c2df2,#101b1df2);backdrop-filter:blur(12px);scrollbar-color:#68786b #172326}
+body.nursing-mode .nursing-heading{display:none}
+body.nursing-mode .nursing-grid{display:block}
+body.nursing-mode .nursing-card{display:none;margin:0 0 10px;padding:16px}
+body.nursing-mode .nursing-card[data-active="true"]:not([hidden]){display:block}
+body.nursing-mode .nursing-panel-close{position:sticky;top:0;z-index:2;float:right;margin:-4px -4px 10px 10px;padding:7px 10px;font-size:.8rem}
+body.nursing-mode .nurse-feedback{clear:both;min-height:44px;padding:10px;margin-bottom:12px;font-size:.9rem}
+@media(max-width:760px){body.nursing-mode header{height:58px;min-height:58px;flex-basis:58px}body.nursing-mode main{height:calc(100vh - 58px);height:calc(100svh - 58px)}body.nursing-mode .nursing-station{top:68px;right:8px;width:min(480px,calc(100vw - 16px));max-height:calc(100vh - 78px);max-height:calc(100svh - 78px);padding:12px}}

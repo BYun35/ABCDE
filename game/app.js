@@ -24,6 +24,29 @@
   const nursingStation = document.getElementById("nursing-station");
   const gameLayout = document.getElementById("game-layout");
   const nurseFeedback = document.getElementById("nurse-feedback");
+  const nursingPanels = ["nurse-record-panel", "cassette-panel", "nurse-drawer-panel", "nurse-elevator-panel", "nursing-ending"];
+
+  function closeNursingPanel() {
+    nursingStation.hidden = true;
+    nursingPanels.forEach(id => { document.getElementById(id).dataset.active = "false"; });
+    window.Ward3D?.closeNursingPanel?.();
+  }
+
+  function openNursingPanel(id, title) {
+    const panel = document.getElementById(id);
+    if (!panel || panel.hidden) return;
+    nursingPanels.forEach(panelId => { document.getElementById(panelId).dataset.active = panelId === id ? "true" : "false"; });
+    nursingStation.hidden = false;
+    document.getElementById("nursing-title").textContent = title || "護理站調查";
+    document.getElementById("close-nursing-panel").focus({ preventScroll: true });
+  }
+
+  if (window.Ward3D) {
+    window.Ward3D.openNursingPanel = openNursingPanel;
+    window.Ward3D.closeNursingPanel = () => canvasForNursing()?.focus({ preventScroll: true });
+  }
+
+  function canvasForNursing() { return document.getElementById("ward-canvas"); }
 
   const clues = {
     warning: "床墊下有一張泛黃紙條：「如果你已經醒來，千萬不要相信那個和你長得一模一樣的人。你只有一次機會離開這裡。」",
@@ -83,12 +106,14 @@
     document.getElementById("take-elevator-card").hidden = nursingState.elevatorCard;
     document.getElementById("nurse-elevator-panel").hidden = !nursingState.elevatorCard || nursingState.complete;
     document.getElementById("nursing-ending").hidden = !nursingState.complete;
+    window.Ward3D?.syncNursing?.(nursingState);
   }
 
   function enterNursingStation() {
     if (!state.ended) return;
-    gameLayout.hidden = true;
-    nursingStation.hidden = false;
+    gameLayout.hidden = false;
+    nursingStation.hidden = true;
+    enterStationButton.hidden = true;
     document.documentElement.classList.add("nursing-mode");
     document.body.classList.add("nursing-mode");
     document.getElementById("page-brand").textContent = "時空密室・第二關";
@@ -98,16 +123,19 @@
     document.getElementById("stage-title").textContent = "值班表上的不可能簽名";
     document.getElementById("stage-description").textContent = "先找出哪份病歷遭到竄改，再追查實驗日期。";
     document.title = "時空密室｜第二關：被篡改的記錄";
-    nursingStation.scrollIntoView({ behavior: "smooth", block: "start" });
-    document.getElementById("nursing-title").focus({ preventScroll: true });
+    window.Ward3D?.enterNursingStation();
+    renderNursingState("沿著值班桌旁的護理師值班表與病歷開始調查。靠近物件後按 E。 ");
   }
 
   enterStationButton.addEventListener("click", enterNursingStation);
+  document.getElementById("close-nursing-panel").addEventListener("click", closeNursingPanel);
   ["A", "B", "C"].forEach(record => {
     document.getElementById("nurse-record-" + record.toLowerCase()).addEventListener("click", () => {
       const result = Nursing.chooseRecord(nursingState, record);
       nursingState = result.state;
       renderNursingState(result.message);
+      closeNursingPanel();
+      window.Ward3D?.notifyPopup({ title: record === "B" ? "取得重要線索" : "病歷檢查結果", item: record === "B" ? "錄音帶" : "病歷 " + record, message: result.message, kind: record === "B" ? "important" : "clue" });
     });
   });
 
@@ -123,12 +151,17 @@
     const result = Nursing.submitDate(nursingState, document.getElementById("nurse-date").value);
     nursingState = result.state;
     renderNursingState(result.message);
+    if (nursingState.drawerUnlocked) {
+      closeNursingPanel();
+      window.Ward3D?.notifyPopup({ title: "日期正確", item: "0217", message: result.message, kind: "important" });
+    }
   });
 
   document.getElementById("open-nurse-drawer").addEventListener("click", () => {
     const result = Nursing.openDrawer(nursingState);
     nursingState = result.state;
     renderNursingState(result.message);
+    window.Ward3D?.notifyPopup({ title: "隱藏抽屜", item: "機密文件與電梯卡", message: result.message, kind: "important" });
   });
 
   document.getElementById("read-nurse-file").addEventListener("click", () => {
@@ -136,19 +169,21 @@
     nursingState = result.state;
     document.getElementById("nurse-file-transcript").textContent = result.message;
     renderNursingState("你讀完了抽屜裡的機密文件。");
+    window.Ward3D?.notifyPopup({ title: "實驗檔案", message: result.message, kind: "important" });
   });
 
   document.getElementById("take-elevator-card").addEventListener("click", () => {
     const result = Nursing.takeElevatorCard(nursingState);
     nursingState = result.state;
     renderNursingState(result.message);
+    window.Ward3D?.notifyPopup({ title: "取得重要物品", item: "地下研究區電梯卡", message: result.message, kind: "important" });
   });
 
   document.getElementById("use-elevator-card").addEventListener("click", () => {
     const result = Nursing.useElevator(nursingState);
     nursingState = result.state;
     renderNursingState(result.message);
-    if (nursingState.complete) document.getElementById("nursing-ending").scrollIntoView({ behavior: "smooth", block: "center" });
+    if (nursingState.complete) window.Ward3D?.notifyPopup({ title: "第二關完成", message: result.message, kind: "important" });
   });
 
   document.querySelectorAll("[data-inspect]").forEach((button) => {

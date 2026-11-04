@@ -51,6 +51,7 @@ test("所有場景互動點都有可走到的操作位置", () => {
 
 test("護理站有獨立起點、房間邊界與桌子和電梯的碰撞", () => {
   assert.equal(NursingNav.canStand(NursingNav.START), true);
+  assert.ok(NursingNav.START.z < 3, "起點需留出第三人稱鏡頭距離");
   assert.equal(NursingNav.canStand({ x: 7, z: 0 }), false);
   assert.equal(NursingNav.canStand({ x: 0, z: -8 }), false);
   assert.equal(NursingNav.canStand({ x: 0, z: -1.7 }), false);

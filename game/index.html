@@ -9,6 +9,7 @@
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js?v=bedwake2" defer></script>
+<script src="nursing-navigation.js?v=nursingnav1" defer></script>
 <script src="avatar.js?v=bedwake2" defer></script>
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
@@ -174,9 +175,10 @@
       <h2 id="nursing-title" tabindex="-1">被篡改的記錄</h2>
       <p>比對值班時間與病歷簽名，找出遭到修改的實驗紀錄。</p>
     </div>
+    <button id="close-nursing-panel" class="secondary nursing-panel-close" type="button">關閉操作面板　Esc</button>
     <p id="nurse-feedback" class="nurse-feedback" role="status" aria-live="polite">值班桌上放著一張值班表和三份病歷。</p>
     <div class="nursing-grid">
-      <section class="nursing-card">
+      <section class="nursing-card" id="nurse-record-panel">
         <h3>護理師值班表</h3>
         <table class="nurse-table">
           <thead><tr><th>日期</th><th>值班時間</th><th>護理師</th></tr></thead>
