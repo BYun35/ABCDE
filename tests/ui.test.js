@@ -143,3 +143,29 @@ test("第一關完成後可進護理站，第二關有病歷、錄音與日期�
   }
   assert.match(html, /id="nursing-station"[\s\S]*值班表[\s\S]*病歷[\s\S]*錄音帶/);
 });
+
+test("頁面操作可從第一關通關一路走完第二關", () => {
+  const { el, click } = setup();
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader");
+  assert.equal(el("enter-nursing-station").hidden, false);
+  click("enter-nursing-station");
+  assert.equal(el("game-layout").hidden, true);
+  assert.equal(el("nursing-station").hidden, false);
+
+  click("nurse-record-a");
+  assert.match(el("nurse-feedback").textContent, /值班表不一致/);
+  assert.equal(el("cassette-panel").hidden, true);
+  click("nurse-record-b");
+  assert.equal(el("cassette-panel").hidden, false);
+  click("play-nurse-tape");
+  assert.match(el("nurse-tape-transcript").textContent, /二月十七日正式啟動/);
+  el("nurse-date").value = "0217";
+  el("nurse-date-form").events.submit({ preventDefault() {} });
+  assert.equal(el("nurse-drawer-panel").hidden, false);
+  click("open-nurse-drawer"); click("read-nurse-file");
+  assert.match(el("nurse-file-transcript").textContent, /YOU ARE NOT THE ORIGINAL/);
+  click("take-elevator-card"); click("use-elevator-card");
+  assert.equal(el("nursing-ending").hidden, false);
+});
