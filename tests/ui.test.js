@@ -27,7 +27,9 @@ function setup() {
   const document = {
     getElementById: el,
     createElement: () => ({ textContent: "" }),
-    querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts
+    querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts,
+    body: { classList: { values: new Set(), add(value) { this.values.add(value); }, contains(value) { return this.values.has(value); } } },
+    documentElement: { classList: { values: new Set(), add(value) { this.values.add(value); }, contains(value) { return this.values.has(value); } } }
   };
   const window = { EscapeRoomGame: Game, NursingStationGame: Level2, Ward3D: {
     sync() {},
@@ -37,7 +39,7 @@ function setup() {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),
     { window, document, Set });
   const click = id => el(id).events.click();
-  return { el, click, inspect, parts, popups };
+  return { el, click, inspect, parts, popups, document };
 }
 
 test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
@@ -144,8 +146,8 @@ test("第一關完成後可進護理站，第二關有病歷、錄音與日期�
   assert.match(html, /id="nursing-station"[\s\S]*值班表[\s\S]*病歷[\s\S]*錄音帶/);
 });
 
-test("頁面操作可從第一關通關一路走完第二關", () => {
-  const { el, click } = setup();
+test("頁面操作可從第一關通關一路走完第二關，且第二關可捲動", () => {
+  const { el, click, document } = setup();
   el("pin").value = "317";
   el("pin-form").events.submit({ preventDefault() {} });
   click("take-tool"); click("open-bottle"); click("scene-reader");
@@ -153,6 +155,12 @@ test("頁面操作可從第一關通關一路走完第二關", () => {
   click("enter-nursing-station");
   assert.equal(el("game-layout").hidden, true);
   assert.equal(el("nursing-station").hidden, false);
+  assert.equal(document.body.classList.contains("nursing-mode"), true);
+  assert.equal(document.documentElement.classList.contains("nursing-mode"), true);
+
+  const css = fs.readFileSync(path.join(__dirname, "../game/style.css"), "utf8");
+  assert.match(css, /\.nursing-mode\s+main\s*\{[^}]*overflow:\s*visible/s);
+  assert.match(css, /\.nursing-mode\s*\{[^}]*overflow-y:\s*auto/s);
 
   click("nurse-record-a");
   assert.match(el("nurse-feedback").textContent, /值班表不一致/);
