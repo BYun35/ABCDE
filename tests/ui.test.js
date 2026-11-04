@@ -8,6 +8,7 @@ const Game = require("../game/game.js");
 
 function setup() {
   const nodes = new Map();
+  const popups = [];
   function el(id, dataset = {}) {
     if (!nodes.has(id)) nodes.set(id, {
       id, dataset, textContent: "", value: "", hidden: false,
@@ -27,10 +28,14 @@ function setup() {
     createElement: () => ({ textContent: "" }),
     querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts
   };
+  const window = { EscapeRoomGame: Game, Ward3D: {
+    sync() {},
+    notifyPopup(popup) { popups.push(popup); }
+  } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),
-    { window: { EscapeRoomGame: Game }, document, Set });
+    { window, document, Set });
   const click = id => el(id).events.click();
-  return { el, click, inspect, parts };
+  return { el, click, inspect, parts, popups };
 }
 
 test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
@@ -97,4 +102,21 @@ test("病房畫面的感應器和下方按鈕都能刷卡", () => {
   el("pin-form").events.submit({ preventDefault() {} });
   click("take-tool"); click("open-bottle"); click("scene-reader");
   assert.equal(el("ending").hidden, false);
+});
+
+test("取得病歷碎片、拆卸工具與門禁卡時回報重要物品名稱", () => {
+  const { el, click, parts, popups } = setup();
+  parts[0].events.click();
+  assert.equal(popups[0].title, "取得重要物品");
+  assert.match(popups[0].item, /病歷碎片（1\/3）/);
+
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool");
+  assert.equal(popups[1].title, "取得重要物品");
+  assert.equal(popups[1].item, "小型拆卸工具");
+
+  click("open-bottle");
+  assert.equal(popups[2].title, "取得重要物品");
+  assert.equal(popups[2].item, "護理站門禁卡");
 });
