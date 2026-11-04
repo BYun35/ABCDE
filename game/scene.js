@@ -44,6 +44,20 @@
   const flashlightBeam=new T.SpotLight(0xffdda0,82,13,Math.PI/6,.5,1.35);
   flashlightBeam.name="player-flashlight-beam";scene.add(flashlightBeam,flashlightBeam.target);
   const handGlow=new T.PointLight(0xffdda0,2.2,2.6,2);scene.add(handGlow);
+  const flashlightLevels=[{name:"柔和",scale:.68},{name:"標準",scale:1},{name:"明亮",scale:1.38}];
+  let flashlightLevelIndex=1;
+  function setFlashlightLevel(index){
+    flashlightLevelIndex=(index+flashlightLevels.length)%flashlightLevels.length;
+    const level=flashlightLevels[flashlightLevelIndex];
+    flashlightBeam.intensity=82*level.scale;
+    handGlow.intensity=2.2*level.scale;
+    const button=document.getElementById("flashlight-level");
+    if(button){
+      button.textContent="手電筒："+level.name;
+      button.setAttribute("aria-label","手電筒亮度："+level.name+"；按下切換亮度");
+      button.title="目前亮度："+level.name+"。按下切換。";
+    }
+  }
   const flashlightPosition=new T.Vector3(),flashlightTargetPosition=new T.Vector3();
   const materials={};
   function mat(color,metalness=0,roughness=.85){
@@ -616,6 +630,10 @@
       const result=canvas.requestPointerLock?.();
       result?.catch(()=>tell("此環境未允許鎖定滑鼠，請按住場景拖曳轉向。"));
     }catch(error){tell("請按住場景拖曳轉向。");}
+  });
+  document.getElementById("flashlight-level").addEventListener("click",()=>{
+    setFlashlightLevel(flashlightLevelIndex+1);
+    tell("手電筒亮度已調整為「"+flashlightLevels[flashlightLevelIndex].name+"」。");
   });
   document.addEventListener("pointerlockchange",()=>{
     keys.clear();

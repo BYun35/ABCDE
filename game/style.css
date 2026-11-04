@@ -137,6 +137,8 @@ main{width:100%;height:calc(100vh - 64px);margin:0;padding:0}
 .crosshair{z-index:2}
 .target-prompt{top:58px;bottom:auto;z-index:3;max-width:min(90%,620px);background:#102121df;box-shadow:0 5px 20px #0007}
 .scene-toolbar{position:absolute;z-index:4;left:10px;right:10px;bottom:10px;min-height:48px;padding:7px 9px;border:1px solid #63766c;border-radius:11px;background:#101c1dcc;backdrop-filter:blur(10px);box-shadow:0 6px 22px #0007}
+.scene-toolbar #flashlight-level{border-color:#93834f;color:#f2dfa4;background:#27291f}
+.scene-toolbar #flashlight-level:focus-visible{outline:2px solid #f2dfa4;outline-offset:2px}
 .scene-toolbar span{margin-left:auto}
 #scene-feedback{position:absolute;z-index:3;top:100px;left:50%;transform:translateX(-50%);width:min(92%,680px);margin:0;padding:8px 12px;border:1px solid #77836c88;border-left:2px solid #d1b56e;border-radius:8px;background:#172726d9;pointer-events:none}
 .nearby-panel{position:absolute;z-index:3;left:12px;bottom:72px;width:min(620px,calc(100% - 24px));padding:9px 10px;border:1px solid #66766c88;border-radius:10px;background:#101c1dbf;backdrop-filter:blur(8px);pointer-events:auto}
@@ -172,6 +174,7 @@ main{width:100%;height:calc(100vh - 64px);margin:0;padding:0}
   .target-prompt{top:48px;font-size:.72rem;padding:6px 9px}
   .scene-toolbar{left:7px;right:7px;bottom:7px;gap:5px;padding:6px}
   .scene-toolbar button{padding:7px 8px;font-size:.7rem}
+  .scene-toolbar #flashlight-level{order:1}
   .scene-toolbar span{display:none}
   .walk-buttons{right:7px;width:138px;padding:4px}
   .walk-buttons button{padding:7px 2px;font-size:.62rem}
