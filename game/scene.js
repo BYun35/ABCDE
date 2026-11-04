@@ -132,8 +132,33 @@
     const data={id:String(targets.length),mesh,name,action,location:location||{x:mesh.position.x,z:mesh.position.z}};
     mesh.userData.target=data;targets.push(data);return data;
   }
-  function inspect(key){document.querySelector('[data-inspect="'+key+'"]')?.click();}
-  function click(id){document.getElementById(id)?.click();}
+  const notebookPanel=document.getElementById("notebook-panel");
+  const notebookBackdrop=document.getElementById("notebook-backdrop");
+  const notebookToggle=document.getElementById("toggle-notebook");
+  function openNotebook(focusId){
+    if(!notebookPanel)return;
+    notebookPanel.hidden=false;notebookBackdrop.hidden=false;
+    notebookToggle?.setAttribute("aria-expanded","true");
+    if(focusId){
+      const target=document.getElementById(focusId);
+      target?.focus({preventScroll:true});
+      target?.scrollIntoView({block:"center",behavior:"smooth"});
+    }else document.getElementById("close-notebook")?.focus({preventScroll:true});
+  }
+  function closeNotebook(){
+    if(!notebookPanel)return;
+    notebookPanel.hidden=true;notebookBackdrop.hidden=true;
+    notebookToggle?.setAttribute("aria-expanded","false");
+    canvas.focus({preventScroll:true});
+  }
+  function inspect(key){
+    openNotebook();
+    document.querySelector('[data-inspect="'+key+'"]')?.click();
+  }
+  function click(id){
+    openNotebook();
+    document.getElementById(id)?.click();
+  }
   box(0,-.12,0,10,.24,12,0x53605b);
   for(let x=-5;x<=5;x++)box(x,.006,0,.018,.012,12,0x36453f);
   for(let z=-6;z<=6;z++)box(0,.007,z,10,.012,.018,0x36453f);
@@ -205,7 +230,7 @@
     const action=I.action("cabinet",state);
     if(action==="take-tool"){click("take-tool");return;}
     if(action==="read-note"){tell("抽屜已打開。紙條：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」");return;}
-    const pin=document.getElementById("pin");pin.focus();pin.scrollIntoView({block:"center",behavior:"smooth"});
+    openNotebook("pin");
     tell("請在密碼鎖輸入三位數密碼。");
   },{x:-3.6,z:-3.4});
   const bottles=[];
@@ -357,7 +382,7 @@
     if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
     if(!hasSight(t)){tell("物件被遮住了，請換個位置靠近。");return;}
     t.action();
-    if(!state.ended&&document.activeElement?.id!=="pin")canvas.focus({preventScroll:true});
+    if(!state.ended&&notebookPanel.hidden&&document.activeElement?.id!=="pin")canvas.focus({preventScroll:true});
     nextNearbyCheck=0;
   }
   function advance(f,r,d){
@@ -443,10 +468,15 @@
     });
   });
   document.getElementById("interact-target").addEventListener("click",()=>activate(aimed));
-  document.getElementById("return-to-room").addEventListener("click",()=>{
-    document.querySelector(".scene-column").scrollIntoView({block:"start",behavior:"smooth"});
-    canvas.focus({preventScroll:true});
+  notebookToggle?.addEventListener("click",()=>notebookPanel.hidden?openNotebook():closeNotebook());
+  document.getElementById("close-notebook")?.addEventListener("click",closeNotebook);
+  notebookBackdrop?.addEventListener("click",closeNotebook);
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&notebookPanel&&!notebookPanel.hidden){
+      e.preventDefault();closeNotebook();
+    }
   });
+  document.getElementById("return-to-room").addEventListener("click",closeNotebook);
   function resize(){
     const w=host.clientWidth,h=host.clientHeight;
     if(!w||!h)return;

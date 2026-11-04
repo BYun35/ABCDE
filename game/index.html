@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=bedwake2">
+<link rel="stylesheet" href="style.css?v=immersivehud1">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js?v=bedwake2" defer></script>
@@ -13,7 +13,7 @@
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
-<script src="scene.js?v=bedwake2" defer></script>
+<script src="scene.js?v=immersivehud1" defer></script>
 <script src="app.js?v=3d1" defer></script>
 </head>
 <body>
@@ -30,8 +30,9 @@
   <div class="layout">
     <section class="scene-column" aria-label="3D 病房探索">
       <div class="scene-shell">
-        <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病床旁</output></div>
         <div id="ward-viewport">
+          <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病床旁</output></div>
+
           <div class="crosshair" aria-hidden="true">+</div>
           <div id="walk-instructions" class="walk-instructions">
             <span class="eyebrow">消失的病歷</span>
@@ -46,10 +47,10 @@
             <span class="awakening-caption">畫面恢復中……</span>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
-        </div>
-        <div class="scene-toolbar">
+        </div>        <div class="scene-toolbar">
           <button id="lock-mouse" class="secondary" type="button">鎖定滑鼠</button>
-          <button id="interact-target" class="primary" type="button">與提示物件互動</button>
+          <button id="interact-target" class="primary" type="button">互動</button>
+          <button id="toggle-notebook" class="secondary" type="button" aria-controls="notebook-panel" aria-expanded="false">線索／背包</button>
           <span>Esc 釋放滑鼠 · 操作線索時可離開場景</span>
         </div>
         <div class="nearby-panel"><h3>附近可互動物件</h3><div id="nearby-actions" role="group" aria-label="附近可互動物件"><span>靠近物件後，這裡會列出可操作的項目。</span></div></div>
@@ -62,11 +63,9 @@
           <button data-walk="right" type="button" aria-label="向右走">右移 →</button>
         </div>
         <p id="scene-feedback" role="status" aria-live="polite">正在載入立體病房。</p>
-      </div>
-    </section>
-
-    <aside class="side" aria-label="線索筆記與道具操作">
-      <div class="notebook-title"><span class="eyebrow">探索筆記</span><h2>線索與背包</h2><p>點場景物件查看線索，也可在這裡閱讀與操作。</p></div>
+          <div id="notebook-backdrop" class="notebook-backdrop" hidden></div>
+    <aside class="side notebook-panel" id="notebook-panel" role="dialog" aria-modal="true" aria-label="線索筆記與道具操作" tabindex="-1" hidden>
+      <div class="notebook-title"><button id="close-notebook" class="secondary notebook-close" type="button">關閉筆記</button><span class="eyebrow">探索筆記</span><h2>線索與背包</h2><p>點場景物件查看線索，也可在這裡閱讀與操作。</p></div>
       <section class="card">
         <h3>目前線索</h3>
         <p id="feedback" role="status" aria-live="polite">找找床墊、藥瓶、日曆和牆上的塗鴉。</p>
@@ -117,7 +116,7 @@
           <input id="pin" inputmode="numeric" autocomplete="off" required maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
-        <button id="return-to-room" class="secondary" type="button">返回病房繼續探索</button>
+        <button id="return-to-room" class="secondary" type="button">回到病房</button>
         <p id="drawer-feedback" role="status" aria-live="polite"></p>
         <div id="drawer-actions" class="row" hidden>
           <button class="secondary" id="take-tool">打開抽屜並取出工具</button>
@@ -150,6 +149,10 @@
         <p role="note"><strong>目前試玩到此結束。</strong>第二關尚未開放，現在無法進入護理站。</p>
       </section>
     </aside>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 <footer>第一關・消失的病歷　｜　WASD 移動 · 滑鼠拖曳轉向 · E 互動　｜　進度僅保留於本次開啟期間。</footer>
