@@ -80,6 +80,7 @@ test("值班桌上的病歷分開擺放，錄音與日期裝置在另一個工�
   const { recordA, recordB, recordC, recorder, keypad } = NursingNav.TARGETS;
   const records = [recordA, recordB, recordC];
   assert.ok(new Set(records.map(point => point.z)).size > 1, "病歷不可全排在同一直線");
+  assert.ok(Math.abs(recordB.x) >= .45, "中央病歷要避開玩家剛進護理站時的視線");
   assert.ok(Math.hypot(recorder.x - recordB.x, recorder.z - recordB.z) > 2.5, "錄音設備要移到分開的工作區");
   assert.ok(Math.abs(keypad.z - recorder.z) < .1,
     "日期裝置放在錄音設備旁");
