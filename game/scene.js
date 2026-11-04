@@ -19,14 +19,14 @@
   renderer.shadowMap.type=T.PCFSoftShadowMap;
   renderer.outputColorSpace=T.SRGBColorSpace;
   renderer.toneMapping=T.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.25;
+  renderer.toneMappingExposure=.92;
   const canvas=renderer.domElement;
   canvas.id="ward-canvas";canvas.tabIndex=0;
   canvas.setAttribute("aria-label","3D 病房，WASD 或方向鍵移動，拖曳轉向，E 互動");
   host.prepend(canvas);
   const scene=new T.Scene();
-  scene.background=new T.Color(0x101c1e);
-  scene.fog=new T.Fog(0x142123,8,22);
+  scene.background=new T.Color(0x05090b);
+  scene.fog=new T.Fog(0x080d0f,4,15);
   const wardRoom=new T.Group();scene.add(wardRoom);
   const nursingRoom=new T.Group();nursingRoom.visible=false;scene.add(nursingRoom);
   let buildGroup=wardRoom,buildingLevel="ward",activeLevel="ward",activeNavigation=N;
@@ -36,11 +36,15 @@
   avatar.root.position.set(player.x,1.05,player.z);
   avatar.root.rotation.x=-Math.PI/2;
   const followRay=new T.Raycaster(),followFocus=new T.Vector3();
-  scene.add(new T.HemisphereLight(0xc2e4e2,0x464336,1.65));
-  const ceilingLight=new T.PointLight(0xd8e7ce,65,16,2);
+  scene.add(new T.HemisphereLight(0xc2e4e2,0x464336,.12));
+  const ceilingLight=new T.PointLight(0xd8e7ce,2.1,8,2);
   ceilingLight.position.set(0,3.1,-.7);ceilingLight.castShadow=true;
   ceilingLight.shadow.mapSize.set(1024,1024);scene.add(ceilingLight);
-  const fill=new T.PointLight(0xffc985,22,10,2);fill.position.set(3,2.5,3);scene.add(fill);
+  const fill=new T.PointLight(0xffc985,.25,5,2);fill.position.set(3,2.5,3);scene.add(fill);
+  const flashlightBeam=new T.SpotLight(0xffdda0,82,13,Math.PI/6,.5,1.35);
+  flashlightBeam.name="player-flashlight-beam";scene.add(flashlightBeam,flashlightBeam.target);
+  const handGlow=new T.PointLight(0xffdda0,2.2,2.6,2);scene.add(handGlow);
+  const flashlightPosition=new T.Vector3(),flashlightTargetPosition=new T.Vector3();
   const materials={};
   function mat(color,metalness=0,roughness=.85){
     const key=[color,metalness,roughness].join("-");
@@ -198,20 +202,23 @@
   function click(id){
     document.getElementById(id)?.click();
   }
-  box(0,-.12,0,10,.24,12,0x53605b);
+  box(0,-.12,-.5,10,.24,13,0x53605b);
   for(let x=-5;x<=5;x++)box(x,.006,0,.018,.012,12,0x36453f);
-  for(let z=-6;z<=6;z++)box(0,.007,z,10,.012,.018,0x36453f);
+  for(let z=-7;z<=6;z++)box(0,.007,z,10,.012,.018,0x36453f);
   box(-5,1.8,0,.18,3.6,12,0x728178);
   box(5,1.8,0,.18,3.6,12,0x6d7e76);
   box(0,1.8,6,10,3.6,.18,0x79877b);
-  box(0,1.8,-6,10,3.6,.18,0x77887f);
+  box(-1.4,1.8,-6,7.2,3.6,.18,0x77887f);
+  box(4.4,1.8,-6,1.2,3.6,.18,0x77887f);
+  box(3,3.12,-6,1.6,.96,.18,0x77887f);
   box(0,3.65,0,10,.12,12,0x3c4843);
   for(const side of [-1,1])box(side*4.89,1.05,0,.04,.11,12,0x365f5d);
-  box(0,1.05,-5.89,10,.11,.04,0x365f5d);
+  box(-1.4,1.05,-5.89,7.2,.11,.04,0x365f5d);
+  box(4.4,1.05,-5.89,1.2,.11,.04,0x365f5d);
   box(0,1.05,5.89,10,.11,.04,0x365f5d);
   box(0,3.48,-.7,1.8,.05,.65,0xdbe9d6);
   box(0,3.43,-.7,2.05,.1,.82,0x59655d);
-  const lightLens=new T.Mesh(new T.BoxGeometry(1.78,.025,.55),new T.MeshStandardMaterial({color:0xe7ebcf,emissive:0xcbd9a5,emissiveIntensity:.75,roughness:.35}));
+  const lightLens=new T.Mesh(new T.BoxGeometry(1.78,.025,.55),new T.MeshStandardMaterial({color:0xe7ebcf,emissive:0xcbd9a5,emissiveIntensity:.12,roughness:.35}));
   lightLens.position.set(0,3.365,-.7);buildGroup.add(lightLens);
   box(-.91,3.365,-.7,.06,.035,.62,0x8f987d);
   box(.91,3.365,-.7,.06,.035,.62,0x8f987d);
@@ -356,7 +363,7 @@
   box(0,1.8,-7,12,3.6,.18,0x7b887e);box(0,1.8,7,12,3.6,.18,0x728078);
   box(0,3.65,0,12,.12,14,0x394540);
   box(0,3.46,-1.8,2.3,.06,.8,0xd9e2d4);box(0,3.40,-1.8,2.55,.12,.95,0x59655e);
-  const nurseLamp=new T.Mesh(new T.BoxGeometry(2.25,.025,.75),new T.MeshStandardMaterial({color:0xe9edda,emissive:0xc8d8ab,emissiveIntensity:.75}));
+  const nurseLamp=new T.Mesh(new T.BoxGeometry(2.25,.025,.75),new T.MeshStandardMaterial({color:0xe9edda,emissive:0xc8d8ab,emissiveIntensity:.12}));
   nurseLamp.position.set(0,3.32,-1.8);buildGroup.add(nurseLamp);
   sign(0,2.55,6.85,2.7,.52,"護理站・實驗紀錄室",Math.PI);
   // 值班表、三份病歷與錄音設備都作為可瞄準的 3D 物件。
@@ -366,26 +373,30 @@
   const recordLetters=["A","B","C"],recordDetails=["2/15 23:50 林","2/17 02:20 陳","2/17 08:40 陳"];
   const recordColors=[0xddd0af,0xc9d1c0,0xd8c6a2];
   const recordMeshes=[];
+  const recordPositions=[NN.TARGETS.recordA,NN.TARGETS.recordB,NN.TARGETS.recordC];
   recordLetters.forEach((letter,index)=>{
-    const x=-1.25+index*1.25;
-    const folder=new T.Group();folder.position.set(x,1.13,-1.55);buildGroup.add(folder);
+    const {x,z}=recordPositions[index];
+    const folder=new T.Group();folder.position.set(x,1.13,z);buildGroup.add(folder);
     box(0,0,0,.78,.09,.62,recordColors[index],folder);
     box(0,.05,-.04,.78,.012,.12,0xb0a078,folder);
-    const label=sign(x,1.42,-1.20,.73,.24,"病歷 "+letter+"・"+recordDetails[index]);
-    const mesh=box(x,1.25,-1.55,.82,.15,.66,recordColors[index]);
+    const label=sign(x,1.42,z+.36,.73,.24,"病歷 "+letter+"・"+recordDetails[index]);
+    const mesh=box(x,1.25,z,.82,.15,.66,recordColors[index]);
     const data=target(mesh,"檢查病歷 "+letter+"（"+recordDetails[index]+"）",()=>document.getElementById("nurse-record-"+letter.toLowerCase()).click(),NN.TARGETS["record"+letter]);
     data.record=letter;recordMeshes.push(data);label.userData.target=data;
   });
-  const cassetteProp=new T.Group();cassetteProp.visible=false;cassetteProp.position.set(2.45,1.18,-1.55);buildGroup.add(cassetteProp);
+  const recorderDesk=box(3.7,.78,-3.0,1.8,.16,1.3,0x716448);
+  for(const x of [3.0,4.4])for(const z of [-3.48,-2.52])box(x,.39,z,.12,.78,.12,0x536059);
+  const cassetteProp=new T.Group();cassetteProp.visible=false;cassetteProp.position.set(NN.TARGETS.recorder.x,1.0,NN.TARGETS.recorder.z);buildGroup.add(cassetteProp);
   box(0,0,0,.72,.28,.55,0x35413b,cassetteProp);box(0,.15,.05,.36,.025,.22,0xb3995f,cassetteProp);
   for(const x of [-.14,.14])cylinder(x,.16,.05,.055,.055,.028,0x252c29,cassetteProp);
-  const cassetteLabel=sign(2.45,1.5,-1.2,.68,.22,"錄音帶");cassetteLabel.visible=false;
+  const cassetteLabel=sign(NN.TARGETS.recorder.x,1.38,NN.TARGETS.recorder.z+.35,.68,.22,"錄音帶");cassetteLabel.visible=false;
   const cassetteTarget=target(cassetteProp,"播放病歷背面的錄音帶",()=>window.Ward3D?.openNursingPanel("cassette-panel","錄音機與實驗日期"),NN.TARGETS.recorder);
   cassetteLabel.userData.target=cassetteTarget;
-  const keypad=box(3.65,1.45,-.72,.55,.8,.13,0x4e6258);
-  const keypadParts=[box(3.65,1.53,-.642,.38,.3,.025,0x152323)];
-  for(let row=0;row<3;row++)for(let col=0;col<3;col++)keypadParts.push(box(3.52+col*.13,1.30-row*.11,-.63,.075,.065,.028,0xa89b73));
-  const keypadLabel=sign(3.65,1.97,-.72,.8,.2,"實驗日期");
+  const keypadX=NN.TARGETS.keypad.x,keypadZ=NN.TARGETS.keypad.z;
+  const keypad=box(keypadX,1.22,keypadZ,.52,.65,.16,0x4e6258);
+  const keypadParts=[box(keypadX,1.29,keypadZ+.094,.38,.25,.025,0x152323)];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)keypadParts.push(box(keypadX-.13+col*.13,1.12-row*.09,keypadZ+.094,.075,.06,.028,0xa89b73));
+  const keypadLabel=sign(keypadX,1.76,keypadZ+.32,.8,.2,"實驗日期");
   const keypadTarget=target(keypad,"實驗日期輸入裝置",()=>window.Ward3D?.openNursingPanel("cassette-panel","實驗日期輸入裝置"),NN.TARGETS.keypad);
   keypadParts.push(keypadLabel);keypadParts.forEach(part=>part.userData.target=keypadTarget);
   const desk=box(0,.86,-1.7,4.25,.18,1.72,0x716448);
@@ -423,7 +434,7 @@
     cabinetTarget.name=next.drawerUnlocked?(next.tool?"抽屜：重讀紙條":"抽屜：取出工具與紙條"):"床頭櫃密碼鎖";
     bottles[2].userData.target.name=next.tool&&!next.keycard?"藥瓶 C：用工具拆開瓶底":next.keycard?"藥瓶 C：查看標籤（門禁卡已取出）":"藥瓶 C：查看標籤";
     if(next.keycard)readerLight.material=mat(0x8edbb7);
-    if(next.ended){door.rotation.y=-1.25;door.position.x=3.6;keys.clear();document.exitPointerLock?.();}
+    if(next.ended){door.rotation.y=-Math.PI/2;door.position.x=4.0;keys.clear();document.exitPointerLock?.();}
   },enterNursingStation(){
     if(activeLevel==="nursing")return;
     closeNotebook();
@@ -533,12 +544,18 @@
     }
     nextNearbyCheck=0;
   }
+  function movementLocked(){
+    return activeLevel==="ward"?state.ended&&!state.doorOpen:nursingState.complete;
+  }
   function advance(f,r,d){
-    const p=activeNavigation.move(player,yaw,f,r,d);
+    const p=activeNavigation.move(player,yaw,f,r,d,activeLevel==="ward"&&state.doorOpen);
     const dx=p.x-player.x,dz=p.z-player.z,moved=Math.hypot(dx,dz);
     if(moved>.0001){travel+=moved;heading=Math.atan2(-dx,-dz);lastMovement=performance.now();}
     player.x=p.x;player.z=p.z;
     avatar.root.position.set(player.x,0,player.z);
+    if(activeLevel==="ward"&&state.doorOpen&&player.x>=2.45&&player.x<=3.55&&player.z< -6.15){
+      keys.clear();document.getElementById("enter-nursing-station").click();
+    }
   }
   function keyDirection(){
     return {f:Number(keys.has("w")||keys.has("arrowup"))-Number(keys.has("s")||keys.has("arrowdown")),
@@ -549,8 +566,8 @@
     if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","e"].includes(key)){
       e.preventDefault();
       if(!introComplete)return;
-      if(activeLevel==="ward"&&state.ended||activeLevel==="nursing"&&nursingState.complete)return;
-      if(key==="e"){if(!e.repeat)activate(aimed);return;}
+      if(movementLocked())return;
+      if(key==="e"){if(!e.repeat&&!(activeLevel==="ward"&&state.ended))activate(aimed);return;}
       if(!keys.has(key)){
         keys.add(key);const d=keyDirection();advance(d.f,d.r,.14);
       }
@@ -564,7 +581,7 @@
     drag={x:e.clientX,y:e.clientY};dragMoved=false;
   });
   window.addEventListener("pointermove",e=>{
-    if(activeLevel==="ward"&&state.ended||activeLevel==="nursing"&&nursingState.complete)return;
+    if(movementLocked())return;
     if(document.pointerLockElement===canvas){
       yaw-=e.movementX*.0026;pitch-=e.movementY*.0026;
     }else if(drag&&e.buttons){
@@ -607,7 +624,7 @@
   document.addEventListener("pointerlockerror",()=>tell("此環境未允許鎖定滑鼠，拖曳場景也能轉向。"));
   document.querySelectorAll("[data-walk]").forEach(button=>{
     button.addEventListener("pointerdown",e=>{
-      e.preventDefault();if(!introComplete||activeLevel==="ward"&&state.ended||activeLevel==="nursing"&&nursingState.complete)return;
+      e.preventDefault();if(!introComplete||movementLocked())return;
       const k=button.dataset.walk;
       if(k==="turn-left")yaw+=.22;
       else if(k==="turn-right")yaw-=.22;
@@ -644,9 +661,9 @@
     // 天花板燈持續輕微閃爍，偶爾短暫暗一下，保持不規則的病房氛圍。
     const pulse=Math.max(0,Math.sin(now*.0019));
     const flicker=Math.max(.58,.88+.055*Math.sin(now*.007)+.045*Math.sin(now*.013)-(pulse>.86?.22:0));
-    ceilingLight.intensity=65*flicker;
-    lightLens.material.emissiveIntensity=.35+flicker*.62;
-    fill.intensity=22*(.94+.06*Math.sin(now*.012));
+    ceilingLight.intensity=2.1*flicker;
+    lightLens.material.emissiveIntensity=.045+flicker*.055;
+    fill.intensity=.25*(.94+.06*Math.sin(now*.012));
     if(opening.started){
       const result=O.tick(opening,dt);opening=result.state;wakeProgress=result.progress;
       if(result.phase!==openingPhase&&result.phase==="reveal"){
@@ -678,12 +695,21 @@
       }
     }
     const moving=keyDirection();
-    const controlsLocked=activeLevel==="ward"?state.ended:nursingState.complete;
-    if(introComplete&&!controlsLocked&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*2.3);
+    const controlsLocked=movementLocked();
+    if(introComplete&&!controlsLocked&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*1.45);
     const walking=!controlsLocked&&now-lastMovement<160;
     walkBlend+=(Number(walking)-walkBlend)*Math.min(1,dt*12);
     if(walkBlend<.001)walkBlend=0;
-    avatar.update(travel,walkBlend,heading,dt,wakeProgress);orient();
+    avatar.update(travel,walkBlend,heading,dt,wakeProgress);
+    avatar.root.updateMatrixWorld(true);
+    if(avatar.flashlight){
+      avatar.flashlight.getWorldPosition(flashlightPosition);
+      flashlightBeam.position.copy(flashlightPosition);
+      flashlightTargetPosition.set(player.x-Math.sin(heading)*7,.72,player.z-Math.cos(heading)*7);
+      flashlightBeam.target.position.copy(flashlightTargetPosition);
+      handGlow.position.copy(flashlightPosition);
+    }
+    orient();
     if(opening.started){
       const shake=(1-wakeProgress)*.025;
       camera.position.x+=Math.sin(now*.035)*shake;
@@ -698,9 +724,9 @@
     updateNearby(now);
     const centered=targetAt(new T.Vector2(0,0));
     aimed=I.chooseTarget(centered,nearbyTargets);
-    document.getElementById("interact-target").disabled=controlsLocked||!introComplete;
+    document.getElementById("interact-target").disabled=controlsLocked||state.ended||!introComplete;
     const reach=aimed&&activeNavigation.withinReach(player,aimed.location);
-    prompt.textContent=controlsLocked?(activeLevel==="ward"?"第一關完成":"第二關完成"):aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:(activeLevel==="ward"?"移動探索病房，對準物件查看":"移動探索護理站，靠近物件按 E");
+    prompt.textContent=activeLevel==="ward"&&state.ended&&state.doorOpen?"門已打開，慢慢走過門口前往護理站。":controlsLocked?(activeLevel==="ward"?"第一關完成":"第二關完成"):aimed?(reach?"E／互動按鈕：":"靠近查看：")+aimed.name:(activeLevel==="ward"?"移動探索病房，對準物件查看":"移動探索護理站，靠近物件按 E");
     const angle=((yaw*180/Math.PI)%360+360)%360;
     const facing=angle<45||angle>=315?"北":angle<135?"西":angle<225?"南":"東";
     walk.textContent="面向"+facing+" · "+(activeLevel==="ward"?(player.z>2.8?"病房入口":player.x<-2.8?"床頭櫃附近":player.x>2.5?"病房右側":player.x>1.3&&player.z>1.6?"病床旁":"病房中央"):(player.z>3.5?"護理站入口":player.z<-4?"電梯區":player.x<-2.2?"值班表／抽屜旁":player.z>-.7?"病歷桌前":"護理站中央"));

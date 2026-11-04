@@ -52,7 +52,7 @@
    }
    return band;
  }
- function create(T){
+ function create(T,withFlashlight=true){
    const root=new T.Group();root.userData.player=true;
    const body=new T.Group();root.add(body);
    const ivory=new T.MeshStandardMaterial({color:0xeeeeea,roughness:.55,metalness:0});
@@ -85,6 +85,14 @@
      arm.rotation.z=i===0?-.13:.13;
    });
    const idBand=createIdBand(T);idBand.position.y=-.53;leftArm.add(idBand);
+   let flashlight=null;
+   if(withFlashlight){
+     flashlight=new T.Group();flashlight.name="hand-flashlight";flashlight.position.set(0,-.70,-.02);rightArm.add(flashlight);
+     const housing=new T.Mesh(new T.CylinderGeometry(.037,.045,.22,14),new T.MeshStandardMaterial({color:0x303b39,metalness:.58,roughness:.42}));
+     housing.rotation.x=-Math.PI/2;housing.position.z=-.105;flashlight.add(housing);
+     const lens=new T.Mesh(new T.CircleGeometry(.032,16),new T.MeshBasicMaterial({color:0xffdf96}));
+     lens.rotation.y=Math.PI;lens.position.z=-.218;flashlight.add(lens);
+   }
    const shadow=new T.Mesh(new T.CircleGeometry(.4,32),new T.MeshBasicMaterial({color:0x071411,transparent:true,opacity:.2,depthWrite:false}));
    shadow.name="ground-shadow";
    shadow.rotation.x=-Math.PI/2;shadow.position.y=.012;root.add(shadow);
@@ -103,10 +111,10 @@
      root.rotation.y+=diff*Math.min(1,dt*12);
      root.userData.walkBlend=blend;
    }
-   return {root,update};
+   return {root,update,flashlight};
  }
  function createPatient(T){
-   const model=create(T);
+   const model=create(T,false);
    model.root.userData.player=false;
    model.root.rotation.x=-Math.PI/2;
    model.root.rotation.y=Math.PI;

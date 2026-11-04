@@ -7,20 +7,21 @@
   const BOUNDS = { minX: -5.7, maxX: 5.7, minZ: -6.7, maxZ: 6.7 };
   const START = { x: 0, z: 2.4 };
   const OBSTACLES = [
-    // The desktop extends past the support legs and includes the tape recorder side.
+    // The main work desk is separate from the recording station.
     { x: 0, z: -1.7, w: 5.4, d: 1.95 },
-    // The date keypad and open hidden drawer are solid props too.
-    { x: 3.65, z: -.72, w: .9, d: .35 },
+    // The tape recorder and date keypad share a second, smaller table.
+    { x: 3.7, z: -3.0, w: 1.9, d: 1.35 },
+    // The open hidden drawer is a solid prop too.
     { x: -2.82, z: -2.3, w: .95, d: .9 },
     { x: 4.75, z: -6.82, w: 1.8, d: .16 }
   ];
   const TARGETS = {
     schedule: { x: -4.2, z: -5.45 },
-    recordA: { x: -1.25, z: -1.15 },
-    recordB: { x: 0, z: -1.15 },
-    recordC: { x: 1.25, z: -1.15 },
-    recorder: { x: 2.4, z: -1.15 },
-    keypad: { x: 3.35, z: -1.15 },
+    recordA: { x: -1.35, z: -1.35 },
+    recordB: { x: 0, z: -2.1 },
+    recordC: { x: 1.35, z: -1.35 },
+    recorder: { x: 3.15, z: -3.0 },
+    keypad: { x: 4.15, z: -3.0 },
     drawer: { x: -2.82, z: -2.3 },
     file: { x: -3.05, z: -2.45 },
     elevatorCard: { x: -2.58, z: -2.45 },

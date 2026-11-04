@@ -13,12 +13,14 @@
     {x:-3.6,z:-3.4,w:1.4,d:1.0},
     {x:3.5,z:2.8,w:.65,d:.65}
   ];
-  function canStand(p){
+  function canStand(p,doorOpen=false){
     const r=.28;
-    if(p.x<-4.65||p.x>4.65||p.z<-5.65||p.z>5.65)return false;
+    const inside=p.x>=-4.65&&p.x<=4.65&&p.z>=-5.65&&p.z<=5.65;
+    const doorway=doorOpen&&p.x>=2.45&&p.x<=3.55&&p.z<-5.65&&p.z>=-7.1;
+    if(!inside&&!doorway)return false;
     return !OBSTACLES.some(b=>Math.abs(p.x-b.x)<b.w/2+r&&Math.abs(p.z-b.z)<b.d/2+r);
   }
-  function move(position,yaw,forward,right,distance){
+  function move(position,yaw,forward,right,distance,doorOpen=false){
     const length=Math.hypot(forward,right);
     if(!length)return {x:position.x,z:position.z};
     const f=forward/length,r=right/length;
@@ -27,8 +29,8 @@
     const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.08));
     const p={x:position.x,z:position.z};
     for(let i=0;i<steps;i++){
-      if(canStand({x:p.x+dx/steps,z:p.z}))p.x+=dx/steps;
-      if(canStand({x:p.x,z:p.z+dz/steps}))p.z+=dz/steps;
+      if(canStand({x:p.x+dx/steps,z:p.z},doorOpen))p.x+=dx/steps;
+      if(canStand({x:p.x,z:p.z+dz/steps},doorOpen))p.z+=dz/steps;
     }
     return p;
   }
