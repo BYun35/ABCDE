@@ -456,8 +456,8 @@
   function frame(now){
     const dt=Math.min((now-last)/1000,.05);last=now;
     // 天花板燈持續輕微閃爍，偶爾短暫暗一下，保持不規則的病房氛圍。
-    const pulse=Math.max(0,Math.sin(now*.0046));
-    const flicker=Math.max(.34,.9+.055*Math.sin(now*.027)+.045*Math.sin(now*.071)-(pulse>.985?.48:0));
+    const pulse=Math.max(0,Math.sin(now*.0019));
+    const flicker=Math.max(.58,.88+.055*Math.sin(now*.007)+.045*Math.sin(now*.013)-(pulse>.86?.22:0));
     ceilingLight.intensity=65*flicker;
     lightLens.material.emissiveIntensity=.35+flicker*.62;
     fill.intensity=22*(.94+.06*Math.sin(now*.012));
