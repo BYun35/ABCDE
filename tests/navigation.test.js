@@ -28,6 +28,12 @@ test("長距離移動不穿牆，也不能穿越病床", () => {
   const bed=Nav.move({x:-2,z:3},0,1,0,10);
   assert.ok(bed.z>1.5);
 });
+test("門禁卡開門後可從病房門口走出病房", () => {
+  assert.equal(Nav.canStand({ x: 3, z: -6.2 }), false, "門鎖著時不能穿牆離開");
+  assert.equal(Nav.canStand({ x: 3, z: -6.2 }, true), true, "刷卡開門後通道可通行");
+  const exit = Nav.move({ x: 3, z: -5.4 }, 0, 1, 0, 1, true);
+  assert.ok(exit.z < -6.1, "玩家能實際穿過門口");
+});
 test("斜向走動不會比較快，互動必須靠近", () => {
   const a=Nav.move(Nav.START,0,1,0,0.5),b=Nav.move(Nav.START,0,1,1,0.5);
   const distance=p=>Math.hypot(p.x-Nav.START.x,p.z-Nav.START.z);
@@ -68,6 +74,15 @@ test("場景移除劇情未使用的空收納櫃與診療車", () => {
   const path = require("node:path");
   const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
   assert.doesNotMatch(scene, /醫療收納櫃|const trolley/);
+});
+
+test("值班桌上的病歷分開擺放，錄音與日期裝置在另一個工作區", () => {
+  const records = [NursingNav.TARGETS.recordA, NursingNav.TARGETS.recordB, NursingNav.TARGETS.recordC];
+  assert.ok(new Set(records.map(point => point.z)).size > 1, "病歷不可全排在同一直線");
+  assert.ok(Math.hypot(NursingNav.TARGETS.recorder.x - NursingNav.TARGETS.recordB.x,
+    NursingNav.TARGETS.recorder.z - NursingNav.TARGETS.recordB.z) > 2.5, "錄音設備要移到分開的工作區");
+  assert.ok(Math.abs(NursingNav.TARGETS.keypad.z - NursingNav.TARGETS.recorder.z) < .1,
+    "日期裝置放在錄音設備旁");
 });
 
 test("護理站桌面、錄音帶、日期裝置與抽屜都不能穿過", () => {

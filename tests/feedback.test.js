@@ -19,6 +19,22 @@ test("互動訊息與重要物品使用畫面中央的無障礙對話框", () =>
   assert.match(scene, /notifyPopup\(/);
 });
 
+test("暗場景由玩家手電筒照亮並降低環境光", () => {
+  const scene = read("game/scene.js");
+  assert.match(scene, /new T\.SpotLight\(/, "玩家前方要有手電筒光束");
+  assert.match(scene, /avatar\.flashlight\.getWorldPosition/, "光源跟著手上的手電筒移動");
+  assert.match(scene, /HemisphereLight\([^\n]+,\.12\)/, "環境光要保持昏暗");
+  assert.match(scene, /dt\*1\.45/, "移動速度要放慢，營造探索感");
+});
+
+test("刷卡開門後走過病房門口會自動進入護理站", () => {
+  const scene = read("game/scene.js");
+  const navigation = read("game/navigation.js");
+  assert.match(scene, /doorOpen[\s\S]{0,180}enter-nursing-station/, "走到開啟的門外要切換場景");
+  assert.match(navigation, /doorOpen[\s\S]{0,220}z\s*<\s*-5\.65/, "門關著時出口不可通行");
+  assert.match(scene, /box\(-1\.4,1\.8,-6,7\.2,3\.6/, "病房後牆要留出門洞");
+});
+
 test("E 互動不會自動開右側筆記，密碼表單改在中央對話框使用", () => {
   const html = read("game/index.html");
   const scene = read("game/scene.js");

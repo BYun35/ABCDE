@@ -85,3 +85,12 @@ test("醒來動畫由病床上的躺姿起身到正常站姿",()=>{
  assert.equal(player.root.position.y,0,"站姿落在地面");
 });
 
+test("玩家右手持有可見的手電筒",()=>{
+ const T=require("../game/vendor/three.min.js");
+ const player=Avatar.create(T);
+ const flashlight=player.root.getObjectByName("hand-flashlight");
+ assert.ok(flashlight,"手電筒要跟著玩家模型出現");
+ assert.equal(flashlight.parent.name,"right-arm","手電筒要拿在手上");
+ assert.ok(flashlight.children.some(part=>part.isMesh),"手電筒模型要看得見");
+});
+
