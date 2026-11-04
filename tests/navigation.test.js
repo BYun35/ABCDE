@@ -77,26 +77,27 @@ test("場景移除劇情未使用的空收納櫃與診療車", () => {
 });
 
 test("值班桌上的病歷分開擺放，錄音與日期裝置在另一個工作區", () => {
-  const records = [NursingNav.TARGETS.recordA, NursingNav.TARGETS.recordB, NursingNav.TARGETS.recordC];
+  const { recordA, recordB, recordC, recorder, keypad } = NursingNav.TARGETS;
+  const records = [recordA, recordB, recordC];
   assert.ok(new Set(records.map(point => point.z)).size > 1, "病歷不可全排在同一直線");
-  assert.ok(Math.hypot(NursingNav.TARGETS.recorder.x - NursingNav.TARGETS.recordB.x,
-    NursingNav.TARGETS.recorder.z - NursingNav.TARGETS.recordB.z) > 2.5, "錄音設備要移到分開的工作區");
-  assert.ok(Math.abs(NursingNav.TARGETS.keypad.z - NursingNav.TARGETS.recorder.z) < .1,
+  assert.ok(Math.hypot(recorder.x - recordB.x, recorder.z - recordB.z) > 2.5, "錄音設備要移到分開的工作區");
+  assert.ok(Math.abs(keypad.z - recorder.z) < .1,
     "日期裝置放在錄音設備旁");
+  assert.ok(Math.abs(keypad.x - recorder.x) > .5, "錄音設備和日期裝置要分開可辨認");
 });
 
 test("護理站桌面、錄音帶、日期裝置與抽屜都不能穿過", () => {
   for (const point of [
     { x: 0, z: -1.7 },
-    { x: 2.4, z: -1.55 },
-    { x: 3.65, z: -.72 },
+    NursingNav.TARGETS.recorder,
+    NursingNav.TARGETS.keypad,
     { x: -2.82, z: -2.3 }
   ]) {
     assert.equal(NursingNav.canStand(point), false, JSON.stringify(point));
   }
   const approaches = [
-    { x: 2.4, z: -3.05 },
-    { x: 3.65, z: 1.0 },
+    { x: 3.1, z: -4.0 },
+    { x: 4.2, z: -4.0 },
     { x: -2.82, z: -3.3 }
   ];
   for (const point of approaches) assert.equal(NursingNav.canStand(point), true, JSON.stringify(point));
