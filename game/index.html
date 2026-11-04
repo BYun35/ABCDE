@@ -13,21 +13,22 @@
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
+<script src="level2.js?v=nursingstation1" defer></script>
 <script src="scene.js?v=centerfeedback1" defer></script>
 <script src="app.js?v=centerfeedback1" defer></script>
 </head>
 <body>
 <header>
-  <div><div class="brand">時空密室・第一關</div><h1>消失的病歷</h1></div>
-  <div class="header-note">第三人稱探索 · 病房</div>
+  <div><div class="brand" id="page-brand">時空密室・第一關</div><h1 id="page-title">消失的病歷</h1></div>
+  <div class="header-note" id="header-note">第三人稱探索 · 病房</div>
 </header>
 <main>
-  <section class="intro">
-    <div><div class="eyebrow">病房・凌晨 3:17</div><h2>你在陌生的病房醒來</h2></div>
-    <p>在病房裡走動，找出線索，揭開自己的身分。</p>
+  <section class="intro" id="stage-intro">
+    <div><div class="eyebrow" id="stage-eyebrow">病房・凌晨 3:17</div><h2 id="stage-title">你在陌生的病房醒來</h2></div>
+    <p id="stage-description">在病房裡走動，找出線索，揭開自己的身分。</p>
   </section>
 
-  <div class="layout">
+  <div class="layout" id="game-layout">
     <section class="scene-column" aria-label="3D 病房探索">
       <div class="scene-shell">
         <div id="ward-viewport">
@@ -47,6 +48,7 @@
             <span class="awakening-caption">畫面恢復中……</span>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
+          <button id="enter-nursing-station" class="primary stage-transition" type="button" hidden>前往護理站</button>
           <div id="interaction-dialog" class="interaction-dialog" role="dialog" aria-modal="true" aria-labelledby="interaction-dialog-title" aria-describedby="interaction-dialog-message" hidden>
             <div class="interaction-dialog-card">
               <span id="interaction-dialog-kicker" class="eyebrow">病房線索</span>
@@ -158,7 +160,7 @@
         <h4>接下來的目標：前往護理站</h4>
         <p>抽屜裡的紙條提醒你：「如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」</p>
         <p>下一關：護理站——被篡改的記錄。</p>
-        <p role="note"><strong>目前試玩到此結束。</strong>第二關尚未開放，現在無法進入護理站。</p>
+        <p role="note">使用畫面上的「前往護理站」按鈕，繼續追查實驗紀錄。</p>
       </section>
     </aside>
         </div>
@@ -166,7 +168,66 @@
     </section>
 
   </div>
+  <section id="nursing-station" class="nursing-station" aria-labelledby="nursing-title" hidden>
+    <div class="nursing-heading">
+      <span class="eyebrow">第二關・護理站</span>
+      <h2 id="nursing-title" tabindex="-1">被篡改的記錄</h2>
+      <p>比對值班時間與病歷簽名，找出遭到修改的實驗紀錄。</p>
+    </div>
+    <p id="nurse-feedback" class="nurse-feedback" role="status" aria-live="polite">值班桌上放著一張值班表和三份病歷。</p>
+    <div class="nursing-grid">
+      <section class="nursing-card">
+        <h3>護理師值班表</h3>
+        <table class="nurse-table">
+          <thead><tr><th>日期</th><th>值班時間</th><th>護理師</th></tr></thead>
+          <tbody>
+            <tr><td>2/15</td><td>16:00–24:00</td><td>林護理師</td></tr>
+            <tr><td>2/17</td><td>00:00–08:00</td><td>王護理師</td></tr>
+            <tr><td>2/17</td><td>08:00–16:00</td><td>陳護理師</td></tr>
+          </tbody>
+        </table>
+        <h3>三份病歷</h3>
+        <div class="record-list">
+          <article class="record-card"><h4>病歷 A</h4><p>2/15 23:50　林護理師</p><button class="secondary" id="nurse-record-a" data-record="A" type="button">檢查病歷 A</button></article>
+          <article class="record-card"><h4>病歷 B</h4><p>2/17 02:20　陳護理師</p><button class="secondary" id="nurse-record-b" data-record="B" type="button">檢查病歷 B</button></article>
+          <article class="record-card"><h4>病歷 C</h4><p>2/17 08:40　陳護理師</p><button class="secondary" id="nurse-record-c" data-record="C" type="button">檢查病歷 C</button></article>
+        </div>
+      </section>
+      <section class="nursing-card" id="cassette-panel" hidden>
+        <h3>病歷背面的錄音帶</h3>
+        <p>錄音帶可以重播。聽完後，依照醫師說的日期輸入實驗啟動日。</p>
+        <button class="primary" id="play-nurse-tape" type="button">播放錄音帶</button>
+        <pre class="transcript" id="nurse-tape-transcript" role="status" aria-live="polite" hidden></pre>
+        <form class="date-form" id="nurse-date-form" hidden>
+          <label for="nurse-date">實驗啟動日期（MMDD）</label>
+          <input id="nurse-date" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" required>
+          <button class="primary" type="submit">輸入日期</button>
+        </form>
+      </section>
+      <section class="nursing-card" id="nurse-drawer-panel" hidden>
+        <h3>桌子下方的隱藏抽屜</h3>
+        <p>日期輸入裝置已解鎖抽屜。</p>
+        <button class="secondary" id="open-nurse-drawer" type="button">打開隱藏抽屜</button>
+        <div id="nurse-drawer-contents" hidden>
+          <h4>機密文件</h4>
+          <button class="secondary" id="read-nurse-file" type="button">閱讀實驗檔案</button>
+          <pre class="transcript file-transcript" id="nurse-file-transcript" role="status" aria-live="polite" hidden></pre>
+          <button class="secondary" id="take-elevator-card" type="button">取得地下研究區電梯卡</button>
+        </div>
+      </section>
+      <section class="nursing-card elevator-card" id="nurse-elevator-panel" hidden>
+        <h3>地下研究區電梯</h3>
+        <p>電梯讀卡器等待感應。</p>
+        <button class="primary" id="use-elevator-card" type="button">使用電梯卡</button>
+      </section>
+      <section class="nursing-card nursing-ending" id="nursing-ending" tabindex="-1" hidden>
+        <h3>第二關完成</h3>
+        <p>警告！NO. 02 已取得實驗資料，請立即啟動封鎖程序。</p>
+        <p>你拿著電梯卡，前往地下研究區。第三關尚未開放。</p>
+      </section>
+    </div>
+  </section>
 </main>
-<footer>第一關・消失的病歷　｜　WASD 移動 · 滑鼠拖曳轉向 · E 互動　｜　進度僅保留於本次開啟期間。</footer>
+<footer>消失的病歷／被篡改的記錄　｜　第一關可用 WASD、滑鼠與 E 探索；兩關進度僅保留於本次開啟期間。</footer>
 </body>
 </html>
