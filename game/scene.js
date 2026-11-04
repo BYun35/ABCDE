@@ -401,9 +401,11 @@
   const fileProp=box(NN.TARGETS.file.x,.63,NN.TARGETS.file.z,.36,.035,.4,0xd7c9a5);fileProp.visible=false;
   const fileLabel=sign(NN.TARGETS.file.x,.86,NN.TARGETS.file.z+.2,.38,.16,"NO.02");fileLabel.visible=false;
   const fileTarget=target(fileProp,"閱讀 NO.02 實驗檔案",()=>document.getElementById("read-nurse-file").click(),NN.TARGETS.file);
+  fileLabel.userData.target=fileTarget;
   const cardProp=box(NN.TARGETS.elevatorCard.x,.63,NN.TARGETS.elevatorCard.z,.28,.035,.4,0xc3a658);cardProp.visible=false;
   const cardLabel=sign(NN.TARGETS.elevatorCard.x,.86,NN.TARGETS.elevatorCard.z+.2,.42,.16,"電梯卡");cardLabel.visible=false;
   const cardTarget=target(cardProp,"取得地下研究區電梯卡",()=>document.getElementById("take-elevator-card").click(),NN.TARGETS.elevatorCard);
+  cardLabel.userData.target=cardTarget;
   // 電梯與刷卡器放在房間另一端，必須拿到卡才能完成第二關。
   const elevatorDoor=box(4.75,1.42,-6.82,1.8,2.84,.16,0x66746a);
   box(4.75,1.4,-6.71,.08,2.55,.04,0x34423d);
