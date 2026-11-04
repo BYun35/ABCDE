@@ -12,6 +12,8 @@ test("第二關開始時所有隱藏道具與結尾都未解鎖", () => {
   assert.equal(state.complete, false);
   assert.match(L2.openDrawer(state).message, /還沒解鎖/);
   assert.equal(L2.openDrawer(state).state.elevatorCard, false);
+  assert.match(L2.readFile(state).message, /抽屜還沒打開/);
+  assert.match(L2.takeElevatorCard(state).message, /抽屜還沒打開/);
   assert.match(L2.useElevator(state).message, /需要電梯卡/);
 });
 
@@ -55,15 +57,18 @@ test("錄音未播放前無法輸入日期，日期錯誤回饋不同且可重�
   assert.equal(result.state.drawerUnlocked, true);
 });
 
-test("輸入 0217 後可讀實驗檔案、取得電梯卡並完成第二關", () => {
+test("輸入 0217 後開抽屜，讀實驗檔案、取得電梯卡並完成第二關", () => {
   let state = L2.createInitialState();
   state = L2.playTape(L2.chooseRecord(state, "B").state).state;
   state = L2.submitDate(state, "0217").state;
-  const file = L2.openDrawer(state);
+  state = L2.openDrawer(state).state;
+  const file = L2.readFile(state);
   assert.match(file.message, /實驗個體 NO\. 02/);
   assert.match(file.message, /YOU ARE NOT THE ORIGINAL/);
-  assert.equal(file.state.elevatorCard, true);
-  const ending = L2.useElevator(file.state);
+  assert.equal(file.state.elevatorCard, false);
+  const card = L2.takeElevatorCard(file.state);
+  assert.equal(card.state.elevatorCard, true);
+  const ending = L2.useElevator(card.state);
   assert.equal(ending.state.complete, true);
   assert.match(ending.message, /地下研究區|第二關完成/);
 });

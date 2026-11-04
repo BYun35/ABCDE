@@ -137,7 +137,7 @@ test("第一關完成後可進護理站，第二關有病歷、錄音與日期�
   const html = fs.readFileSync(path.join(__dirname, "../game/index.html"), "utf8");
   assert.match(html, /id="enter-nursing-station"/);
   assert.match(html, /id="nursing-station"[^>]*hidden/);
-  for (const id of ["nurse-record-a", "nurse-record-b", "nurse-record-c", "play-nurse-tape", "nurse-date-form", "open-nurse-drawer", "use-elevator-card"]) {
+  for (const id of ["nurse-record-a", "nurse-record-b", "nurse-record-c", "play-nurse-tape", "nurse-date-form", "open-nurse-drawer", "read-nurse-file", "take-elevator-card", "use-elevator-card"]) {
     assert.ok(html.includes(`id="${id}"`), `缺少第二關操作：${id}`);
   }
   assert.match(html, /id="nursing-station"[\s\S]*值班表[\s\S]*病歷[\s\S]*錄音帶/);
