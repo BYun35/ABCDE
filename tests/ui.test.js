@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const Game = require("../game/game.js");
+const Level2 = require("../game/level2.js");
 
 function setup() {
   const nodes = new Map();
@@ -28,7 +29,7 @@ function setup() {
     createElement: () => ({ textContent: "" }),
     querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts
   };
-  const window = { EscapeRoomGame: Game, Ward3D: {
+  const window = { EscapeRoomGame: Game, NursingStationGame: Level2, Ward3D: {
     sync() {},
     updateDialog() {},
     notifyPopup(popup) { popups.push(popup); }
