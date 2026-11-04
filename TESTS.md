@@ -116,6 +116,8 @@ node --test tests/game.test.js tests/ui.test.js tests/navigation.test.js tests/a
 
 先新增 T-U06、T-F01、T-F02。執行 `node --test tests/ui.test.js tests/feedback.test.js` 時，右側面板行為／中央對話框檢查和重要物品通知共 3 項失敗，先獨立提交 [f878c19](https://github.com/BYun35/ABCDE/commit/f878c19b5343fa0babbf457d7fe7d63eb0596067)，再實作。按 E 查看線索、拾取碎片、拿工具、拆瓶或刷卡時改用置中對話框；物品名稱獨立醒目顯示。密碼表單會移入置中視窗；筆記／背包由工具列按鈕手動開啟。中央視窗有關閉按鈕與 Esc 操作。本輪完整命令 `node --test tests/*.test.js`：**36 項通過，0 項失敗**。
 
+使用者補充紙條拾取後應直接看得到紙條正文。新增斷言要求中央重要物品提示將正文以「紙條內容」標示並分行；修正前 `node --test tests/ui.test.js` 有 1 項失敗，修正後完整 `node --test tests/*.test.js` 為 **36 項通過、0 項失敗**。
+
 同日較早的床頭櫃附近 E 拾取修正：新增 T-I05～07，先執行出現 4 過、3 失敗，獨立提交 [233d3ca](https://github.com/BYun35/ABCDE/commit/233d3ca76cddfd5b2e1b20bacaf8e03e71b61d6f) 後才實作。當時完整測試為 27 項通過、0 項失敗；已由本輪 30 項結果涵蓋重跑。
 
 實際重現舊版：新遊戲從入口沿左側走道到床頭櫃，附近清單已列出櫃後病歷碎片，E 卻開密碼輸入欄。修正版同一路線第一次 E 正常收碎片，背包為 1/3、場景焦點保留；第二次 E 才開密碼欄。瀏覽器沒有程式錯誤。只重驗該路線與焦點，不把本輪宣稱為完整通關或團隊驗收。直接點櫃體依舊可以輸入密碼，不增加收齊碎片才能輸入的限制。
