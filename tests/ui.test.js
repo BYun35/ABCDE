@@ -132,3 +132,13 @@ test("取得病歷碎片、拆卸工具與門禁卡時回報重要物品名稱",
   assert.equal(popups[2].title, "取得重要物品");
   assert.equal(popups[2].item, "護理站門禁卡");
 });
+
+test("第一關完成後可進護理站，第二關有病歷、錄音與日期輸入操作", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../game/index.html"), "utf8");
+  assert.match(html, /id="enter-nursing-station"/);
+  assert.match(html, /id="nursing-station"[^>]*hidden/);
+  for (const id of ["nurse-record-a", "nurse-record-b", "nurse-record-c", "play-nurse-tape", "nurse-date-form", "open-nurse-drawer", "use-elevator-card"]) {
+    assert.ok(html.includes(`id="${id}"`), `缺少第二關操作：${id}`);
+  }
+  assert.match(html, /id="nursing-station"[\s\S]*值班表[\s\S]*病歷[\s\S]*錄音帶/);
+});
