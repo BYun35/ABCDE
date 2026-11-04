@@ -57,10 +57,17 @@ test("護理站有獨立起點、房間邊界與桌子和電梯的碰撞", () =>
   assert.equal(NursingNav.canStand({ x: 0, z: -1.7 }), false);
 });
 
-test("護理站的收納櫃、推車與電梯門都是實體障礙", () => {
-  for (const point of [{ x: -5.25, z: -3.35 }, { x: 4.15, z: 1.05 }, { x: 4.75, z: -6.82 }]) {
+test("護理站電梯門是實體障礙", () => {
+  for (const point of [{ x: 4.75, z: -6.82 }]) {
     assert.equal(NursingNav.canStand(point), false, JSON.stringify(point));
   }
+});
+
+test("場景移除劇情未使用的空收納櫃與診療車", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
+  assert.doesNotMatch(scene, /醫療收納櫃|const trolley/);
 });
 
 test("護理站桌面、錄音帶、日期裝置與抽屜都不能穿過", () => {
@@ -73,7 +80,7 @@ test("護理站桌面、錄音帶、日期裝置與抽屜都不能穿過", () =>
     assert.equal(NursingNav.canStand(point), false, JSON.stringify(point));
   }
   const approaches = [
-    { x: 2.4, z: -2.9 },
+    { x: 2.4, z: -3.05 },
     { x: 3.65, z: 1.0 },
     { x: -2.82, z: -3.3 }
   ];
