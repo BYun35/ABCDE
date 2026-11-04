@@ -88,3 +88,32 @@ main{width:min(1600px,96vw)}
 #nearby-actions button{font-size:.8rem;padding:7px 10px}
 #nearby-actions span{font-size:.8rem;color:var(--muted)}
 #return-to-room{margin-top:10px;font-size:.8rem}
+
+/* 3D 病房整體視覺整理：冷色燈光、舊病房材質與清楚的互動層次。 */
+:root{--bg:#0c1416;--panel:#172326;--panel2:#202e30;--line:#405451;--ink:#f2efe4;--muted:#b5c2b9;--gold:#d5b66f;--teal:#a5d7cb}
+body{background:radial-gradient(ellipse at 50% -18%,#33413d 0,#172326 35%,#0c1416 76%)}
+header{background:linear-gradient(105deg,#172729f2,#111b1df2);border-bottom-color:#49605b}
+.brand,.eyebrow{color:#dec47f}
+h1,h2,h3{letter-spacing:.025em}
+.scene-shell{border-color:#63736b;background:#111d1f;box-shadow:0 24px 68px #0009,inset 0 1px #d9ddc41c}
+.scene-topline{background:linear-gradient(90deg,#1c2c2d,#172425);color:#d5d8c7}
+#ward-viewport{background:radial-gradient(ellipse at 50% 45%,#263735,#111b1d 82%)}
+#ward-viewport:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 48%,#07101155 100%),linear-gradient(180deg,#ffffff08,transparent 28%,#050b0d24)}
+.crosshair{z-index:2;width:26px;height:26px;display:grid;place-items:center;color:#f2e5bd;font-size:19px;text-shadow:0 0 8px #f4e6bc,0 2px 6px #000}
+.target-prompt{z-index:2;border-color:#cfb87599;background:#101c1deF;box-shadow:0 4px 18px #0006}
+.walk-instructions,.awakening-scene{z-index:3}
+.awakening-scene{z-index:4}
+.card{background:linear-gradient(145deg,#1b2a2c,#152124);border-color:#3b514d;box-shadow:0 8px 22px #0002}
+.card h3{border-left:2px solid var(--gold);padding-left:9px}
+.card p{color:#c0cbc1}
+.action,.primary,.secondary,.walk-buttons button{transition:background-color .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
+.action:hover,.secondary:hover,.walk-buttons button:hover{border-color:#d3b56e;background:#2d3b37;box-shadow:0 3px 12px #0003}
+.primary{background:linear-gradient(135deg,#756039,#51452f);border-color:#c4a86b}
+.primary:hover{background:linear-gradient(135deg,#8a7142,#635238)}
+#scene-feedback{border-left-color:#d1b56e;background:linear-gradient(90deg,#243b38,#1a2b2c);color:#d7e5d9}
+#nearby-actions button{background:#203332;border-color:#546a60}
+.fragment{background:#1c2b2c;border-color:#425550}
+.inventory .chip{background:#2c4840;color:#d8eee2}
+.walk-buttons button{background:#203332;border-color:#50635a;color:#e0e4d8}
+footer{color:#a0aaa2}
+@media(prefers-reduced-motion:reduce){.action,.primary,.secondary,.walk-buttons button{transition:none}}

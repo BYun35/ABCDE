@@ -66,9 +66,46 @@
     lines.forEach((line,i)=>ctx.fillText(line,384,128+(i-(lines.length-1)/2)*70,720));
     const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;return texture;
   }
+  function calendarTexture(){
+    const canvas=document.createElement("canvas");canvas.width=768;canvas.height=768;
+    const ctx=canvas.getContext("2d");
+    const paper=ctx.createLinearGradient(0,0,768,768);paper.addColorStop(0,"#e9dfc4");paper.addColorStop(.55,"#d8c9a4");paper.addColorStop(1,"#c5b48d");
+    ctx.fillStyle=paper;ctx.fillRect(0,0,768,768);
+    ctx.fillStyle="#263b3a";ctx.fillRect(0,0,768,142);
+    ctx.fillStyle="#f1e7ce";ctx.font="bold 76px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("2 月",384,70);
+    ctx.font="28px sans-serif";ctx.fillStyle="#425754";ctx.fillText("日　 一　 二　 三　 四　 五　 六",384,190);
+    ctx.strokeStyle="#8f8062";ctx.lineWidth=2;
+    const left=65,top=230,cw=91,ch=82;
+    for(let r=0;r<5;r++)for(let col=0;col<7;col++){
+      const x=left+col*cw,y=top+r*ch;ctx.strokeRect(x,y,cw,ch);
+      const n=r*7+col-2;if(n<1||n>28)continue;
+      ctx.fillStyle="#293d3b";ctx.font="bold 34px sans-serif";ctx.fillText(String(n),x+cw/2,y+ch/2);
+      if([1,3,7].includes(n)){ctx.strokeStyle="#a74735";ctx.lineWidth=7;ctx.beginPath();ctx.arc(x+cw/2,y+ch/2,25,0,Math.PI*2);ctx.stroke();ctx.strokeStyle="#8f8062";ctx.lineWidth=2;}
+    }
+    ctx.strokeStyle="#b24d39";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(720,20);ctx.lineTo(735,748);ctx.stroke();
+    const tex=new T.CanvasTexture(canvas);tex.colorSpace=T.SRGBColorSpace;return tex;
+  }
+  function graffitiTexture(){
+    const canvas=document.createElement("canvas");canvas.width=1024;canvas.height=360;
+    const ctx=canvas.getContext("2d");ctx.clearRect(0,0,1024,360);
+    ctx.strokeStyle="#ad5948";ctx.fillStyle="#ad5948";ctx.lineWidth=11;ctx.lineCap="round";ctx.lineJoin="round";
+    ctx.font="bold 58px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.save();ctx.translate(512,180);ctx.rotate(-.045);ctx.fillText("月亮  →  時鐘  →  太陽",0,0);ctx.restore();
+    for(const [x,label] of [[145,"月"],[512,"03:17"],[879,"日"]]){
+      ctx.beginPath();ctx.arc(x,56,30,0,Math.PI*2);ctx.stroke();
+      ctx.font="bold 24px sans-serif";ctx.fillText(label,x,58);
+      ctx.beginPath();ctx.moveTo(x-38,114);ctx.lineTo(x+35,114);ctx.stroke();
+    }
+    const tex=new T.CanvasTexture(canvas);tex.colorSpace=T.SRGBColorSpace;return tex;
+  }
   function sign(x,y,z,w,h,text,rotation=0){
-    const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:textureText(text),side:T.DoubleSide}));
-    m.position.set(x,y,z);m.rotation.y=rotation;scene.add(m);return m;
+    const group=new T.Group();group.position.set(x,y,z);group.rotation.y=rotation;scene.add(group);
+    const back=new T.Mesh(new T.BoxGeometry(w+.12,h+.12,.055),mat(0x5d5849));back.castShadow=true;group.add(back);
+    const isGraffiti=text.includes("月亮");
+    const tex=text.startsWith("2 月")?calendarTexture():isGraffiti?graffitiTexture():textureText(text);
+    const material=new T.MeshBasicMaterial({map:tex,side:T.DoubleSide,transparent:isGraffiti});
+    const m=new T.Mesh(new T.PlaneGeometry(w,h),material);m.position.z=.031;group.add(m);
+    m.userData.signGroup=group;return m;
   }
   function clockDialTexture(){
     const size=1024,center=size/2,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
@@ -109,6 +146,11 @@
   box(0,1.05,-5.89,10,.11,.04,0x365f5d);
   box(0,1.05,5.89,10,.11,.04,0x365f5d);
   box(0,3.48,-.7,1.8,.05,.65,0xdbe9d6);
+  box(0,3.43,-.7,2.05,.1,.82,0x59655d);
+  const lightLens=new T.Mesh(new T.BoxGeometry(1.78,.025,.55),new T.MeshStandardMaterial({color:0xe7ebcf,emissive:0xcbd9a5,emissiveIntensity:.75,roughness:.35}));
+  lightLens.position.set(0,3.365,-.7);scene.add(lightLens);
+  box(-.91,3.365,-.7,.06,.035,.62,0x8f987d);
+  box(.91,3.365,-.7,.06,.035,.62,0x8f987d);
   sign(0,2.5,5.85,2,.5,"隔離病房",Math.PI);
   // 牆面裂痕與停止運作的設備。
   for(let i=0;i<7;i++){const crack=box(-1.3+i*.06,2.9-i*.12,-5.88,.018,.2,.015,0x34463f);crack.rotation.z=i%2?.5:-.35;}
@@ -134,6 +176,16 @@
   box(.25,.92,1.48,1.8,.35,.06,0x688f8b);
   box(-2,1.02,-1.48,2,.55,.06,0x688f8b);
   box(-2,.92,1.48,2,.35,.06,0x688f8b);
+  // 床欄、金屬接頭與縫線，讓兩張病床更像可使用的病房設備。
+  for(const bedX of [-2,.25]){
+    const half=bedX===-2?1:.9;
+    for(const side of [-1,1]){
+      const rail=cylinder(bedX+side*(half-.08),.98,.12,.035,.035,2.2,0x87938a);
+      rail.rotation.x=Math.PI/2;
+      for(const z of [-.88,-.28,.32,.92])cylinder(bedX+side*(half-.08),.89,z,.025,.025,.2,0x9aa69a);
+    }
+    for(let i=0;i<5;i++)box(bedX-.62+i*.31,.934,1.08,.012,.008,.48,0x9caa9e);
+  }
   const patientModel=A.createPatient(T);
   const patient=patientModel.root;
   patient.position.set(-2,1.05,.95);scene.add(patient);
@@ -144,6 +196,11 @@
   const cabinet=box(-3.6,.55,-3.4,1.4,1.1,1,0x887e64);
   box(-3.6,.62,-2.886,1.24,.025,.025,0x473e30);
   box(-3.6,.38,-2.85,.25,.055,.06,0xc0ac71);
+  box(-3.6,.85,-2.884,1.16,.3,.035,0x9a8e72);
+  box(-3.6,.36,-2.875,1.16,.28,.035,0x756b56);
+  box(-3.6,.83,-2.852,.24,.035,.035,0xc9b77f);
+  box(-3.6,.34,-2.842,.24,.035,.035,0xc9b77f);
+  box(-3.6,.99,-2.864,.28,.12,.018,0x414d48);
   const cabinetTarget=target(cabinet,"床頭櫃密碼鎖",()=>{
     const action=I.action("cabinet",state);
     if(action==="take-tool"){click("take-tool");return;}
@@ -154,8 +211,13 @@
   const bottles=[];
   [0x7a9b83,0x668f9e,0xbca263].forEach((color,i)=>{
     const g=new T.Group();g.position.set(-4.05+i*.45,1.12,-3.4);scene.add(g);
-    cylinder(0,.2,0,.12,.12,.4,color,g);cylinder(0,.45,0,.09,.09,.1,0xd5d0b9,g);
-    const label=new T.Mesh(new T.PlaneGeometry(.19,.16),new T.MeshBasicMaterial({map:textureText(["A","B","C"][i])}));
+    const bottle=cylinder(0,.2,0,.12,.12,.4,color,g);bottle.material=mat(color,.16,.28);
+    cylinder(0,.405,0,.078,.078,.025,0xe0d8c4,g);
+    cylinder(0,.45,0,.09,.09,.1,0xd5d0b9,g);
+    cylinder(0,.505,0,.074,.074,.018,0x887e65,g);
+    cylinder(0,.015,0,.125,.125,.025,0xddd2b8,g);
+    const labelTexture=textureText("藥品  "+["A","B","C"][i],"#e8ddbd","#243d3b");
+    const label=new T.Mesh(new T.PlaneGeometry(.205,.17),new T.MeshBasicMaterial({map:labelTexture,side:T.DoubleSide}));
     label.position.set(0,.22,.124);g.add(label);
     target(g,"藥瓶 "+["A","B","C"][i],()=>{
       if(i===2&&I.action("bottle-C",state)==="open-bottle")click("open-bottle");
@@ -190,6 +252,9 @@
   // 垃圾桶與可拾取的碎片。
   cylinder(3.5,.4,2.8,.34,.28,.8,0x667b73);
   cylinder(3.5,.805,2.8,.30,.30,.015,0x17231f);
+  cylinder(3.5,.82,2.8,.345,.345,.035,0x839087);
+  box(3.5,.12,3.12,.28,.06,.16,0x9aa49b);
+  box(3.5,.09,3.2,.18,.035,.08,0x313c39);
   const paperTargets=[];
   const paperPositions=[[-.65,1.8,"bed"],[-4.3,-2.6,"cabinet"],[3,2.4,"bin"]];
   paperPositions.forEach(([x,z,id])=>{
@@ -206,8 +271,11 @@
   box(3,1.65,-5.72,.8,.45,.035,0x1d3939);
   sphere(3.53,1.1,-5.68,.06,0xbba770);
   target(door,"病房門",()=>inspect("door"),{x:3,z:-5.7});
+  const readerFrame=box(1.96,1.37,-5.635,.39,.56,.055,0x52645c);
   const reader=box(1.96,1.35,-5.72,.3,.46,.16,0x1e3634);
   const readerLight=box(1.96,1.46,-5.625,.2,.055,.02,0xe7bb68);
+  box(1.96,1.23,-5.625,.19,.13,.02,0x102321);
+  box(1.96,1.07,-5.62,.1,.018,.018,0xc5aa70);
   target(reader,"門禁感應器：使用門禁卡",()=>click("open-door"),{x:2,z:-5.7});
   sign(1.95,1.85,-5.72,.7,.22,"刷卡");
   // 讓工具與拆瓶底操作能直接從場景進行。
@@ -387,6 +455,12 @@
   new ResizeObserver(resize).observe(host);resize();orient();
   function frame(now){
     const dt=Math.min((now-last)/1000,.05);last=now;
+    // 天花板燈持續輕微閃爍，偶爾短暫暗一下，保持不規則的病房氛圍。
+    const pulse=Math.max(0,Math.sin(now*.0046));
+    const flicker=Math.max(.34,.9+.055*Math.sin(now*.027)+.045*Math.sin(now*.071)-(pulse>.985?.48:0));
+    ceilingLight.intensity=65*flicker;
+    lightLens.material.emissiveIntensity=.35+flicker*.62;
+    fill.intensity=22*(.94+.06*Math.sin(now*.012));
     if(opening.started){
       const result=O.tick(opening,dt);opening=result.state;wakeProgress=result.progress;
       if(result.phase!==openingPhase&&result.phase==="reveal"){
