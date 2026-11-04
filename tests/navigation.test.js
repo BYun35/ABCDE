@@ -57,6 +57,20 @@ test("護理站有獨立起點、房間邊界與桌子和電梯的碰撞", () =>
   assert.equal(NursingNav.canStand({ x: 0, z: -1.7 }), false);
 });
 
+test("護理站的收納櫃、推車與電梯門都是實體障礙", () => {
+  for (const point of [{ x: -5.25, z: -3.35 }, { x: 4.15, z: 1.05 }, { x: 4.75, z: -6.82 }]) {
+    assert.equal(NursingNav.canStand(point), false, JSON.stringify(point));
+  }
+});
+
+test("抽屜裡的電梯卡放在桌外可見且可走近的位置", () => {
+  const card = NursingNav.TARGETS.elevatorCard;
+  assert.equal(NursingNav.canStand(card), true, "卡片模型不能埋在桌子或其他碰撞區裡");
+  const approach = { x: -2.8, z: -2.9 };
+  assert.equal(NursingNav.canStand(approach), true);
+  assert.equal(NursingNav.withinReach(approach, card), true);
+});
+
 test("護理站可走到值班表、三份病歷、錄音機、抽屜與電梯感應器", () => {
   const queue = [NursingNav.START], seen = new Set(), reachable = [];
   for (let i = 0; i < queue.length; i++) {

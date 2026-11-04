@@ -41,7 +41,7 @@ function setup() {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),
     { window, document, Set });
   const click = id => el(id).events.click();
-  return { el, click, inspect, parts, popups, document, nursingSceneEntries };
+  return { el, click, inspect, parts, popups, document, nursingSceneEntries, window };
 }
 
 test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
@@ -181,4 +181,20 @@ test("頁面操作可從第一關通關進入 3D 護理站並走完第二關", (
   assert.match(el("nurse-file-transcript").textContent, /YOU ARE NOT THE ORIGINAL/);
   click("take-elevator-card"); click("use-elevator-card");
   assert.equal(el("nursing-ending").hidden, false);
+});
+
+test("到電梯讀卡器會說明需要電梯卡，取得後才可刷卡", () => {
+  const { el, click, window } = setup();
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader"); click("enter-nursing-station");
+  window.Ward3D.openNursingPanel("nurse-elevator-panel", "地下研究區電梯");
+  assert.equal(el("nurse-elevator-panel").hidden, false);
+  assert.equal(el("use-elevator-card").disabled, true);
+  assert.match(el("elevator-card-feedback").textContent, /先從隱藏抽屜取得電梯卡/);
+  el("nurse-record-b").events.click(); el("play-nurse-tape").events.click();
+  el("nurse-date").value = "0217";
+  el("nurse-date-form").events.submit({ preventDefault() {} });
+  el("open-nurse-drawer").events.click(); el("take-elevator-card").events.click();
+  assert.equal(el("use-elevator-card").disabled, false);
 });
