@@ -151,7 +151,7 @@
     interactionDialogItem.hidden=!item;
     interactionDialogMessage.textContent=message||"";
     interactionDialog.dataset.kind=kind;
-    interactionDialogKicker.textContent=kind==="important"?"重要物品":kind==="input"?"輸入密碼":"病房線索";
+    interactionDialogKicker.textContent=kind==="fragment"?"病歷碎片":kind==="important"?"重要物品":kind==="input"?"輸入密碼":"病房線索";
     interactionDialog.hidden=false;
     interactionDialogClose.focus({preventScroll:true});
   }
