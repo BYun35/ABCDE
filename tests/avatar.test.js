@@ -29,13 +29,17 @@ test("床上人物與玩家共用外觀，床上人物使用躺姿",()=>{
  const player=Avatar.create(T),patient=Avatar.createPatient(T);
  function shape(root){
    const shapes=[];
-   root.traverse(o=>{if(o.isMesh&&o.name!=="ground-shadow")shapes.push({
+   const flashlight=root.getObjectByName("hand-flashlight"),excluded=new Set();
+   flashlight?.traverse(o=>excluded.add(o));
+   root.traverse(o=>{if(o.isMesh&&o.name!=="ground-shadow"&&!excluded.has(o))shapes.push({
      geometry:o.geometry.type,parameters:o.geometry.parameters,
      color:o.material.color.getHex(),scale:o.scale.toArray()
    });});
    return shapes;
  }
  assert.deepEqual(shape(patient.root),shape(player.root));
+ assert.ok(player.flashlight,"玩家拿著手電筒");
+ assert.equal(patient.root.getObjectByName("hand-flashlight"),undefined,"床上的人沒有手電筒");
  assert.equal(patient.root.rotation.x,-Math.PI/2);
  assert.equal(patient.root.userData.player,false);
  assert.equal(patient.root.getObjectByName("ground-shadow").visible,false);
