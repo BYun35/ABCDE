@@ -382,6 +382,7 @@
     if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
     if(!hasSight(t)){tell("物件被遮住了，請換個位置靠近。");return;}
     t.action();
+    if(notebookPanel.hidden)openNotebook();
     if(!state.ended&&notebookPanel.hidden&&document.activeElement?.id!=="pin")canvas.focus({preventScroll:true});
     nextNearbyCheck=0;
   }
