@@ -386,11 +386,13 @@
   for(const x of [-.14,.14])cylinder(x,.16,.05,.055,.055,.028,0x252c29,cassetteProp);
   const cassetteLabel=sign(2.45,1.5,-1.2,.68,.22,"錄音帶");cassetteLabel.visible=false;
   const cassetteTarget=target(cassetteProp,"播放病歷背面的錄音帶",()=>window.Ward3D?.openNursingPanel("cassette-panel","錄音機與實驗日期"),NN.TARGETS.recorder);
+  cassetteLabel.userData.target=cassetteTarget;
   const keypad=box(3.65,1.45,-.72,.55,.8,.13,0x4e6258);
-  box(3.65,1.53,-.642,.38,.3,.025,0x152323);
-  for(let row=0;row<3;row++)for(let col=0;col<3;col++)box(3.52+col*.13,1.30-row*.11,-.63,.075,.065,.028,0xa89b73);
-  sign(3.65,1.97,-.72,.8,.2,"實驗日期");
+  const keypadParts=[box(3.65,1.53,-.642,.38,.3,.025,0x152323)];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)keypadParts.push(box(3.52+col*.13,1.30-row*.11,-.63,.075,.065,.028,0xa89b73));
+  const keypadLabel=sign(3.65,1.97,-.72,.8,.2,"實驗日期");
   const keypadTarget=target(keypad,"實驗日期輸入裝置",()=>window.Ward3D?.openNursingPanel("cassette-panel","實驗日期輸入裝置"),NN.TARGETS.keypad);
+  keypadParts.push(keypadLabel);keypadParts.forEach(part=>part.userData.target=keypadTarget);
   const desk=box(0,.86,-1.7,4.25,.18,1.72,0x716448);
   for(const x of [-1.9,1.9])for(const z of [-2.35,-1.05])box(x,.43,z,.14,.82,.14,0x536059);
   box(0,.74,-2.42,2.0,.16,.32,0x8c7b58);
