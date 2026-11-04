@@ -125,7 +125,7 @@
     state = result.state;
     if (state.tool) inventory.add("小型拆卸工具");
     renderInventory();
-    const message = state.tool ? result.message + "\\n\\n紙條內容：\\n「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message;
+    const message = state.tool ? result.message + "\n\n紙條內容：\n「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message;
     say(message, "drawer-feedback");
     if (state.tool && !hadTool) showItemPopup("小型拆卸工具", message);
     renderState();
