@@ -87,7 +87,7 @@ node --test tests/game.test.js tests/ui.test.js tests/navigation.test.js tests/a
 - **修改範圍：** `game/opening.js`、`game/clock.js`、`game/scene.js`、`game/index.html`、對應的 `tests/` 測試與 `TESTS.md`／本計畫的自身紀錄；不修改 `BRIEF.md`、`VERIFY.md` 或 A 分支。
 - **相關驗收／測試：** VIS-01、3D-02；醒來演出階段時間與文字顯示測試、時鐘外觀／指針及既有場景測試。
 - **完成條件：** 開場總長至少 7 秒，兩段文字各至少完整停留 3.5 秒；玩家在演出期間仍不能手動移動，演出結束後可操作。牆上保留清晰圓形時鐘，外觀有 1–12 數字、分鐘刻度、外框及中央軸心；時針短而粗、分針長而細，角度指向劇情既定的 3:17。先提交會因現況失敗的測試，再實作；相關及既有測試全數通過後，分別提交測試與實作，記錄實際驗收結果。
-- **目前狀態：** 使用者已確認並完成。醒來與時鐘測試提交為 [184b152](https://github.com/BYun35/ABCDE/commit/184b152c681b326ef1515f91799c70b15e44fd1e)；依使用者試看回饋，另先提交鐘面辨識測試 [b3965d4](https://github.com/BYun35/ABCDE/commit/b3965d48ee04d6d7f6c0ca7b5e48d9c6556b61a9)，再調整鐘面及指針長寬／顏色；使用者提供鐘面參考圖後，先提交數字及刻度測試 [f92ec1e](https://github.com/BYun35/ABCDE/commit/f92ec1ed1d93ceffb9c6e82868a6a4c927067e38)，再完成完整數字鐘面。`node --test tests/*.test.js` 為 33 項通過、0 項失敗。只修改 B，未修改 A、BRIEF.md 或 VERIFY.md。
+- **目前狀態：** 使用者已確認並完成。醒來與時鐘測試提交為 [184b152](https://github.com/BYun35/ABCDE/commit/184b152c681b326ef1515f91799c70b15e44fd1e)；依使用者試看回饋，另先提交鐘面辨識測試 [b3965d4](https://github.com/BYun35/ABCDE/commit/b3965d48ee04d6d7f6c0ca7b5e48d9c6556b61a9)，再調整鐘面及指針長寬／顏色；使用者提供鐘面參考圖後，先提交數字及刻度測試 [f92ec1e](https://github.com/BYun35/ABCDE/commit/f92ec1ed1d93ceffb9c6e82868a6a4c927067e38)，再完成完整數字鐘面。`node --test tests/*.test.js` 為 33 項通過、0 項失敗。只修改 B，未修改 A、BRIEF.md 或 VERIFY.md。 使用者補充撿到床頭櫃紙條時應直接看見內容；追加修正中央提示格式，分行顯示「紙條內容」及正文，並在 TESTS.md 記錄測試。
 
 
 ## 本輪 STEP 10：讓 E 互動回饋顯示在畫面中央
