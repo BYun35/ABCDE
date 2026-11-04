@@ -410,7 +410,7 @@
   const elevatorReader=box(3.65,1.35,-6.56,.38,.58,.12,0x425b50);
   const readerScreen=box(3.65,1.48,-6.48,.22,.13,.025,0x9b7650);
   sign(4.75,2.95,-6.8,1.6,.3,"地下研究區電梯");
-  const elevatorTarget=target(elevatorReader,"使用電梯卡前往地下研究區",()=>document.getElementById("use-elevator-card").click(),NN.TARGETS.elevatorReader);
+  const elevatorTarget=target(elevatorReader,"電梯讀卡器",()=>window.Ward3D?.openNursingPanel("nurse-elevator-panel","地下研究區電梯"),NN.TARGETS.elevatorReader);
   const nursingProps={cassetteProp,cassetteLabel,drawerTray,drawerFace,drawerKnob,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
   buildGroup=wardRoom;buildingLevel="ward";
   let state={ended:false},nursingState={complete:false},fragmentIds=[];
