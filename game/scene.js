@@ -354,7 +354,7 @@
     if(next.keycard)readerLight.material=mat(0x8edbb7);
     if(next.ended){door.rotation.y=-1.25;door.position.x=3.6;keys.clear();document.exitPointerLock?.();}
   },notifyPopup(popup){
-    showDialog(popup.title,popup.message,"important",popup.item);
+    showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
