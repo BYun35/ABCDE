@@ -199,4 +199,5 @@ test("到電梯讀卡器會說明需要電梯卡，取得後才可刷卡", () =>
   assert.equal(el("use-elevator-card").disabled, false);
   const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
   assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?openNursingPanel\("nurse-elevator-panel"/);
+  assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?if\(nursingState\.elevatorCard\)[\s\S]*?use-elevator-card/);
 });
