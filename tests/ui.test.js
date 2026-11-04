@@ -116,6 +116,8 @@ test("取得病歷碎片、拆卸工具與門禁卡時回報重要物品名稱",
   click("take-tool");
   assert.equal(popups[1].title, "取得重要物品");
   assert.equal(popups[1].item, "小型拆卸工具");
+  assert.match(popups[1].message, /紙條內容：\\n「你已經找到第一個答案。/);
+  assert.match(popups[1].message, /就去護理站。記住，那裡的紀錄不一定是真相。」$/);
 
   click("open-bottle");
   assert.equal(popups[2].title, "取得重要物品");
