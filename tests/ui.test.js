@@ -49,8 +49,13 @@ test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
   assert.match(el("feedback").textContent, /1\/3/);
   parts[1].events.click();
   parts[2].events.click();
-  assert.match(popups[2].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.match(popups[0].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.match(popups[1].message, /藥物依序為：午夜前、午夜後、清晨/);
+  assert.match(popups[2].message, /若順序錯誤，記憶恢復程序將無法啟動/);
   assert.match(popups[2].message, /真正的答案藏在時間的先後之中/);
+  assert.equal(popups[0].kind, "fragment");
+  assert.equal(popups[1].kind, "fragment");
+  assert.equal(popups[2].kind, "fragment");
   click("inspect-fragments");
   assert.match(el("feedback").textContent, /NO\. 02 病人/);
 });
@@ -112,6 +117,8 @@ test("取得病歷碎片、拆卸工具與門禁卡時回報重要物品名稱",
   parts[0].events.click();
   assert.equal(popups[0].title, "取得重要物品");
   assert.match(popups[0].item, /病歷碎片（1\/3）/);
+  assert.match(popups[0].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.equal(popups[0].kind, "fragment");
 
   el("pin").value = "317";
   el("pin-form").events.submit({ preventDefault() {} });
