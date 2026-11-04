@@ -95,7 +95,7 @@ node --test tests/game.test.js tests/ui.test.js tests/navigation.test.js tests/a
 使用者回報按 E 後右側筆記面板會突然打開，重要物品取得提示也不明顯。依使用者要求，調整第一關互動回饋位置與呈現方式。
 
 - **負責角色：** B：網頁與機關；測試角色維護自動化檢查。
-- **修改範圍：** `game/scene.js`、`game/app.js`、`game/index.html`、`game/style.css`、對應的 `tests/` 測試、`TESTS.md` 與本計畫自身紀錄；不修改 `BRIEF.md`、`VERIFY.md 或 A 分支。
+- **修改範圍：** `game/scene.js`、`game/app.js`、`game/index.html`、`game/style.css`、對應的 `tests/` 測試、`TESTS.md` 與本計畫自身紀錄；不修改 `BRIEF.md`、`VERIFY.md` 或 A 分支。
 - **相關驗收／測試：** MECH-01、MECH-04、MECH-05；互動訊息置中、重要物品取得提示、中央密碼輸入，以及筆記面板手動開啟的測試。
 - **完成條件：** 按 E 查看線索或取得物品時，不自動打開右側筆記；線索訊息在病房畫面中央清楚顯示，取得病歷碎片、拆卸工具或門禁卡時顯示醒目的「取得物品」標題與物品名稱。E 開啟密碼鎖時，在中央視窗輸入密碼；右側筆記只由其按鈕手動開啟。中央視窗可由明確的關閉按鈕或 Esc 關閉，且有無障礙對話框標示。先建立會因現況失敗的測試並獨立提交，再實作；相關及既有測試通過後分開提交測試與實作，記錄結果。
-- **目前狀態：** 新增步驟，等待使用者確認；尚未修改遊戲程式。
+- **目前狀態：** 使用者已確認並完成。先提交失敗測試 [f878c19](https://github.com/BYun35/ABCDE/commit/f878c19b5343fa0babbf457d7fe7d63eb0596067)，再實作中央訊息、重要物品名稱、中央密碼輸入和筆記手動開啟；`node --test tests/*.test.js` 為 36 項通過、0 項失敗。只修改 B，未修改 A、BRIEF.md 或 VERIFY.md。

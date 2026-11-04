@@ -30,6 +30,7 @@ function setup() {
   };
   const window = { EscapeRoomGame: Game, Ward3D: {
     sync() {},
+    updateDialog() {},
     notifyPopup(popup) { popups.push(popup); }
   } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),

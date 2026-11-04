@@ -30,6 +30,11 @@
     const sceneFeedback = document.getElementById("scene-feedback");
     if (sceneFeedback) sceneFeedback.textContent = message;
     if (targetId) document.getElementById(targetId).textContent = message;
+    if (targetId === "drawer-feedback") window.Ward3D?.updateDialog(message, "密碼鎖");
+  }
+
+  function showItemPopup(item, message) {
+    window.Ward3D?.notifyPopup({ title: "取得重要物品", item, message });
   }
 
   function renderInventory() {
@@ -76,9 +81,11 @@
       inventory.delete("病歷碎片 " + (fragments.size - 1) + "/3");
       inventory.add("病歷碎片 " + fragments.size + "/3");
       renderInventory();
-      say(fragments.size === 3
+      const message = fragments.size === 3
         ? "病歷碎片已收齊（3/3），請按「查看病歷內容」閱讀拼合後的線索。"
-        : "你收起一片病歷碎片（" + fragments.size + "/3）。", "fragment-feedback");
+        : "你收起一片病歷碎片（" + fragments.size + "/3）。";
+      say(message, "fragment-feedback");
+      showItemPopup("病歷碎片（" + fragments.size + "/3）", message);
       button.textContent = "已收集";
       button.disabled = true;
       renderState();
@@ -113,20 +120,25 @@
   });
 
   document.getElementById("take-tool").addEventListener("click", () => {
+    const hadTool = state.tool;
     const result = Game.takeTool(state);
     state = result.state;
     if (state.tool) inventory.add("小型拆卸工具");
     renderInventory();
-    say(state.tool ? result.message + " 紙條寫著：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message, "drawer-feedback");
+    const message = state.tool ? result.message + " 紙條寫著：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」" : result.message;
+    say(message, "drawer-feedback");
+    if (state.tool && !hadTool) showItemPopup("小型拆卸工具", message);
     renderState();
   });
 
   document.getElementById("open-bottle").addEventListener("click", () => {
+    const hadKeycard = state.keycard;
     const result = Game.openBottle(state, "C");
     state = result.state;
     if (state.keycard) inventory.add("護理站門禁卡");
     renderInventory();
     say(result.message, "bottle-feedback");
+    if (state.keycard && !hadKeycard) showItemPopup("護理站門禁卡", result.message);
     renderState();
   });
 

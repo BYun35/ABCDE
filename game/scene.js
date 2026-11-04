@@ -135,6 +135,44 @@
   const notebookPanel=document.getElementById("notebook-panel");
   const notebookBackdrop=document.getElementById("notebook-backdrop");
   const notebookToggle=document.getElementById("toggle-notebook");
+  const interactionDialog=document.getElementById("interaction-dialog");
+  const interactionDialogTitle=document.getElementById("interaction-dialog-title");
+  const interactionDialogItem=document.getElementById("interaction-dialog-item");
+  const interactionDialogMessage=document.getElementById("interaction-dialog-message");
+  const interactionDialogKicker=document.getElementById("interaction-dialog-kicker");
+  const interactionDialogContent=document.getElementById("interaction-dialog-content");
+  const interactionDialogClose=document.getElementById("interaction-dialog-close");
+  const pinForm=document.getElementById("pin-form"),pinFormSlot=document.getElementById("pin-form-slot");
+  function showDialog(title,message,kind="clue",item=""){
+    if(!interactionDialog)return;
+    document.exitPointerLock?.();
+    interactionDialogTitle.textContent=title;
+    interactionDialogItem.textContent=item;
+    interactionDialogItem.hidden=!item;
+    interactionDialogMessage.textContent=message||"";
+    interactionDialog.dataset.kind=kind;
+    interactionDialogKicker.textContent=kind==="important"?"重要物品":kind==="input"?"輸入密碼":"病房線索";
+    interactionDialog.hidden=false;
+    interactionDialogClose.focus({preventScroll:true});
+  }
+  function closeInteractionDialog(){
+    if(!interactionDialog||interactionDialog.hidden)return;
+    if(pinForm&&pinForm.parentElement===interactionDialogContent)pinFormSlot.append(pinForm);
+    interactionDialogContent.replaceChildren();
+    interactionDialog.hidden=true;
+    canvas.focus({preventScroll:true});
+  }
+  function showPinDialog(){
+    interactionDialogContent.replaceChildren();
+    interactionDialogContent.append(pinForm);
+    showDialog("床頭櫃密碼鎖","輸入三位數密碼以解鎖抽屜。","input");
+    document.getElementById("pin")?.focus({preventScroll:true});
+  }
+  function updateDialog(message,title){
+    if(!interactionDialog||interactionDialog.hidden)return;
+    interactionDialogTitle.textContent=title||"操作結果";
+    interactionDialogMessage.textContent=message||"";
+  }
   function openNotebook(focusId){
     if(!notebookPanel)return;
     notebookPanel.hidden=false;notebookBackdrop.hidden=false;
@@ -152,11 +190,9 @@
     canvas.focus({preventScroll:true});
   }
   function inspect(key){
-    openNotebook();
     document.querySelector('[data-inspect="'+key+'"]')?.click();
   }
   function click(id){
-    openNotebook();
     document.getElementById(id)?.click();
   }
   box(0,-.12,0,10,.24,12,0x53605b);
@@ -230,7 +266,7 @@
     const action=I.action("cabinet",state);
     if(action==="take-tool"){click("take-tool");return;}
     if(action==="read-note"){tell("抽屜已打開。紙條：「你已經找到第一個答案。但如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」");return;}
-    openNotebook("pin");
+    showPinDialog();
     tell("請在密碼鎖輸入三位數密碼。");
   },{x:-3.6,z:-3.4});
   const bottles=[];
@@ -317,7 +353,9 @@
     bottles[2].userData.target.name=next.tool&&!next.keycard?"藥瓶 C：用工具拆開瓶底":next.keycard?"藥瓶 C：查看標籤（門禁卡已取出）":"藥瓶 C：查看標籤";
     if(next.keycard)readerLight.material=mat(0x8edbb7);
     if(next.ended){door.rotation.y=-1.25;door.position.x=3.6;keys.clear();document.exitPointerLock?.();}
-  }};
+  },notifyPopup(popup){
+    showDialog(popup.title,popup.message,"important",popup.item);
+  },updateDialog(message,title){updateDialog(message,title);}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now();
   let opening=O.create(),introComplete=false,openingPhase="idle",wakeProgress=1;
@@ -382,8 +420,10 @@
     if(!N.withinReach(player,t.location)){tell("距離「"+t.name+"」太遠，請再靠近一些。");return;}
     if(!hasSight(t)){tell("物件被遮住了，請換個位置靠近。");return;}
     t.action();
-    if(notebookPanel.hidden)openNotebook();
-    if(!state.ended&&notebookPanel.hidden&&document.activeElement?.id!=="pin")canvas.focus({preventScroll:true});
+    if(interactionDialog.hidden){
+      const message=document.getElementById("scene-feedback")?.textContent||"";
+      showDialog(state.ended?"第一關完成":t.name,message,state.ended?"important":"clue");
+    }
     nextNearbyCheck=0;
   }
   function advance(f,r,d){
@@ -472,7 +512,12 @@
   notebookToggle?.addEventListener("click",()=>notebookPanel.hidden?openNotebook():closeNotebook());
   document.getElementById("close-notebook")?.addEventListener("click",closeNotebook);
   notebookBackdrop?.addEventListener("click",closeNotebook);
+  interactionDialogClose?.addEventListener("click",closeInteractionDialog);
+  interactionDialog?.addEventListener("click",e=>{if(e.target===interactionDialog)closeInteractionDialog();});
   document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&interactionDialog&&!interactionDialog.hidden){
+      e.preventDefault();closeInteractionDialog();return;
+    }
     if(e.key==="Escape"&&notebookPanel&&!notebookPanel.hidden){
       e.preventDefault();closeNotebook();
     }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=immersivehud1">
+<link rel="stylesheet" href="style.css?v=centerfeedback1">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js?v=bedwake2" defer></script>
@@ -13,8 +13,8 @@
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
-<script src="scene.js?v=immersivehud1" defer></script>
-<script src="app.js?v=3d1" defer></script>
+<script src="scene.js?v=centerfeedback1" defer></script>
+<script src="app.js?v=centerfeedback1" defer></script>
 </head>
 <body>
 <header>
@@ -47,6 +47,16 @@
             <span class="awakening-caption">畫面恢復中……</span>
           </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
+          <div id="interaction-dialog" class="interaction-dialog" role="dialog" aria-modal="true" aria-labelledby="interaction-dialog-title" aria-describedby="interaction-dialog-message" hidden>
+            <div class="interaction-dialog-card">
+              <span id="interaction-dialog-kicker" class="eyebrow">病房線索</span>
+              <h2 id="interaction-dialog-title">線索</h2>
+              <p id="interaction-dialog-item" class="interaction-dialog-item" hidden></p>
+              <p id="interaction-dialog-message"></p>
+              <div id="interaction-dialog-content"></div>
+              <button id="interaction-dialog-close" class="primary" type="button">關閉　Esc</button>
+            </div>
+          </div>
         </div>        <div class="scene-toolbar">
           <button id="lock-mouse" class="secondary" type="button">鎖定滑鼠</button>
           <button id="interact-target" class="primary" type="button">互動</button>
@@ -111,11 +121,13 @@
 
       <section class="card">
         <h3>床頭櫃密碼鎖</h3>
+        <div id="pin-form-slot">
         <form class="row" id="pin-form">
           <label for="pin">輸入三位數密碼</label>
           <input id="pin" inputmode="numeric" autocomplete="off" required maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
+        </div>
         <button id="return-to-room" class="secondary" type="button">回到病房</button>
         <p id="drawer-feedback" role="status" aria-live="polite"></p>
         <div id="drawer-actions" class="row" hidden>
