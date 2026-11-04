@@ -2,6 +2,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const Nav = require("../game/navigation.js");
+const NursingNav = require("../game/nursing-navigation.js");
 
 test("起點可站立，牆外與病床內不可進入", () => {
   assert.equal(Nav.canStand(Nav.START), true);
@@ -46,4 +47,35 @@ test("所有場景互動點都有可走到的操作位置", () => {
     }
   }
   for(const point of points)assert.ok(reachable.some(p=>Nav.withinReach(p,point)),JSON.stringify(point));
+});
+
+test("護理站有獨立起點、房間邊界與桌子和電梯的碰撞", () => {
+  assert.equal(NursingNav.canStand(NursingNav.START), true);
+  assert.equal(NursingNav.canStand({ x: 7, z: 0 }), false);
+  assert.equal(NursingNav.canStand({ x: 0, z: -8 }), false);
+  assert.equal(NursingNav.canStand({ x: 0, z: -1.7 }), false);
+});
+
+test("護理站可走到值班表、三份病歷、錄音機、抽屜與電梯感應器", () => {
+  const queue = [NursingNav.START], seen = new Set(), reachable = [];
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i], key = p.x.toFixed(1) + "," + p.z.toFixed(1);
+    if (seen.has(key)) continue;
+    seen.add(key); reachable.push(p);
+    for (const [dx, dz] of [[.5, 0], [-.5, 0], [0, .5], [0, -.5]]) {
+      const next = { x: Math.round((p.x + dx) * 10) / 10, z: Math.round((p.z + dz) * 10) / 10 };
+      if (NursingNav.canStand(next) && !seen.has(next.x.toFixed(1) + "," + next.z.toFixed(1))) queue.push(next);
+    }
+  }
+  for (const [name, point] of Object.entries(NursingNav.TARGETS)) {
+    assert.ok(reachable.some(p => NursingNav.withinReach(p, point)), name + " 無法走近");
+  }
+});
+
+test("護理站長距離移動不會穿牆或穿過值班桌", () => {
+  const wall = NursingNav.move(NursingNav.START, 0, 1, 0, 40);
+  assert.equal(NursingNav.canStand(wall), true);
+  assert.ok(wall.z >= NursingNav.BOUNDS.minZ + .28);
+  const desk = NursingNav.move({ x: 0, z: 1 }, 0, 1, 0, 10);
+  assert.ok(desk.z > -.65);
 });
