@@ -38,8 +38,8 @@
     if (targetId === "drawer-feedback") window.Ward3D?.updateDialog(message, "密碼鎖");
   }
 
-  function showItemPopup(item, message) {
-    window.Ward3D?.notifyPopup({ title: "取得重要物品", item, message });
+  function showItemPopup(item, message, kind = "important") {
+    window.Ward3D?.notifyPopup({ title: "取得重要物品", item, message, kind });
   }
 
   function renderInventory() {
