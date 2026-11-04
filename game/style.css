@@ -259,3 +259,5 @@ main{width:100%;height:calc(100vh - 64px);height:calc(100svh - 64px);min-height:
 #interaction-dialog-content #pin-form{justify-content:center;align-items:center;width:100%;padding:14px;border:1px solid #72847a;border-radius:12px;background:#0b1515}
 #interaction-dialog-content #pin-form input{width:150px;text-align:center;font-size:1.4rem;letter-spacing:.3em}
 #interaction-dialog-close{min-width:132px;text-align:center}
+
+#interaction-dialog[data-kind="fragment"] .interaction-dialog-card p{font-size:clamp(1.3rem,3.4vw,1.55rem);font-weight:650;line-height:1.85;color:#fff4d2}
