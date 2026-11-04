@@ -201,3 +201,9 @@ test("到電梯讀卡器會說明需要電梯卡，取得後才可刷卡", () =>
   assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?openNursingPanel\("nurse-elevator-panel"/);
   assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?if\(nursingState\.elevatorCard\)[\s\S]*?use-elevator-card/);
 });
+
+test("抽屜裡檔案與電梯卡的標籤不會擋住物件互動", () => {
+  const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
+  assert.match(scene, /fileLabel\.userData\.target=fileTarget/);
+  assert.match(scene, /cardLabel\.userData\.target=cardTarget/);
+});
