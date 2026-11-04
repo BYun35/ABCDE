@@ -394,14 +394,15 @@
   const desk=box(0,.86,-1.7,4.25,.18,1.72,0x716448);
   for(const x of [-1.9,1.9])for(const z of [-2.35,-1.05])box(x,.43,z,.14,.82,.14,0x536059);
   box(0,.74,-2.42,2.0,.16,.32,0x8c7b58);
-  const drawerFace=box(-2.46,.65,-1.77,.64,.34,.1,0x927c53);drawerFace.visible=false;
-  box(-2.46,.66,-1.70,.15,.04,.04,0xd3bc78);
+  const drawerTray=box(-2.82,.52,-2.35,.95,.09,.9,0x756746);drawerTray.visible=false;
+  const drawerFace=box(-2.82,.65,-1.77,.64,.34,.1,0x927c53);drawerFace.visible=false;
+  const drawerKnob=box(-2.82,.66,-1.70,.15,.04,.04,0xd3bc78);
   const drawerTarget=target(drawerFace,"打開桌下隱藏抽屜",()=>document.getElementById("open-nurse-drawer").click(),NN.TARGETS.drawer);
-  const fileProp=box(-2.65,.86,-1.88,.4,.055,.52,0xd7c9a5);fileProp.visible=false;
-  const fileLabel=sign(-2.65,.98,-1.60,.38,.16,"NO.02");fileLabel.visible=false;
+  const fileProp=box(NN.TARGETS.file.x,.63,NN.TARGETS.file.z,.36,.035,.4,0xd7c9a5);fileProp.visible=false;
+  const fileLabel=sign(NN.TARGETS.file.x,.86,NN.TARGETS.file.z+.2,.38,.16,"NO.02");fileLabel.visible=false;
   const fileTarget=target(fileProp,"閱讀 NO.02 實驗檔案",()=>document.getElementById("read-nurse-file").click(),NN.TARGETS.file);
-  const cardProp=box(-2.0,.88,-1.92,.28,.035,.42,0xc3a658);cardProp.visible=false;
-  const cardLabel=sign(-2.0,.96,-1.70,.3,.14,"電梯卡");cardLabel.visible=false;
+  const cardProp=box(NN.TARGETS.elevatorCard.x,.63,NN.TARGETS.elevatorCard.z,.28,.035,.4,0xc3a658);cardProp.visible=false;
+  const cardLabel=sign(NN.TARGETS.elevatorCard.x,.86,NN.TARGETS.elevatorCard.z+.2,.42,.16,"電梯卡");cardLabel.visible=false;
   const cardTarget=target(cardProp,"取得地下研究區電梯卡",()=>document.getElementById("take-elevator-card").click(),NN.TARGETS.elevatorCard);
   // 電梯與刷卡器放在房間另一端，必須拿到卡才能完成第二關。
   const elevatorDoor=box(4.75,1.42,-6.82,1.8,2.84,.16,0x66746a);
@@ -410,7 +411,7 @@
   const readerScreen=box(3.65,1.48,-6.48,.22,.13,.025,0x9b7650);
   sign(4.75,2.95,-6.8,1.6,.3,"地下研究區電梯");
   const elevatorTarget=target(elevatorReader,"使用電梯卡前往地下研究區",()=>document.getElementById("use-elevator-card").click(),NN.TARGETS.elevatorReader);
-  const nursingProps={cassetteProp,cassetteLabel,drawerFace,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
+  const nursingProps={cassetteProp,cassetteLabel,drawerTray,drawerFace,drawerKnob,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
   buildGroup=wardRoom;buildingLevel="ward";
   let state={ended:false},nursingState={complete:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
@@ -441,7 +442,9 @@
     nursingProps.cassetteProp.visible=next.cassetteFound;
     nursingProps.cassetteLabel.visible=next.cassetteFound;
     nursingProps.drawerFace.visible=next.drawerUnlocked;
-    nursingProps.drawerFace.position.z=next.drawerOpen?-2.08:-1.77;
+    nursingProps.drawerFace.position.z=next.drawerOpen?-2.55:-1.77;
+    nursingProps.drawerKnob.position.z=nursingProps.drawerFace.position.z+.07;
+    nursingProps.drawerTray.visible=next.drawerOpen;
     nursingProps.fileProp.visible=next.drawerOpen&&!next.fileRead;
     nursingProps.fileLabel.visible=next.drawerOpen&&!next.fileRead;
     nursingProps.cardProp.visible=next.drawerOpen&&!next.elevatorCard;

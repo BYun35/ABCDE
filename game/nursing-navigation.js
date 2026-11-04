@@ -8,8 +8,9 @@
   const START = { x: 0, z: 2.4 };
   const OBSTACLES = [
     { x: 0, z: -1.7, w: 4, d: 1.6 },
-    { x: -4.8, z: -2.8, w: 1, d: 1.2 },
-    { x: 4.85, z: -5.8, w: .25, d: 1.6 }
+    { x: -5.25, z: -3.35, w: 1.15, d: 1.2 },
+    { x: 4.15, z: 1.05, w: 1.15, d: .72 },
+    { x: 4.75, z: -6.82, w: 1.8, d: .16 }
   ];
   const TARGETS = {
     schedule: { x: -4.2, z: -5.45 },
@@ -18,9 +19,9 @@
     recordC: { x: 1.25, z: -1.15 },
     recorder: { x: 2.4, z: -1.15 },
     keypad: { x: 3.35, z: -1.15 },
-    drawer: { x: -2.8, z: -1.65 },
-    file: { x: -2.8, z: -1.85 },
-    elevatorCard: { x: -2.2, z: -1.85 },
+    drawer: { x: -2.82, z: -2.3 },
+    file: { x: -3.05, z: -2.45 },
+    elevatorCard: { x: -2.58, z: -2.45 },
     elevatorReader: { x: 3.75, z: -5.65 }
   };
 

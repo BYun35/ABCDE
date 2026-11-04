@@ -104,7 +104,11 @@
     document.getElementById("nurse-drawer-contents").hidden = !nursingState.drawerOpen;
     document.getElementById("nurse-file-transcript").hidden = !nursingState.fileRead;
     document.getElementById("take-elevator-card").hidden = nursingState.elevatorCard;
-    document.getElementById("nurse-elevator-panel").hidden = !nursingState.elevatorCard || nursingState.complete;
+    document.getElementById("nurse-elevator-panel").hidden = nursingState.complete;
+    document.getElementById("use-elevator-card").disabled = !nursingState.elevatorCard;
+    document.getElementById("elevator-card-feedback").textContent = nursingState.elevatorCard
+      ? "已取得地下研究區電梯卡。按下方按鈕刷卡。"
+      : "請先從已解鎖的隱藏抽屜取得電梯卡，再回到這裡刷卡。";
     document.getElementById("nursing-ending").hidden = !nursingState.complete;
     window.Ward3D?.syncNursing?.(nursingState);
   }

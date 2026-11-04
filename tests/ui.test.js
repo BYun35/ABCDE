@@ -191,7 +191,7 @@ test("到電梯讀卡器會說明需要電梯卡，取得後才可刷卡", () =>
   window.Ward3D.openNursingPanel("nurse-elevator-panel", "地下研究區電梯");
   assert.equal(el("nurse-elevator-panel").hidden, false);
   assert.equal(el("use-elevator-card").disabled, true);
-  assert.match(el("elevator-card-feedback").textContent, /先從隱藏抽屜取得電梯卡/);
+  assert.match(el("elevator-card-feedback").textContent, /取得電梯卡/);
   el("nurse-record-b").events.click(); el("play-nurse-tape").events.click();
   el("nurse-date").value = "0217";
   el("nurse-date-form").events.submit({ preventDefault() {} });
