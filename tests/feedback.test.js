@@ -35,3 +35,8 @@ test("E 互動不會自動開右側筆記，密碼表單改在中央對話框使
   assert.match(scene, /interactionDialogContent\.append\(pinForm\)/);
   assert.match(scene, /e\.key\s*===\s*"Escape"[\s\S]*closeInteractionDialog/);
 });
+
+test("病歷紙片內容在中央提示以大字顯示", () => {
+  const css = read("game/style.css");
+  assert.match(css, /#interaction-dialog\[data-kind="fragment"\].*font-size:\s*clamp\(1\.3rem/);
+});
