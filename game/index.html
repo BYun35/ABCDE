@@ -5,43 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=qa2">
+<link rel="stylesheet" href="style.css?v=centerfeedback1">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
-<script src="navigation.js" defer></script>
-<script src="avatar.js" defer></script>
-<script src="interaction.js" defer></script>
-<script src="scene.js?v=qa2" defer></script>
-<script src="app.js?v=3d1" defer></script>
+<script src="navigation.js?v=bedwake2" defer></script>
+<script src="nursing-navigation.js?v=nursingnav1" defer></script>
+<script src="avatar.js?v=bedwake2" defer></script>
+<script src="opening.js?v=bedwake2" defer></script>
+<script src="clock.js?v=analog317" defer></script>
+<script src="interaction.js?v=paper1" defer></script>
+<script src="level2.js?v=nursingstation1" defer></script>
+<script src="scene.js?v=centerfeedback1" defer></script>
+<script src="app.js?v=centerfeedback1" defer></script>
 </head>
 <body>
 <header>
-  <div><div class="brand">時空密室・第一關</div><h1>消失的病歷</h1></div>
-  <div class="header-note">第三人稱探索 · 病房</div>
+  <div><div class="brand" id="page-brand">時空密室・第一關</div><h1 id="page-title">消失的病歷</h1></div>
+  <div class="header-note" id="header-note">第三人稱探索 · 病房</div>
 </header>
 <main>
-  <section class="intro">
-    <div><div class="eyebrow">病房・凌晨 3:17</div><h2>你在陌生的病房醒來</h2></div>
-    <p>在病房裡走動，找出線索，揭開自己的身分。</p>
+  <section class="intro" id="stage-intro">
+    <div><div class="eyebrow" id="stage-eyebrow">病房・凌晨 3:17</div><h2 id="stage-title">你在陌生的病房醒來</h2></div>
+    <p id="stage-description">在病房裡走動，找出線索，揭開自己的身分。</p>
   </section>
 
-  <div class="layout">
+  <div class="layout" id="game-layout">
     <section class="scene-column" aria-label="3D 病房探索">
       <div class="scene-shell">
-        <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病房入口</output></div>
         <div id="ward-viewport">
+          <div class="scene-topline"><span>隔離病房 / 03:17</span><output id="walk-status">病床旁</output></div>
+
           <div class="crosshair" aria-hidden="true">+</div>
           <div id="walk-instructions" class="walk-instructions">
             <span class="eyebrow">消失的病歷</span>
             <h2>這裡，有另一個你。</h2>
-            <p>WASD／方向鍵控制人物走動<br>按住滑鼠拖曳轉動跟隨鏡頭，或鎖定滑鼠<br>靠近物件後點擊，或對準後按 E</p>
+            <p>先看看你醒來後發生了什麼。拿起手電筒，慢慢探索病房；覺得太暗或太亮，可以用下方按鈕調整光線。</p>
             <button id="enter-room" class="primary" type="button">進入病房</button>
           </div>
+          <div id="awakening-scene" class="awakening-scene" role="dialog" aria-modal="true" aria-labelledby="awakening-title" hidden>
+            <span class="eyebrow">消失的病歷</span>
+            <h2 id="awakening-title">你醒來了</h2>
+            <p id="awakening-text"></p>
+            <span class="awakening-skip-hint">按 Esc 跳過演出</span>
+            <span class="awakening-caption">畫面恢復中……</span>
+          </div>
           <div id="target-prompt" class="target-prompt">正在準備病房…</div>
-        </div>
-        <div class="scene-toolbar">
+          <button id="enter-nursing-station" class="primary stage-transition" type="button" hidden>直接前往護理站</button>
+          <div id="interaction-dialog" class="interaction-dialog" role="dialog" aria-modal="true" aria-labelledby="interaction-dialog-title" aria-describedby="interaction-dialog-message" hidden>
+            <div class="interaction-dialog-card">
+              <span id="interaction-dialog-kicker" class="eyebrow">病房線索</span>
+              <h2 id="interaction-dialog-title">線索</h2>
+              <p id="interaction-dialog-item" class="interaction-dialog-item" hidden></p>
+              <p id="interaction-dialog-message"></p>
+              <div id="interaction-dialog-content"></div>
+              <button id="interaction-dialog-close" class="primary" type="button">關閉　Esc</button>
+            </div>
+          </div>
+        </div>        <div class="scene-toolbar">
           <button id="lock-mouse" class="secondary" type="button">鎖定滑鼠</button>
-          <button id="interact-target" class="primary" type="button">與準星物件互動</button>
+          <button id="interact-target" class="primary" type="button">互動</button>
+          <button id="flashlight-level" class="secondary" type="button" aria-label="調整手電筒亮度" title="調整手電筒亮度">手電筒：標準</button>
+          <button id="toggle-notebook" class="secondary" type="button" aria-controls="notebook-panel" aria-expanded="false">線索／背包</button>
           <span>Esc 釋放滑鼠 · 操作線索時可離開場景</span>
         </div>
         <div class="nearby-panel"><h3>附近可互動物件</h3><div id="nearby-actions" role="group" aria-label="附近可互動物件"><span>靠近物件後，這裡會列出可操作的項目。</span></div></div>
@@ -54,11 +78,9 @@
           <button data-walk="right" type="button" aria-label="向右走">右移 →</button>
         </div>
         <p id="scene-feedback" role="status" aria-live="polite">正在載入立體病房。</p>
-      </div>
-    </section>
-
-    <aside class="side" aria-label="線索筆記與道具操作">
-      <div class="notebook-title"><span class="eyebrow">探索筆記</span><h2>線索與背包</h2><p>點場景物件查看線索，也可在這裡閱讀與操作。</p></div>
+          <div id="notebook-backdrop" class="notebook-backdrop" hidden></div>
+    <aside class="side notebook-panel" id="notebook-panel" role="dialog" aria-modal="true" aria-label="線索筆記與道具操作" tabindex="-1" hidden>
+      <div class="notebook-title"><button id="close-notebook" class="secondary notebook-close" type="button">關閉筆記</button><span class="eyebrow">探索筆記</span><h2>線索與背包</h2><p>點場景物件查看線索，也可在這裡閱讀與操作。</p></div>
       <section class="card">
         <h3>目前線索</h3>
         <p id="feedback" role="status" aria-live="polite">找找床墊、藥瓶、日曆和牆上的塗鴉。</p>
@@ -104,12 +126,14 @@
 
       <section class="card">
         <h3>床頭櫃密碼鎖</h3>
+        <div id="pin-form-slot">
         <form class="row" id="pin-form">
           <label for="pin">輸入三位數密碼</label>
           <input id="pin" inputmode="numeric" autocomplete="off" required maxlength="3" pattern="[0-9]{3}" aria-label="三位數密碼">
           <button class="primary" type="submit">解鎖抽屜</button>
         </form>
-        <button id="return-to-room" class="secondary" type="button">返回病房繼續探索</button>
+        </div>
+        <button id="return-to-room" class="secondary" type="button">回到病房</button>
         <p id="drawer-feedback" role="status" aria-live="polite"></p>
         <div id="drawer-actions" class="row" hidden>
           <button class="secondary" id="take-tool">打開抽屜並取出工具</button>
@@ -139,11 +163,75 @@
         <h4>接下來的目標：前往護理站</h4>
         <p>抽屜裡的紙條提醒你：「如果你想知道自己是誰，就去護理站。記住，那裡的紀錄不一定是真相。」</p>
         <p>下一關：護理站——被篡改的記錄。</p>
-        <p role="note"><strong>目前試玩到此結束。</strong>第二關尚未開放，現在無法進入護理站。</p>
+        <p role="note">門已解鎖。走過門口進入護理站，繼續追查實驗紀錄。</p>
       </section>
     </aside>
+        </div>
+      </div>
+    </section>
+
   </div>
+  <section id="nursing-station" class="nursing-station" aria-labelledby="nursing-title" hidden>
+    <div class="nursing-heading">
+      <span class="eyebrow">第二關・護理站</span>
+      <h2 id="nursing-title" tabindex="-1">被篡改的記錄</h2>
+      <p>比對值班時間與病歷簽名，找出遭到修改的實驗紀錄。</p>
+    </div>
+    <button id="close-nursing-panel" class="secondary nursing-panel-close" type="button">關閉操作面板　Esc</button>
+    <p id="nurse-feedback" class="nurse-feedback" role="status" aria-live="polite">值班桌上放著一張值班表和三份病歷。</p>
+    <div class="nursing-grid">
+      <section class="nursing-card" id="nurse-record-panel">
+        <h3>護理師值班表</h3>
+        <table class="nurse-table">
+          <thead><tr><th>日期</th><th>值班時間</th><th>護理師</th></tr></thead>
+          <tbody>
+            <tr><td>2/15</td><td>16:00–24:00</td><td>林護理師</td></tr>
+            <tr><td>2/17</td><td>00:00–08:00</td><td>王護理師</td></tr>
+            <tr><td>2/17</td><td>08:00–16:00</td><td>陳護理師</td></tr>
+          </tbody>
+        </table>
+        <h3>三份病歷</h3>
+        <div class="record-list">
+          <article class="record-card"><h4>病歷 A</h4><p>2/15 23:50　林護理師</p><button class="secondary" id="nurse-record-a" data-record="A" type="button">檢查病歷 A</button></article>
+          <article class="record-card"><h4>病歷 B</h4><p>2/17 02:20　陳護理師</p><button class="secondary" id="nurse-record-b" data-record="B" type="button">檢查病歷 B</button></article>
+          <article class="record-card"><h4>病歷 C</h4><p>2/17 08:40　陳護理師</p><button class="secondary" id="nurse-record-c" data-record="C" type="button">檢查病歷 C</button></article>
+        </div>
+      </section>
+      <section class="nursing-card" id="cassette-panel" hidden>
+        <h3>病歷背面的錄音帶</h3>
+        <p>錄音帶可以重播。聽完後，依照醫師說的日期輸入實驗啟動日。</p>
+        <button class="primary" id="play-nurse-tape" type="button">播放錄音帶</button>
+        <pre class="transcript" id="nurse-tape-transcript" role="status" aria-live="polite" hidden></pre>
+        <form class="date-form" id="nurse-date-form" hidden>
+          <label for="nurse-date">實驗啟動日期（MMDD）</label>
+          <input id="nurse-date" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" required>
+          <button class="primary" type="submit">輸入日期</button>
+        </form>
+      </section>
+      <section class="nursing-card" id="nurse-drawer-panel" hidden>
+        <h3>桌子下方的隱藏抽屜</h3>
+        <p>日期輸入裝置已解鎖抽屜。</p>
+        <button class="secondary" id="open-nurse-drawer" type="button">打開隱藏抽屜</button>
+        <div id="nurse-drawer-contents" hidden>
+          <h4>機密文件</h4>
+          <button class="secondary" id="read-nurse-file" type="button">閱讀實驗檔案</button>
+          <pre class="transcript file-transcript" id="nurse-file-transcript" role="status" aria-live="polite" hidden></pre>
+          <button class="secondary" id="take-elevator-card" type="button">取得地下研究區電梯卡</button>
+        </div>
+      </section>
+      <section class="nursing-card elevator-card" id="nurse-elevator-panel" hidden>
+        <h3>地下研究區電梯</h3>
+        <p id="elevator-card-feedback" role="status" aria-live="polite">請先從已解鎖的隱藏抽屜取得電梯卡，再回到這裡刷卡。</p>
+        <button class="primary" id="use-elevator-card" type="button">使用電梯卡</button>
+      </section>
+      <section class="nursing-card nursing-ending" id="nursing-ending" tabindex="-1" hidden>
+        <h3>第二關完成</h3>
+        <p>警告！NO. 02 已取得實驗資料，請立即啟動封鎖程序。</p>
+        <p>你拿著電梯卡，前往地下研究區。第三關尚未開放。</p>
+      </section>
+    </div>
+  </section>
 </main>
-<footer>第一關・消失的病歷　｜　WASD 移動 · 滑鼠拖曳轉向 · E 互動　｜　進度僅保留於本次開啟期間。</footer>
+<footer>消失的病歷／被篡改的記錄　｜　第一關可用 WASD、滑鼠與 E 探索；兩關進度僅保留於本次開啟期間。</footer>
 </body>
 </html>
