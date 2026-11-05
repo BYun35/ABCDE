@@ -151,8 +151,9 @@
   }
 
   enterStationButton.addEventListener("click", enterNursingStation);
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!surgeryStation.hidden)closeSurgeryPanel();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&surgeryStation&&!surgeryStation.hidden)closeSurgeryPanel();});
   document.getElementById("close-nursing-panel").addEventListener("click", closeNursingPanel);
+  if (surgeryStation) {
   document.getElementById("enter-surgery-room").addEventListener("click",enterSurgeryRoom);
   document.getElementById("close-surgery-panel").addEventListener("click",closeSurgeryPanel);
   document.getElementById("surgery-console-form").addEventListener("submit",e=>{e.preventDefault();const r=Surgery.unlock(surgeryState,document.getElementById("surgery-code").value);surgeryState=r.state;renderSurgery(r.message);});
@@ -161,6 +162,7 @@
   document.getElementById("surgery-read-memo").addEventListener("click",()=>{const r=Surgery.readMemo(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
   document.getElementById("surgery-take-pass").addEventListener("click",()=>{const r=Surgery.takePass(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
   document.getElementById("surgery-use-pass").addEventListener("click",()=>{const r=Surgery.useExit(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  }
   ["A", "B", "C"].forEach(record => {
     document.getElementById("nurse-record-" + record.toLowerCase()).addEventListener("click", () => {
       const result = Nursing.chooseRecord(nursingState, record);
