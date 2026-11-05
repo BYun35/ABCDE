@@ -485,7 +485,7 @@
   const surgeryProps={memoProp,passProp,exitReader,surgeryLight};
   buildGroup=wardRoom;buildingLevel="ward";
   buildGroup=wardRoom;buildingLevel="ward";
-  let state={ended:false},nursingState={complete:false},surgeryState={complete:false},fragmentIds=[];
+  let state={ended:false},nursingState={complete:false},surgeryState={complete:false,photos:{A:false,B:false,C:false,D:false},recordRead:false,consoleUnlocked:false,remote:false,videoPlayed:false,memoRead:false,passTaken:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
     state=next;fragmentIds=ids;
     paperTargets.forEach(t=>{t.mesh.visible=!fragmentIds.includes(t.fragment);});
@@ -527,6 +527,24 @@
   },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
     showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);}};
+  function surgeryPanel(title,message){const panel=document.getElementById("surgery-station");if(panel)panel.hidden=false;const heading=document.getElementById("surgery-title");if(heading&&title)heading.textContent=title;const feedback=document.getElementById("surgery-feedback");if(feedback)feedback.textContent=message;document.body.classList.add("nursing-mode");}
+  window.SurgeryApp={
+    photo(id){surgeryState.photos[id]=true;const lines={A:"簽署同意書｜我已經考慮很久了，這是我自己的選擇。數字 4。",B:"進入醫院｜從今天開始，我將不再以原本的方式活著。數字 1。",C:"接受手術｜記憶移植程序開始。數字 3。",D:"記憶清除｜NO.02 已成功甦醒。數字 2。"};document.getElementById("surgery-photo-progress").textContent="記憶照片："+Object.values(surgeryState.photos).filter(Boolean).length+"/4；手術紀錄："+(surgeryState.recordRead?"已閱讀":"未閱讀");surgeryPanel("記憶照片 "+id,lines[id]);},
+    record(){surgeryState.recordRead=true;surgeryPanel("機密手術紀錄","2/14 09:10 簽署同意書；2/15 23:40 原始個體進入醫院；2/17 02:17 記憶移植；2/17 03:17 記憶清除。依時間排序後輸入照片背面的數字。");},
+    graffiti(){surgeryPanel("牆面提示","先是選擇，再是抵達；接著分離，最後遺忘。");},
+    console(){surgeryPanel("手術室控制台","先調查四張照片與手術紀錄，再輸入密碼。");},
+    drawer(){if(!surgeryState.consoleUnlocked){surgeryPanel("控制台抽屜","抽屜鎖著，請先解開密碼。");return;}surgeryState.remote=true;document.getElementById("surgery-take-remote").hidden=true;surgeryPanel("控制台抽屜","你取得監視器遙控器。現在可以播放監視器影片。");},
+    monitor(){surgeryPanel("監視器","使用遙控器播放實驗紀錄。");},
+    exit(){surgeryPanel("出口讀卡器",surgeryState.passTaken?"按「使用通行證離開」完成第三關。":"出口需要地下研究區通行證。")}
+  };
+  document.getElementById("try-third-level")?.addEventListener("click",()=>{document.getElementById("page-brand").textContent="時空密室・第三關";document.getElementById("page-title").textContent="不屬於自己的記憶";document.getElementById("header-note").textContent="3D 探索 · 地下手術室";document.title="時空密室｜第三關：不屬於自己的記憶";window.Ward3D.enterSurgeryRoom();});
+  document.getElementById("close-surgery-panel")?.addEventListener("click",()=>{document.getElementById("surgery-station").hidden=true;canvas.focus({preventScroll:true});});
+  document.getElementById("surgery-console-form")?.addEventListener("submit",e=>{e.preventDefault();if(!Object.values(surgeryState.photos).every(Boolean)||!surgeryState.recordRead){surgeryPanel("控制台","請先找到四張照片並閱讀手術紀錄。");return;}if(document.getElementById("surgery-code").value!=="4132"){surgeryPanel("控制台","密碼不正確，請依時間順序排列照片。");return;}surgeryState.consoleUnlocked=true;document.getElementById("surgery-take-remote").hidden=false;surgeryPanel("控制台解鎖","密碼 4132 正確，抽屜已打開。");});
+  document.getElementById("surgery-take-remote")?.addEventListener("click",()=>{surgeryState.remote=true;document.getElementById("surgery-take-remote").hidden=true;surgeryPanel("取得遙控器","拿著遙控器到監視器播放影片。");});
+  document.getElementById("surgery-play-video")?.addEventListener("click",()=>{if(!surgeryState.remote){surgeryPanel("監視器","先從控制台抽屜取得遙控器。");return;}surgeryState.videoPlayed=true;document.getElementById("surgery-read-memo").disabled=false;document.getElementById("surgery-take-pass").disabled=false;surgeryPanel("監視器影片","NO.01 自願參與複製實驗。研究員完成 NO.02 複製與記憶移植，NO.01 的狀態正在惡化。畫面最後顯示：原始個體曾自願參與實驗。");});
+  document.getElementById("surgery-read-memo")?.addEventListener("click",()=>{surgeryState.memoRead=true;surgeryPanel("研究員備忘錄","記憶移植後，NO.02 開始產生獨立意識。他不再只是原始個體的複製品。");});
+  document.getElementById("surgery-take-pass")?.addEventListener("click",()=>{surgeryState.passTaken=true;document.getElementById("surgery-use-pass").disabled=false;surgeryProps.passProp.visible=false;surgeryPanel("研究區通行證","已取得通行證。到出口讀卡器離開手術室。");});
+  document.getElementById("surgery-use-pass")?.addEventListener("click",()=>{surgeryState.complete=true;document.getElementById("surgery-complete").hidden=false;surgeryPanel("第三關完成","NO.01 留下訊息：「複製你，不是為了讓我活下去，而是為了讓你替我完成一件事。」");});
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
   let yaw=0,pitch=-.32,drag=null,dragMoved=false,aimed=null,last=performance.now(),lastAimCheck=0;
   let opening=O.create(),introComplete=false,openingPhase="idle",wakeProgress=1;
