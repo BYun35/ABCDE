@@ -311,10 +311,43 @@ body.nursing-mode .nurse-feedback{clear:both;min-height:44px;padding:10px;margin
 /* 第三關預覽入口與操作面板 */
 .surgery-station{position:fixed;z-index:11;top:50%;left:50%;right:auto;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 32px));max-height:calc(100svh - 84px);overflow-y:auto;overscroll-behavior:contain;margin:0;padding:16px;background:#172326f2;backdrop-filter:blur(12px)}.surgery-play-grid .nursing-card{display:none;margin:0 0 12px;padding:14px}.surgery-play-grid .nursing-card[data-active="true"]:not([hidden]){display:block}.surgery-play-grid{display:block}.surgery-station .nursing-heading{display:block}.surgery-station .nurse-feedback{clear:both}@media(max-width:760px){.surgery-station{top:50%;left:50%;right:auto;transform:translate(-50%,-50%);width:calc(100vw - 16px);max-height:calc(100svh - 24px);padding:12px}}
 
+#notebook-internal-controls[hidden]{display:none!important}.notebook-content{display:grid;gap:10px}.notebook-content .card{margin:0}.notebook-content #notebook-stage-empty{color:var(--muted);margin:0}.notebook-content #notebook-entries{margin:0;padding-left:1.4rem;white-space:pre-wrap}.notebook-content #notebook-entries li{margin:0 0 14px}.notebook-content #notebook-entries p{margin:5px 0 0;color:#d3d0c5;line-height:1.65;overflow-wrap:anywhere}.form-feedback{min-height:1.5em;margin:8px 0 0;font-weight:700}.form-feedback[data-result="error"]{color:#ffaaa0}.form-feedback[data-result="success"]{color:#a8e0bd}.date-form input[aria-invalid="true"]{border-color:#ff8e82;box-shadow:0 0 0 2px #ff8e8233}
+
 /* 第三關彈窗置中並限制高度；查看單一線索時隱藏重複的進度與提示。 */
 body.nursing-mode .surgery-station{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 32px));max-height:calc(100svh - 96px)}
 body.nursing-mode .surgery-station[data-active-panel="surgery-inspection-panel"] .surgery-progress,body.nursing-mode .surgery-station[data-active-panel="surgery-inspection-panel"] #surgery-inspection-panel{display:none!important}
 @media(max-width:760px){body.nursing-mode .surgery-station{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:calc(100vw - 16px);max-height:calc(100svh - 24px)}}
 
+.surveillance-player{margin:14px 0;padding:10px;border:1px solid #68786a;border-radius:12px;background:#0b1110}
+.surveillance-meta{display:flex;justify-content:space-between;align-items:center;margin:0 0 7px;color:#a9c2b4;font:700 .78rem/1.4 ui-monospace,monospace}
+.recording-light{display:inline-block;width:8px;height:8px;margin-right:7px;border-radius:50%;background:#e7544c;box-shadow:0 0 9px #ff5c52;animation:recording-blink .8s steps(2,end) infinite}
+.surveillance-frame{position:relative;isolation:isolate;aspect-ratio:16/9;min-height:190px;overflow:hidden;border:1px solid #57645c;border-radius:8px;background:radial-gradient(ellipse at 50% 55%,#47544a,#19231f 72%);box-shadow:inset 0 0 42px #000b}
+.surveillance-frame::after{position:absolute;z-index:5;inset:0;content:"";pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 3px,#0004 4px 5px),linear-gradient(90deg,#08110c66,#fff0 50%,#08110c77);animation:camera-flicker 2.8s steps(1,end) infinite}
+.surveillance-window{position:absolute;left:8%;top:10%;width:24%;height:39%;border:2px solid #59675b;background:linear-gradient(135deg,#314037,#101512)}
+.surveillance-bed{position:absolute;left:18%;bottom:18%;width:62%;height:15%;border:3px solid #839184;border-width:3px 0 0;background:#344139;transform:skewX(-8deg)}
+.surveillance-bed::after{position:absolute;left:5%;right:5%;bottom:-22px;height:22px;content:"";border:2px solid #657166;border-top:0}
+.surveillance-subject{position:absolute;left:23%;top:-48%;width:52%;height:58%;border-radius:48% 40% 12% 12%;background:linear-gradient(90deg,#18211c,#69766a 48%,#202a22);transform:rotate(-5deg);transform-origin:center;animation:surveillance-breathe 2.2s ease-in-out infinite}
+.surveillance-subject::before{position:absolute;left:34%;top:-42%;width:34%;aspect-ratio:1;content:"";border-radius:50%;background:radial-gradient(circle at 38% 35%,#92998a,#3b463e 68%,#19211c)}
+.surveillance-doctor{position:absolute;right:17%;bottom:27%;width:10%;height:42%;border-radius:40% 40% 12% 12%;background:linear-gradient(90deg,#111915,#7a8879 45%,#202a22)}
+.surveillance-doctor::before{position:absolute;left:20%;top:-27%;width:62%;aspect-ratio:1;content:"";border-radius:50%;background:#737e70}
+.surveillance-console{position:absolute;right:6%;top:23%;width:13%;height:18%;border:2px solid #607161;background:linear-gradient(140deg,#728b73,#17271c);box-shadow:0 0 16px #9ab68666}
+.surveillance-camera{position:absolute;z-index:6;top:8px;right:9px;color:#e8b3a7;font:700 .68rem ui-monospace,monospace;text-shadow:0 1px #000}
+.surveillance-caption{min-height:3.3em;margin:9px 2px 7px;color:#f1e6c7;font-size:.9rem;line-height:1.55}
+.surveillance-progress{height:4px;overflow:hidden;border-radius:4px;background:#303a34}
+.surveillance-progress span{display:block;width:0;height:100%;background:#c6a45b;transition:width .12s linear}
+.surveillance-status{margin:7px 2px 0;color:#aebbb0;font-size:.78rem}
+.surveillance-frame[data-scene="consent"] .surveillance-bed{opacity:.18}
+.surveillance-frame[data-scene="consent"] .surveillance-doctor{right:34%;height:50%;transform:scale(.92)}
+.surveillance-frame[data-scene="operation"]{background:radial-gradient(ellipse at 50% 50%,#46564c,#121b17 74%)}
+.surveillance-frame[data-scene="operation"] .surveillance-bed{left:12%;width:75%;bottom:28%;transform:rotate(-4deg)}
+.surveillance-frame[data-scene="operation"] .surveillance-subject{animation:none;transform:rotate(82deg) scale(.8);left:24%;top:-36%}
+.surveillance-frame[data-scene="operation"] .surveillance-doctor{right:13%;height:62%}
+.surveillance-frame[data-scene="waking"] .surveillance-subject{animation:surveillance-wake 3s ease-in-out infinite}
+.surveillance-frame[data-scene="waking"] .surveillance-doctor{opacity:.45}
+@keyframes recording-blink{50%{opacity:.35}}
+@keyframes camera-flicker{0%,92%,96%,100%{opacity:.45}94%{opacity:.16}}
+@keyframes surveillance-breathe{50%{transform:rotate(-4deg) scaleY(1.035)}}
+@keyframes surveillance-wake{0%,25%{transform:rotate(-5deg)}70%,100%{transform:rotate(-38deg) translateY(-9%)}}
+@media(prefers-reduced-motion:reduce){.recording-light,.surveillance-frame::after,.surveillance-subject{animation:none}}
 /* 開場與第三關試玩入口需高於底部互動清單。 */
 .walk-instructions{z-index:6}

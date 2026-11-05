@@ -498,7 +498,7 @@
   },enterNursingStation(){
     if(activeLevel==="nursing")return;
     closeNotebook();
-    activeLevel="nursing";activeNavigation=NN;
+    activeLevel="nursing";activeNavigation=NN;window.WardClueApp?.setStage("nursing");
     wardRoom.visible=false;nursingRoom.visible=true;
     player.x=NN.START.x;player.z=NN.START.z;heading=0;yaw=0;pitch=-.28;
     avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;
@@ -524,7 +524,7 @@
     if(next.elevatorCard)nursingProps.readerScreen.material=mat(0x8edbb7);
     if(next.complete){nursingProps.elevatorDoor.position.x=5.7;nursingProps.elevatorDoor.rotation.y=-1.15;}
     nextNearbyCheck=0;
-  },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
+  },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;window.WardClueApp?.setStage("surgery");wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
     showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);},closeInteractionDialog(){closeInteractionDialog();}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);

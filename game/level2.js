@@ -60,10 +60,10 @@
     if (String(value).trim() === "0217") return reply(Object.assign({}, state, { drawerUnlocked: true }), "日期正確。桌子下方的隱藏抽屜解鎖了。");
     const dateAttempts = state.dateAttempts + 1;
     const message = dateAttempts === 1
-      ? "日期資料不完整。"
+      ? "輸入錯誤：實驗日期不正確。請輸入四位數月日（MMDD）。"
       : dateAttempts === 2
-        ? "請依 MMDD 格式輸入。"
-        : "日期錯誤。你仍可重播錄音並繼續嘗試。";
+        ? "日期仍不正確。請再聽一次錄音，確認實驗啟動的月日。"
+        : "日期仍不正確。請從錄音中找出實驗啟動日，再用 MMDD 格式輸入。";
     return reply(Object.assign({}, state, { dateAttempts }), message);
   }
 
