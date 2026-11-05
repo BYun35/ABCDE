@@ -217,7 +217,7 @@
     const result = Nursing.useElevator(nursingState);
     nursingState = result.state;
     renderNursingState(result.message);
-    if (nursingState.complete) window.Ward3D?.notifyPopup({ title: "第二關完成", message: result.message, kind: "important" });
+    if (nursingState.complete) openNursingPanel("nursing-ending", "第二關完成");
   });
 
   document.querySelectorAll("[data-inspect]").forEach((button) => {
