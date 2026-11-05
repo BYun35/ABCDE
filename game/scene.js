@@ -10,7 +10,7 @@
   }
   const T=window.THREE,N=window.WardNavigation,NN=window.WardNursingNavigation,SN=window.WardSurgeryNavigation,A=window.WardAvatar,O=window.WardOpening,C=window.WardClock,I=window.WardInteraction;
   const player={x:N.OPENING_START.x,z:N.OPENING_START.z};
-  let travel=0,heading=0,lastMovement=0,walkBlend=0;
+  let travel=0,heading=0,lastMovement=0,walkBlend=0,exitDoorProgress=0;
   let renderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false});}
   catch(error){tell("這個瀏覽器無法顯示 3D。請使用支援 WebGL 的瀏覽器；右側操作仍可使用。");host.dataset.ready="error";return;}
@@ -466,7 +466,9 @@
   // 第三關地下手術室：獨立可走動 3D 房間。
   buildingLevel="surgery";buildGroup=surgeryRoom;
   box(0,-.12,0,12,.24,14,0x42484b);
-  box(-6,1.8,0,.18,3.6,14,0x626b70);box(6,1.8,0,.18,3.6,14,0x59636a);
+  box(-6,1.8,0,.18,3.6,14,0x626b70);
+  box(6,1.8,-1.925,.18,3.6,10.15,0x59636a);box(6,1.8,6.175,.18,3.6,1.65,0x59636a);
+  box(7.8,-.12,4.25,3.6,.24,2.46,0x79776a);box(7.8,1.8,3.02,3.6,3.6,.16,0x746f5d);box(7.8,1.8,5.48,3.6,3.6,.16,0x746f5d);box(9.32,1.8,4.25,.16,3.6,2.6,0x9a9172);
   box(0,1.8,-7,12,3.6,.18,0x697076);box(0,1.8,7,12,3.6,.18,0x5d646b);
   box(0,3.65,0,12,.12,14,0x282e32);
   box(0,.58,-1.2,2.8,.24,1.6,0x9aa3a7);box(0,.75,-1.2,1.7,.16,1.1,0xc8cfd0);
@@ -482,7 +484,13 @@
   const memoProp=box(3.75,.35,-1.1,.4,.05,.5,0xe2d3a8);memoProp.visible=false;target(memoProp,"閱讀研究員備忘錄",()=>document.getElementById("surgery-read-memo").click(),SN.TARGETS.memo);
   const passProp=box(4.9,.37,-1.1,.4,.06,.5,0xb8cfb4);passProp.visible=false;target(passProp,"取得研究區通行證",()=>document.getElementById("surgery-take-pass").click(),SN.TARGETS.pass);
   const exitReader=box(5.72,1.35,4.25,.12,.55,.36,0x415955);target(exitReader,"手術室出口讀卡器",()=>window.SurgeryApp?.exit(),SN.TARGETS.exit);
-  const surgeryProps={memoProp,passProp,exitReader,surgeryLight};
+  const exitDoor=new T.Group();exitDoor.position.set(6,0,3.2);exitDoor.rotation.y=Math.PI/2;buildGroup.add(exitDoor);
+  box(-1.05,1.45,0,2.1,2.9,.12,0x8c7650,exitDoor);box(-1.05,1.45,-.075,1.82,2.58,.025,0x30423b,exitDoor);box(-.18,1.42,-.11,.035,.72,.035,0xd2b76f,exitDoor);
+  box(6,3.02,4.25,2.28,.14,.3,0x897850);box(6,1.48,3.12,.13,2.96,.13,0xc8ad6b);box(6,1.48,5.38,.13,2.96,.13,0xc8ad6b);
+  const sunlight=new T.PointLight(0xffdf9c,0,9,1.4);sunlight.position.set(8.85,2.75,4.25);buildGroup.add(sunlight);
+  const sunBeam=new T.SpotLight(0xffe6b4,0,11,Math.PI/3,.72,1.1);sunBeam.position.set(9.05,3.35,4.25);sunBeam.target.position.set(5.9,.8,4.25);buildGroup.add(sunBeam,sunBeam.target);
+  const corridorGlow=box(8.55,.015,4.25,1.05,.025,1.55,0xb5a06e);corridorGlow.material=corridorGlow.material.clone();corridorGlow.material.emissive=new T.Color(0xffcf75);corridorGlow.material.emissiveIntensity=.03;
+  const surgeryProps={memoProp,passProp,exitReader,surgeryLight,exitDoor,sunlight,sunBeam,corridorGlow};
   buildGroup=wardRoom;buildingLevel="ward";
   buildGroup=wardRoom;buildingLevel="ward";
   let state={ended:false},nursingState={complete:false},surgeryState={complete:false,photos:{A:false,B:false,C:false,D:false},recordRead:false,consoleUnlocked:false,remote:false,videoPlayed:false,memoRead:false,passTaken:false},fragmentIds=[];
@@ -524,7 +532,7 @@
     if(next.elevatorCard)nursingProps.readerScreen.material=mat(0x8edbb7);
     if(next.complete){nursingProps.elevatorDoor.position.x=5.7;nursingProps.elevatorDoor.rotation.y=-1.15;}
     nextNearbyCheck=0;
-  },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;window.WardClueApp?.setStage("surgery");wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
+  },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;window.WardClueApp?.setStage("surgery");wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.exitUnlocked?0x8edbb7:next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
     showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);},closeInteractionDialog(){closeInteractionDialog();}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
@@ -615,7 +623,7 @@
     return activeLevel==="ward"?state.ended&&(!state.doorOpen||doorProgress<.995):activeLevel==="nursing"?false:surgeryState.complete;
   }
   function advance(f,r,d){
-    const p=activeNavigation.move(player,yaw,f,r,d,activeLevel==="ward"&&state.doorOpen);
+    const p=activeNavigation.move(player,yaw,f,r,d,activeLevel==="ward"?state.doorOpen:activeLevel==="surgery"&&surgeryState.exitUnlocked);
     const dx=p.x-player.x,dz=p.z-player.z,moved=Math.hypot(dx,dz);
     if(moved>.0001){travel+=moved;heading=Math.atan2(-dx,-dz);lastMovement=performance.now();}
     player.x=p.x;player.z=p.z;
@@ -625,6 +633,9 @@
     }
     if(activeLevel==="nursing"&&nursingState.complete&&player.x>=3.85&&player.x<=4.65&&player.z< -6.05){
       keys.clear();window.SurgeryApp?.enter?.();
+    }
+    if(activeLevel==="surgery"&&surgeryState.exitUnlocked&&!surgeryState.complete&&player.x>=8.2&&player.z>=3.45&&player.z<=5.05){
+      keys.clear();window.SurgeryApp?.finishExit?.();
     }
   }
   function keyDirection(){
@@ -770,6 +781,15 @@ document.getElementById("skip-awakening").addEventListener("click",()=>finishOpe
       doorProgress=Math.min(1,doorProgress+dt*1.05);
       const eased=1-Math.pow(1-doorProgress,3);
       doorPivot.rotation.y=-Math.PI*.5*eased;
+    }
+    if(activeLevel==="surgery"&&surgeryState.exitUnlocked){
+      exitDoorProgress=Math.min(1,exitDoorProgress+dt*.9);
+      const sunlightProgress=1-Math.pow(1-exitDoorProgress,2);
+      surgeryProps.exitDoor.rotation.y=Math.PI/2+1.28*sunlightProgress;
+      surgeryProps.surgeryLight.intensity=2.2*(1-.65*sunlightProgress);
+      surgeryProps.sunlight.intensity=7.5*sunlightProgress;
+      surgeryProps.sunBeam.intensity=85*sunlightProgress;
+      surgeryProps.corridorGlow.material.emissiveIntensity=.95*sunlightProgress;
     }
     const controlsLocked=movementLocked();
     if(introComplete&&!controlsLocked&&(document.activeElement===canvas||document.pointerLockElement===canvas))advance(moving.f,moving.r,dt*1.45);

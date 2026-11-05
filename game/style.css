@@ -351,3 +351,16 @@ body.nursing-mode .surgery-station[data-active-panel="surgery-inspection-panel"]
 @media(prefers-reduced-motion:reduce){.recording-light,.surveillance-frame::after,.surveillance-subject{animation:none}}
 /* 開場與第三關試玩入口需高於底部互動清單。 */
 .walk-instructions{z-index:6}
+
+/* 結尾：穿過出口後，陽光漸亮並淡出到故事終章。 */
+.final-ending-screen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow:auto;padding:clamp(18px,4vw,52px);background:rgba(255,250,231,0);color:#26343a;opacity:0;}
+.final-ending-screen[hidden]{display:none;}
+.ending-reveal .final-ending-screen:not([hidden]){animation:ending-daylight 2.8s ease-out forwards;}
+.final-ending-content{width:min(900px,100%);max-height:100%;overflow:auto;padding:clamp(24px,5vw,64px);border:1px solid #d6c998;border-radius:18px;background:rgba(255,253,244,.96);box-shadow:0 18px 80px #443a2366;line-height:1.9;opacity:0;animation:ending-story 1s ease-out 1.3s forwards;}
+.final-ending-content h2{margin:.1em 0 .5em;color:#344943;font-size:clamp(2rem,5vw,3.4rem);}
+.final-ending-content p,.final-ending-content blockquote{font-size:clamp(1rem,2vw,1.3rem);}
+.final-ending-content blockquote{margin:1.1em 0;padding-left:1em;border-left:4px solid #bdab76;color:#485660;}
+.final-ending-content h3{font-size:clamp(2rem,4vw,3rem);letter-spacing:.08em;}
+@keyframes ending-daylight{0%{background:rgba(255,250,231,0);opacity:0}60%{background:rgba(255,250,231,.96);opacity:1}100%{background:#fffdf4;opacity:1}}
+@keyframes ending-story{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.ending-reveal .final-ending-screen:not([hidden]),.final-ending-content{animation-duration:.01ms;animation-delay:0ms}}

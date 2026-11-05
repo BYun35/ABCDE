@@ -275,7 +275,7 @@
 
   function openSurgeryPanel(panelId,title,message){ surgeryStation.hidden=false; surgeryStation.dataset.activePanel=panelId; document.querySelectorAll("#surgery-station .surgery-play-grid > .nursing-card").forEach(card=>{card.dataset.active=card.id===panelId?"true":"false";}); document.getElementById("surgery-title").textContent=title||"手術室調查"; if(message)document.getElementById("surgery-feedback").textContent=message; document.getElementById("close-surgery-panel").focus({preventScroll:true}); }
   function closeSurgeryPanel(){surgeryStation.hidden=true;document.getElementById("ward-canvas")?.focus({preventScroll:true});}
-  function renderSurgery(message){if(message)document.getElementById("surgery-feedback").textContent=message;document.getElementById("surgery-photo-progress").textContent="記憶照片："+Object.values(surgeryState.photos).filter(Boolean).length+"/4；手術紀錄："+(surgeryState.recordRead?"已閱讀":"未閱讀");document.getElementById("surgery-unlock-console").disabled=!Object.values(surgeryState.photos).every(Boolean)||!surgeryState.recordRead||surgeryState.consoleUnlocked;document.getElementById("surgery-unlock-console").textContent=surgeryState.consoleUnlocked?"控制台已解鎖":"輸入密碼解鎖抽屜";document.getElementById("surgery-take-remote").hidden=!surgeryState.consoleUnlocked||surgeryState.remote;document.getElementById("surgery-play-video").disabled=!surgeryState.remote||!!videoTimer;document.getElementById("surgery-read-memo").disabled=!surgeryState.videoPlayed||!videoPlaybackComplete;document.getElementById("surgery-take-pass").disabled=!surgeryState.videoPlayed||surgeryState.passTaken;document.getElementById("surgery-use-pass").disabled=!surgeryState.passTaken||!surgeryState.memoRead||surgeryState.complete;document.getElementById("surgery-complete").hidden=!surgeryState.complete;if(surgeryState.complete){document.querySelectorAll("#surgery-station .surgery-play-grid > .nursing-card").forEach(card=>{card.dataset.active=card.id==="surgery-complete"?"true":"false";});surgeryStation.hidden=false;}window.Ward3D?.syncSurgery?.(surgeryState);}
+  function renderSurgery(message){if(message)document.getElementById("surgery-feedback").textContent=message;document.getElementById("surgery-photo-progress").textContent="記憶照片："+Object.values(surgeryState.photos).filter(Boolean).length+"/4；手術紀錄："+(surgeryState.recordRead?"已閱讀":"未閱讀");document.getElementById("surgery-unlock-console").disabled=!Object.values(surgeryState.photos).every(Boolean)||!surgeryState.recordRead||surgeryState.consoleUnlocked;document.getElementById("surgery-unlock-console").textContent=surgeryState.consoleUnlocked?"控制台已解鎖":"輸入密碼解鎖抽屜";document.getElementById("surgery-take-remote").hidden=!surgeryState.consoleUnlocked||surgeryState.remote;document.getElementById("surgery-play-video").disabled=!surgeryState.remote||!!videoTimer;document.getElementById("surgery-read-memo").disabled=!surgeryState.videoPlayed||!videoPlaybackComplete;document.getElementById("surgery-take-pass").disabled=!surgeryState.videoPlayed||surgeryState.passTaken;document.getElementById("surgery-use-pass").disabled=!surgeryState.passTaken||!surgeryState.memoRead||surgeryState.exitUnlocked||surgeryState.complete;document.getElementById("surgery-complete").hidden=!surgeryState.complete;if(surgeryState.complete){document.querySelectorAll("#surgery-station .surgery-play-grid > .nursing-card").forEach(card=>{card.dataset.active=card.id==="surgery-complete"?"true":"false";});}window.Ward3D?.syncSurgery?.(surgeryState);}
   function enterSurgeryRoom(){if(!nursingState.complete)return; surgeryState.passTaken=nursingState.elevatorCard; nursingStation.hidden=true;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;document.getElementById("page-brand").textContent="時空密室・第三關";document.getElementById("page-title").textContent="不屬於自己的記憶";document.getElementById("header-note").textContent="3D 探索 · 地下手術室";document.getElementById("stage-eyebrow").textContent="地下研究區 · 凌晨 3:17";document.getElementById("stage-title").textContent="手術室裡的四段記憶";document.getElementById("stage-description").textContent="調查照片與手術紀錄，依事件時間排序，找出控制台密碼。";document.title="時空密室｜第三關：不屬於自己的記憶";document.documentElement.classList.add("nursing-mode");document.body.classList.add("nursing-mode");window.Ward3D?.enterSurgeryRoom();renderSurgery("手術台旁的紙條寫著：「記憶可以被刪除，但不代表它從未發生。找回四段記憶，確認自己是誰。」");}
   if(window.Ward3D)window.Ward3D.openSurgeryPanel=openSurgeryPanel;
 
@@ -287,7 +287,8 @@
     console(){openSurgeryPanel("surgery-console-panel","控制台｜四位數密碼","依手術紀錄排序四張照片，輸入背面的數字。");},
     drawer(){if(!surgeryState.consoleUnlocked){openSurgeryPanel("surgery-console-panel","控制台下方抽屜","抽屜仍被密碼鎖住。先調查四張照片與手術紀錄。");return;}if(!surgeryState.remote){const r=Surgery.takeRemote(surgeryState);surgeryState=r.state;renderSurgery(r.message);}else openSurgeryPanel("surgery-console-panel","控制台抽屜",surgeryState.videoPlayed?"抽屜中還有研究員備忘錄。":"已取得遙控器。到牆面監視器播放實驗紀錄。");},
     monitor(){openSurgeryPanel("surgery-monitor-panel","監視器","監視器保留了三段實驗紀錄。需要使用控制台抽屜裡的遙控器。");},
-    exit(){openSurgeryPanel("surgery-exit-panel","手術室出口","讀卡器需要地下研究區通行證。")}
+    exit(){openSurgeryPanel("surgery-exit-panel","手術室出口",surgeryState.exitUnlocked?"逃生門已解鎖。關閉面板後，沿著門外的暖光走出去。":"讀卡器需要地下研究區通行證。")},
+    finishExit(){if(surgeryState.complete)return;surgeryState.complete=true;renderSurgery("你走進陽光裡，身後的廣播聲逐漸遠去。");closeSurgeryPanel();document.getElementById("final-ending-screen").hidden=false;document.body.classList.add("ending-reveal");document.getElementById("final-ending-restart").focus({preventScroll:true});if(window.speechSynthesis)window.speechSynthesis.cancel();}
   };
 
   function enterNursingStation() {
@@ -318,7 +319,7 @@
   document.getElementById("surgery-play-video").addEventListener("click",()=>{const r=Surgery.playVideo(surgeryState);surgeryState=r.state;if(r.ok){playSurveillanceVideo();renderSurgery("監視器開始播放影像。");}else renderSurgery(r.message);});
   document.getElementById("surgery-read-memo").addEventListener("click",()=>{const r=Surgery.readMemo(surgeryState);surgeryState=r.state;recordNotebookEntry("surgery","研究員備忘錄",r.message);renderSurgery(r.message);});
   document.getElementById("surgery-take-pass").addEventListener("click",()=>{const r=Surgery.takePass(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
-  document.getElementById("surgery-use-pass").addEventListener("click",()=>{const r=Surgery.useExit(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-use-pass").addEventListener("click",()=>{const r=Surgery.useExit(surgeryState);surgeryState=r.state;renderSurgery(r.message);if(r.ok&&surgeryState.exitUnlocked)closeSurgeryPanel();});
   }
   ["A", "B", "C"].forEach(record => {
     document.getElementById("nurse-record-" + record.toLowerCase()).addEventListener("click", () => {
@@ -494,6 +495,8 @@
 
   document.getElementById("open-door").addEventListener("click", useKeycard);
   document.getElementById("scene-reader").addEventListener("click", useKeycard);
+
+  document.getElementById("final-ending-restart").addEventListener("click",()=>window.location.reload());
 
   renderNursingState();
   renderNotebook("ward");

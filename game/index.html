@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111318">
 <title>時空密室｜3D 病房：消失的病歷</title>
-<link rel="stylesheet" href="style.css?v=storypanelvideo1">
+<link rel="stylesheet" href="style.css?v=brightending1">
 <script src="game.js?v=1" defer></script>
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js?v=bedwake2" defer></script>
 <script src="nursing-navigation.js?v=recordsrow1" defer></script>
-<script src="surgery-navigation.js?v=level3" defer></script>
+<script src="surgery-navigation.js?v=brightending1" defer></script>
 <script src="avatar.js?v=bedwake2" defer></script>
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
 <script src="level2.js?v=datefeedback1" defer></script>
-<script src="level3.js?v=level3exit1" defer></script>
-<script src="scene.js?v=notebookstage1" defer></script>
-<script src="app.js?v=storypanelvideo1" defer></script>
+<script src="level3.js?v=brightending1" defer></script>
+<script src="scene.js?v=brightending1" defer></script>
+<script src="app.js?v=brightending1" defer></script>
 </head>
 <body>
 <header>
@@ -260,11 +260,14 @@
       <section id="surgery-console-panel" class="nursing-card"><h3>控制台密碼</h3><p>依手術紀錄時間排列照片，輸入照片背面數字。</p><form id="surgery-console-form" class="date-form"><label for="surgery-code">四位數密碼</label><input id="surgery-code" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required><button id="surgery-unlock-console" class="primary" type="submit" disabled>解鎖抽屜</button></form><button id="surgery-take-remote" class="secondary" type="button" hidden>取得遙控器與紙條</button></section>
       <section id="surgery-monitor-panel" class="nursing-card"><h3>監視器</h3><p>取得遙控器後播放影片，再閱讀研究員備忘錄。</p><div id="surgery-video-player" class="surveillance-player" hidden><div class="surveillance-meta"><span><i class="recording-light"></i>監視器錄影</span><span id="surveillance-time">00:00</span></div><div id="surveillance-frame" class="surveillance-frame" data-scene="consent" role="img" aria-label="監視器影像"><div class="surveillance-window"></div><div class="surveillance-bed"><div class="surveillance-subject"></div></div><div class="surveillance-doctor"></div><div class="surveillance-console"></div><span class="surveillance-camera">CAM 03</span><span class="surveillance-noise"></span></div><p id="surveillance-caption" class="surveillance-caption" aria-live="polite"></p><div class="surveillance-progress"><span id="surveillance-progress"></span></div><p id="surveillance-status" class="surveillance-status" role="status" aria-live="polite">影片準備播放。</p></div><button id="surgery-play-video" class="primary" type="button" disabled>播放監視器影片</button><button id="surgery-read-memo" class="secondary" type="button" disabled>閱讀研究員備忘錄</button></section>
       <section id="surgery-exit-panel" class="nursing-card"><h3>緊急出口</h3><p>使用地下研究區通行證解鎖出口。</p><button id="surgery-take-pass" class="secondary" type="button" disabled>取得研究區通行證</button><button id="surgery-use-pass" class="primary" type="button" disabled>刷卡並離開醫院</button></section>
-      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>你逃離了醫院</h3><p>NO.01 留下最後留言，希望你不再被困在實驗裡，也不必為了完成他的願望而活。</p><p>研究區啟動封鎖程序。你用地下研究區通行證解鎖緊急出口，離開醫院，開始自己的人生。</p><p><strong>THE END｜重新開始</strong></p></section>
+      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>你逃離了醫院</h3><p>研究區已解鎖。走過出口，迎向門外的光。</p></section>
     </div>
   </section>
 
 </main>
+<section id="final-ending-screen" class="final-ending-screen" role="dialog" aria-modal="true" aria-labelledby="final-ending-title" hidden>
+  <div class="final-ending-content"><p class="eyebrow">《複製人生》・最終結局：重新開始</p><h2 id="final-ending-title">你走出了醫院</h2><p>你推開緊急逃生門。外面的陽光照進陰暗的走廊，身後的廣播聲逐漸消失。</p><p>你低頭看著手腕上的標籤：</p><blockquote>NO.02</blockquote><p>你沉默了一會兒，最後將標籤撕下，丟在地上。</p><blockquote>他曾經以為，自己只是另一個人的複製品。<br>他失去了記憶，也失去了對自己身分的認知。<br>但當他踏出醫院的那一刻，他終於明白——<br>即使生命的起點來自另一個人，也不代表自己的人生必須由別人決定。<br>他不是 NO.01 的替代品。<br>他是自己。</blockquote><h3>THE END</h3><button id="final-ending-restart" class="primary" type="button">重新開始</button></div>
+</section>
 <footer>消失的病歷／被篡改的記錄／不屬於自己的記憶　｜　WASD、滑鼠與 E 探索；三關進度僅保留於本次開啟期間。</footer>
 </body>
 </html>
