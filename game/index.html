@@ -41,8 +41,8 @@
           <div id="walk-instructions" class="walk-instructions">
             <span class="eyebrow">消失的病歷</span>
             <h2>這裡，有另一個你。</h2>
-            <p>先看看你醒來後發生了什麼。拿起手電筒，慢慢探索病房；覺得太暗或太亮，可以用下方按鈕調整光線。第三關按鈕僅供測試，正式流程會從第二關接續。</p>
-            <button id="enter-room" class="primary" type="button">進入病房</button><button id="try-third-level" class="secondary" type="button">預覽測試第三關（開發中）</button>
+            <p>拿起手電筒，探索病房並找出離開的方法。完成第一關後前往護理站，再從護理站進入地下手術室。</p>
+            <button id="enter-room" class="primary" type="button">進入病房</button>
           </div>
           <div id="awakening-scene" class="awakening-scene" role="dialog" aria-modal="true" aria-labelledby="awakening-title" hidden>
             <span class="eyebrow">消失的病歷</span>
@@ -243,11 +243,11 @@
     <div class="surgery-play-grid">
       <section class="nursing-card"><h3>控制台密碼</h3><p>依手術紀錄時間排列照片，輸入照片背面數字。</p><form id="surgery-console-form" class="date-form"><label for="surgery-code">四位數密碼</label><input id="surgery-code" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required><button id="surgery-unlock-console" class="primary" type="submit" disabled>解鎖抽屜</button></form><button id="surgery-take-remote" class="secondary" type="button" hidden>取得遙控器與紙條</button></section>
       <section class="nursing-card"><h3>監視器與出口</h3><p>取得遙控器後播放影片，再取備忘錄和通行證。</p><button id="surgery-play-video" class="primary" type="button" disabled>播放監視器影片</button><button id="surgery-read-memo" class="secondary" type="button" disabled>閱讀研究員備忘錄</button><button id="surgery-take-pass" class="secondary" type="button" disabled>取得研究區通行證</button><button id="surgery-use-pass" class="primary" type="button" disabled>使用通行證離開</button></section>
-      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>第三關完成</h3><p>NO.01 留下最後一段訊息：複製你，是為了讓你替他完成一件事。</p></section>
+      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>目前三關劇情完成</h3><p>NO.01 留下最後一段訊息：複製你，是為了讓你替他完成一件事。</p><p>警示燈閃爍，廣播要求停止你的研究權限。地下研究區通行證將用於後續劇情；目前可遊玩的內容到此為止。</p></section>
     </div>
   </section>
 
 </main>
-<footer>消失的病歷／被篡改的記錄　｜　第一關可用 WASD、滑鼠與 E 探索；兩關進度僅保留於本次開啟期間。</footer>
+<footer>消失的病歷／被篡改的記錄／不屬於自己的記憶　｜　WASD、滑鼠與 E 探索；三關進度僅保留於本次開啟期間。</footer>
 </body>
 </html>
