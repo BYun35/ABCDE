@@ -624,7 +624,7 @@
       keys.clear();document.getElementById("enter-nursing-station").click();
     }
     if(activeLevel==="nursing"&&nursingState.complete&&player.x>=3.85&&player.x<=4.65&&player.z< -6.05){
-      keys.clear();document.getElementById("enter-surgery-room").click();
+      keys.clear();window.SurgeryApp?.enter?.();
     }
   }
   function keyDirection(){

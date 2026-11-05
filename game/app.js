@@ -132,6 +132,7 @@
   if(window.Ward3D)window.Ward3D.openSurgeryPanel=openSurgeryPanel;
 
   window.SurgeryApp={
+    enter(){enterSurgeryRoom();},
     photo(id){const r=Surgery.inspectPhoto(surgeryState,id);surgeryState=r.state;openSurgeryPanel("記憶照片 "+id,r.message);renderSurgery(r.message);},
     record(){const r=Surgery.inspectRecord(surgeryState);surgeryState=r.state;openSurgeryPanel("機密手術紀錄",r.message);renderSurgery(r.message);},
     graffiti(){const r=Surgery.inspectGraffiti(surgeryState);surgeryState=r.state;openSurgeryPanel("牆上的字",r.message);renderSurgery(r.message);},
@@ -163,7 +164,6 @@
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&surgeryStation&&!surgeryStation.hidden)closeSurgeryPanel();});
   document.getElementById("close-nursing-panel").addEventListener("click", closeNursingPanel);
   if (surgeryStation) {
-  document.getElementById("enter-surgery-room").addEventListener("click",enterSurgeryRoom);
   document.getElementById("close-surgery-panel").addEventListener("click",closeSurgeryPanel);
   document.getElementById("surgery-console-form").addEventListener("submit",e=>{e.preventDefault();const r=Surgery.unlock(surgeryState,document.getElementById("surgery-code").value);surgeryState=r.state;renderSurgery(r.message);});
   document.getElementById("surgery-take-remote").addEventListener("click",()=>{const r=Surgery.takeRemote(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
