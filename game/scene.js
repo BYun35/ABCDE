@@ -737,9 +737,6 @@ document.getElementById("skip-awakening").addEventListener("click",()=>finishOpe
     ceilingLight.intensity=2.1*flicker;
     lightLens.material.emissiveIntensity=.045+flicker*.055;
     fill.intensity=.25*(.94+.06*Math.sin(now*.012));
-    const alarmPulse=surgeryState.complete?(.35+.65*Math.abs(Math.sin(now*.006))):.12;
-    surgeryProps.alarmLamp.material.emissiveIntensity=alarmPulse;
-    surgeryProps.alarmLight.intensity=surgeryState.complete?2.6*alarmPulse:.18;
     if(opening.started){
       const result=O.tick(opening,dt);opening=result.state;wakeProgress=result.progress;
       if(result.phase!==openingPhase&&result.phase==="reveal"){
