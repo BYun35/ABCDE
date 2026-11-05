@@ -304,3 +304,8 @@ body.nursing-mode .nurse-feedback{clear:both;min-height:44px;padding:10px;margin
 .surgery-grid .nursing-card button{margin:8px 8px 0 0}.surgery-grid input{max-width:10rem}
 #surgery-complete{border-color:#c4a45c;background:linear-gradient(140deg,#35301f,#1d201e)}
 @media(max-width:700px){.surgery-grid{grid-template-columns:1fr}.surgery-grid .nursing-card{min-height:0}}
+
+/* 開場仍能看見病房；醒來片段的跳過按鈕可以點擊。 */
+.walk-instructions{background:linear-gradient(180deg,#10202070,#102020b3);backdrop-filter:blur(1px)}
+.awakening-scene{pointer-events:auto}
+.awakening-scene .awakening-skip{pointer-events:auto;cursor:pointer}
