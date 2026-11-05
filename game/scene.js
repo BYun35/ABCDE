@@ -612,7 +612,7 @@
     nextNearbyCheck=0;
   }
   function movementLocked(){
-    return activeLevel==="ward"?state.ended&&(!state.doorOpen||doorProgress<.995):activeLevel==="nursing"?nursingState.complete:surgeryState.complete;
+    return activeLevel==="ward"?state.ended&&(!state.doorOpen||doorProgress<.995):activeLevel==="nursing"?false:surgeryState.complete;
   }
   function advance(f,r,d){
     const p=activeNavigation.move(player,yaw,f,r,d,activeLevel==="ward"&&state.doorOpen);
@@ -622,6 +622,9 @@
     avatar.root.position.set(player.x,0,player.z);
     if(activeLevel==="ward"&&state.doorOpen&&player.x>=2.45&&player.x<=3.55&&player.z< -6.15){
       keys.clear();document.getElementById("enter-nursing-station").click();
+    }
+    if(activeLevel==="nursing"&&nursingState.complete&&player.x>=3.85&&player.x<=4.65&&player.z< -6.05){
+      keys.clear();document.getElementById("enter-surgery-room").click();
     }
   }
   function keyDirection(){

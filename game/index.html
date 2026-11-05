@@ -16,9 +16,9 @@
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
 <script src="level2.js?v=nursingstation1" defer></script>
-<script src="level3.js?v=thirdroom1" defer></script>
-<script src="scene.js?v=recordsrow1" defer></script>
-<script src="app.js?v=autoclosepin1" defer></script>
+<script src="level3.js?v=level3exit1" defer></script>
+<script src="scene.js?v=level3exit1" defer></script>
+<script src="app.js?v=level3exit1" defer></script>
 </head>
 <body>
 <header>
@@ -230,8 +230,8 @@
       <section class="nursing-card nursing-ending" id="nursing-ending" tabindex="-1" hidden>
         <h3>第二關完成</h3>
         <p>警告！NO. 02 已取得實驗資料，請立即啟動封鎖程序。</p>
-        <p>警示燈閃爍，你拿著電梯卡走進地下研究區。前方的手術室裡，留下四段與你有關的記憶。</p>
-        <button id="enter-surgery-room" class="primary" type="button">走進地下手術室</button>
+        <p>電梯門已解鎖。關閉面板後，走到護理站右後方，走進電梯即可前往地下研究區。</p>
+        <button id="enter-surgery-room" class="primary" type="button">直接前往第三關</button>
       </section>
     </div>
   </section>
@@ -243,8 +243,8 @@
     <p id="surgery-photo-progress" class="surgery-progress">記憶照片：0/4；手術紀錄：未閱讀</p>
     <div class="surgery-play-grid">
       <section class="nursing-card"><h3>控制台密碼</h3><p>依手術紀錄時間排列照片，輸入照片背面數字。</p><form id="surgery-console-form" class="date-form"><label for="surgery-code">四位數密碼</label><input id="surgery-code" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required><button id="surgery-unlock-console" class="primary" type="submit" disabled>解鎖抽屜</button></form><button id="surgery-take-remote" class="secondary" type="button" hidden>取得遙控器與紙條</button></section>
-      <section class="nursing-card"><h3>監視器與出口</h3><p>取得遙控器後播放影片，再取備忘錄和通行證。</p><button id="surgery-play-video" class="primary" type="button" disabled>播放監視器影片</button><button id="surgery-read-memo" class="secondary" type="button" disabled>閱讀研究員備忘錄</button><button id="surgery-take-pass" class="secondary" type="button" disabled>取得研究區通行證</button><button id="surgery-use-pass" class="primary" type="button" disabled>使用通行證離開</button></section>
-      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>目前三關劇情完成</h3><p>NO.01 留下最後一段訊息：複製你，是為了讓你替他完成一件事。</p><p>警示燈閃爍，廣播要求停止你的研究權限。地下研究區通行證將用於後續劇情；目前可遊玩的內容到此為止。</p></section>
+      <section class="nursing-card"><h3>監視器與出口</h3><p>取得遙控器後播放影片並閱讀備忘錄；第二關的通行證會用來離開研究區。</p><button id="surgery-play-video" class="primary" type="button" disabled>播放監視器影片</button><button id="surgery-read-memo" class="secondary" type="button" disabled>閱讀研究員備忘錄</button><button id="surgery-take-pass" class="secondary" type="button" disabled>取得研究區通行證</button><button id="surgery-use-pass" class="primary" type="button" disabled>刷卡並離開醫院</button></section>
+      <section id="surgery-complete" class="nursing-card nursing-ending" hidden><h3>你逃離了醫院</h3><p>NO.01 留下最後留言，希望你不再被困在實驗裡，也不必為了完成他的願望而活。</p><p>研究區啟動封鎖程序。你用地下研究區通行證解鎖緊急出口，離開醫院，開始自己的人生。</p><p><strong>THE END｜重新開始</strong></p></section>
     </div>
   </section>
 
