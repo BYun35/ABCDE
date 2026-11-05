@@ -10,11 +10,13 @@
 <script src="vendor/three.min.js" defer></script>
 <script src="navigation.js?v=bedwake2" defer></script>
 <script src="nursing-navigation.js?v=nursingnav1" defer></script>
+<script src="surgery-navigation.js?v=level3" defer></script>
 <script src="avatar.js?v=bedwake2" defer></script>
 <script src="opening.js?v=bedwake2" defer></script>
 <script src="clock.js?v=analog317" defer></script>
 <script src="interaction.js?v=paper1" defer></script>
 <script src="level2.js?v=nursingstation1" defer></script>
+<script src="level3.js?v=thirdroom1" defer></script>
 <script src="scene.js?v=centerfeedback1" defer></script>
 <script src="app.js?v=centerfeedback1" defer></script>
 </head>
@@ -227,7 +229,8 @@
       <section class="nursing-card nursing-ending" id="nursing-ending" tabindex="-1" hidden>
         <h3>第二關完成</h3>
         <p>警告！NO. 02 已取得實驗資料，請立即啟動封鎖程序。</p>
-        <p>你拿著電梯卡，前往地下研究區。第三關尚未開放。</p>
+        <p>警示燈閃爍，你拿著電梯卡走進地下研究區。前方的手術室裡，留下四段與你有關的記憶。</p>
+        <button id="enter-surgery-room" class="primary" type="button">走進地下手術室</button>
       </section>
     </div>
   </section>

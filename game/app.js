@@ -4,9 +4,12 @@
   const Game = window.EscapeRoomGame;
   if (!Game) return;
   const Nursing = window.NursingStationGame;
+  const Surgery = window.SurgeryRoomGame;
 
   let state = Game.createInitialState();
   let nursingState = Nursing.createInitialState();
+  let surgeryState = Surgery.createInitialState();
+  const surgeryStation = document.getElementById("surgery-station");
   const fragments = new Set();
   const fragmentText = {
     bed: "NO. 02 病人於實驗前接受三次藥物測試。",
@@ -113,6 +116,22 @@
     window.Ward3D?.syncNursing?.(nursingState);
   }
 
+  function openSurgeryPanel(title,message){ surgeryStation.hidden=false; document.getElementById("surgery-title").textContent=title||"手術室調查"; if(message)document.getElementById("surgery-feedback").textContent=message; }
+  function closeSurgeryPanel(){surgeryStation.hidden=true;document.getElementById("ward-canvas")?.focus({preventScroll:true});}
+  function renderSurgery(message){if(message)document.getElementById("surgery-feedback").textContent=message;document.getElementById("surgery-photo-progress").textContent="記憶照片："+Object.values(surgeryState.photos).filter(Boolean).length+"/4；手術紀錄："+(surgeryState.recordRead?"已閱讀":"未閱讀");document.getElementById("surgery-unlock-console").disabled=!Object.values(surgeryState.photos).every(Boolean)||!surgeryState.recordRead||surgeryState.consoleUnlocked;document.getElementById("surgery-unlock-console").textContent=surgeryState.consoleUnlocked?"控制台已解鎖":"輸入密碼解鎖抽屜";document.getElementById("surgery-take-remote").hidden=!surgeryState.consoleUnlocked||surgeryState.remote;document.getElementById("surgery-play-video").disabled=!surgeryState.remote;document.getElementById("surgery-read-memo").disabled=!surgeryState.videoPlayed;document.getElementById("surgery-take-pass").disabled=!surgeryState.videoPlayed||surgeryState.passTaken;document.getElementById("surgery-use-pass").disabled=!surgeryState.passTaken||surgeryState.complete;document.getElementById("surgery-complete").hidden=!surgeryState.complete;window.Ward3D?.syncSurgery?.(surgeryState);}
+  function enterSurgeryRoom(){if(!nursingState.complete)return; nursingStation.hidden=true;document.getElementById("page-brand").textContent="時空密室・第三關";document.getElementById("page-title").textContent="不屬於自己的記憶";document.getElementById("header-note").textContent="3D 探索 · 地下手術室";document.getElementById("stage-eyebrow").textContent="地下研究區 · 凌晨 3:17";document.getElementById("stage-title").textContent="手術室裡的四段記憶";document.getElementById("stage-description").textContent="調查照片與手術紀錄，依事件時間排序，找出控制台密碼。";document.title="時空密室｜第三關：不屬於自己的記憶";window.Ward3D?.enterSurgeryRoom();renderSurgery("手術台旁的紙條寫著：「記憶可以被刪除，但不代表它從未發生。找回四段記憶，確認自己是誰。」");}
+  if(window.Ward3D)window.Ward3D.openSurgeryPanel=openSurgeryPanel;
+
+  window.SurgeryApp={
+    photo(id){const r=Surgery.inspectPhoto(surgeryState,id);surgeryState=r.state;openSurgeryPanel("記憶照片 "+id,r.message);renderSurgery(r.message);},
+    record(){const r=Surgery.inspectRecord(surgeryState);surgeryState=r.state;openSurgeryPanel("機密手術紀錄",r.message);renderSurgery(r.message);},
+    graffiti(){const r=Surgery.inspectGraffiti(surgeryState);surgeryState=r.state;openSurgeryPanel("牆上的字",r.message);renderSurgery(r.message);},
+    console(){openSurgeryPanel("控制台｜四位數密碼","依手術紀錄排序四張照片，輸入背面的數字。");},
+    drawer(){if(!surgeryState.consoleUnlocked){openSurgeryPanel("控制台下方抽屜","抽屜仍被密碼鎖住。先調查四張照片與手術紀錄。");return;}if(!surgeryState.remote){const r=Surgery.takeRemote(surgeryState);surgeryState=r.state;renderSurgery(r.message);}else openSurgeryPanel("控制台抽屜",surgeryState.videoPlayed?"抽屜中還有研究員備忘錄和地下研究區通行證。":"已取得遙控器。到牆面監視器播放實驗紀錄。");},
+    monitor(){openSurgeryPanel("監視器","監視器保留了三段實驗紀錄。需要使用控制台抽屜裡的遙控器。");},
+    exit(){openSurgeryPanel("手術室出口","讀卡器需要地下研究區通行證。")}
+  };
+
   function enterNursingStation() {
     if (!state.ended) return;
     gameLayout.hidden = false;
@@ -132,7 +151,16 @@
   }
 
   enterStationButton.addEventListener("click", enterNursingStation);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!surgeryStation.hidden)closeSurgeryPanel();});
   document.getElementById("close-nursing-panel").addEventListener("click", closeNursingPanel);
+  document.getElementById("enter-surgery-room").addEventListener("click",enterSurgeryRoom);
+  document.getElementById("close-surgery-panel").addEventListener("click",closeSurgeryPanel);
+  document.getElementById("surgery-console-form").addEventListener("submit",e=>{e.preventDefault();const r=Surgery.unlock(surgeryState,document.getElementById("surgery-code").value);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-take-remote").addEventListener("click",()=>{const r=Surgery.takeRemote(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-play-video").addEventListener("click",()=>{const r=Surgery.playVideo(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-read-memo").addEventListener("click",()=>{const r=Surgery.readMemo(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-take-pass").addEventListener("click",()=>{const r=Surgery.takePass(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
+  document.getElementById("surgery-use-pass").addEventListener("click",()=>{const r=Surgery.useExit(surgeryState);surgeryState=r.state;renderSurgery(r.message);});
   ["A", "B", "C"].forEach(record => {
     document.getElementById("nurse-record-" + record.toLowerCase()).addEventListener("click", () => {
       const result = Nursing.chooseRecord(nursingState, record);

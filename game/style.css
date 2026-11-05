@@ -296,3 +296,11 @@ body.nursing-mode .nursing-card[data-active="true"]:not([hidden]){display:block}
 body.nursing-mode .nursing-panel-close{position:sticky;top:0;z-index:2;float:right;margin:-4px -4px 10px 10px;padding:7px 10px;font-size:.8rem}
 body.nursing-mode .nurse-feedback{clear:both;min-height:44px;padding:10px;margin-bottom:12px;font-size:.9rem}
 @media(max-width:760px){body.nursing-mode header{height:58px;min-height:58px;flex-basis:58px}body.nursing-mode main{height:calc(100vh - 58px);height:calc(100svh - 58px)}body.nursing-mode .nursing-station{top:68px;right:8px;width:min(480px,calc(100vw - 16px));max-height:calc(100vh - 78px);max-height:calc(100svh - 78px);padding:12px}}
+
+/* 第三關面板：沿用同一套深色調查介面，讓遊戲可在單一頁面完成。 */
+.surgery-station{border-color:#776650;background:radial-gradient(ellipse at 50% 0%,#343d43,#171b20 68%)}
+.surgery-progress{padding:12px 16px;border:1px solid #60717b;border-radius:10px;background:#202a30;color:#d7e8ee;text-align:center;font-weight:700}
+.surgery-grid .nursing-card{min-height:190px}.surgery-grid .nursing-card ul{color:#d3d0c5;line-height:1.8}
+.surgery-grid .nursing-card button{margin:8px 8px 0 0}.surgery-grid input{max-width:10rem}
+#surgery-complete{border-color:#c4a45c;background:linear-gradient(140deg,#35301f,#1d201e)}
+@media(max-width:700px){.surgery-grid{grid-template-columns:1fr}.surgery-grid .nursing-card{min-height:0}}

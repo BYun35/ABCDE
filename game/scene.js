@@ -4,11 +4,11 @@
   const notice=document.getElementById("scene-feedback");
   if(!host)return;
   function tell(message){notice.textContent=message;}
-  if(!window.THREE||!window.WardNavigation||!window.WardNursingNavigation||!window.WardAvatar||!window.WardOpening||!window.WardClock||!window.WardInteraction){
+  if(!window.THREE||!window.WardNavigation||!window.WardNursingNavigation||!window.WardSurgeryNavigation||!window.WardAvatar||!window.WardOpening||!window.WardClock||!window.WardInteraction){
     tell("3D 場景未能載入。請重新整理；你仍可使用右側的線索與操作完成第一關。");
     host.dataset.ready="error";return;
   }
-  const T=window.THREE,N=window.WardNavigation,NN=window.WardNursingNavigation,A=window.WardAvatar,O=window.WardOpening,C=window.WardClock,I=window.WardInteraction;
+  const T=window.THREE,N=window.WardNavigation,NN=window.WardNursingNavigation,SN=window.WardSurgeryNavigation,A=window.WardAvatar,O=window.WardOpening,C=window.WardClock,I=window.WardInteraction;
   const player={x:N.OPENING_START.x,z:N.OPENING_START.z};
   let travel=0,heading=0,lastMovement=0,walkBlend=0;
   let renderer;
@@ -29,6 +29,7 @@
   scene.fog=new T.Fog(0x080d0f,4,15);
   const wardRoom=new T.Group();scene.add(wardRoom);
   const nursingRoom=new T.Group();nursingRoom.visible=false;scene.add(nursingRoom);
+  const surgeryRoom=new T.Group();surgeryRoom.visible=false;scene.add(surgeryRoom);
   let buildGroup=wardRoom,buildingLevel="ward",activeLevel="ward",activeNavigation=N;
   const camera=new T.PerspectiveCamera(66,1,.06,35);
   camera.position.set(N.START.x,2.4,5.6);
@@ -461,7 +462,7 @@
   },NN.TARGETS.elevatorReader);
   const nursingProps={cassetteProp,cassetteLabel,drawerAssembly,drawerFace,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
   buildGroup=wardRoom;buildingLevel="ward";
-  let state={ended:false},nursingState={complete:false},fragmentIds=[];
+  let state={ended:false},nursingState={complete:false},surgeryState={complete:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
     state=next;fragmentIds=ids;
     paperTargets.forEach(t=>{t.mesh.visible=!fragmentIds.includes(t.fragment);});
@@ -500,7 +501,7 @@
     if(next.elevatorCard)nursingProps.readerScreen.material=mat(0x8edbb7);
     if(next.complete){nursingProps.elevatorDoor.position.x=5.7;nursingProps.elevatorDoor.rotation.y=-1.15;}
     nextNearbyCheck=0;
-  },notifyPopup(popup){
+  },enterSurgeryRoom(){if(activeLevel==="surgery")return;closeNotebook();activeLevel="surgery";activeNavigation=SN;wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);if(next.complete){surgeryProps.exitReader.material=mat(0x8edbb7);surgeryProps.alarmLamp.material.emissiveIntensity=2.2;}nextNearbyCheck=0;},notifyPopup(popup){
     showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);
@@ -517,10 +518,10 @@
   }
   function orient(){
     followFocus.set(player.x,1.05+.1*wakeProgress,player.z);
-    const desired=activeLevel==="nursing"?{
-      x:Math.max(NN.BOUNDS.minX+.35,Math.min(NN.BOUNDS.maxX-.35,player.x+Math.sin(yaw)*Math.cos(pitch)*3.1)),
+    const desired=(activeLevel==="nursing"||activeLevel==="surgery")?{
+      x:Math.max(activeNavigation.BOUNDS.minX+.35,Math.min(activeNavigation.BOUNDS.maxX-.35,player.x+Math.sin(yaw)*Math.cos(pitch)*3.1)),
       y:Math.max(.4,Math.min(3.25,1.15-Math.sin(pitch)*3.1)),
-      z:Math.max(NN.BOUNDS.minZ+.35,Math.min(NN.BOUNDS.maxZ-.35,player.z+Math.cos(yaw)*Math.cos(pitch)*3.1))
+      z:Math.max(activeNavigation.BOUNDS.minZ+.35,Math.min(activeNavigation.BOUNDS.maxZ-.35,player.z+Math.cos(yaw)*Math.cos(pitch)*3.1))
     }:A.cameraPosition(player,yaw,pitch);
     const destination=new T.Vector3(desired.x,desired.y,desired.z);
     const offset=destination.clone().sub(followFocus),length=offset.length();
@@ -712,6 +713,9 @@
     ceilingLight.intensity=2.1*flicker;
     lightLens.material.emissiveIntensity=.045+flicker*.055;
     fill.intensity=.25*(.94+.06*Math.sin(now*.012));
+    const alarmPulse=surgeryState.complete?(.35+.65*Math.abs(Math.sin(now*.006))):.12;
+    surgeryProps.alarmLamp.material.emissiveIntensity=alarmPulse;
+    surgeryProps.alarmLight.intensity=surgeryState.complete?2.6*alarmPulse:.18;
     if(opening.started){
       const result=O.tick(opening,dt);opening=result.state;wakeProgress=result.progress;
       if(result.phase!==openingPhase&&result.phase==="reveal"){
