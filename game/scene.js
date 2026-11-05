@@ -462,6 +462,28 @@
     else window.Ward3D?.openNursingPanel("nurse-elevator-panel","地下研究區電梯");
   },NN.TARGETS.elevatorReader);
   const nursingProps={cassetteProp,cassetteLabel,drawerAssembly,drawerFace,fileProp,fileLabel,cardProp,cardLabel,elevatorDoor,readerScreen,nurseLamp};
+
+  // 第三關地下手術室：獨立可走動 3D 房間。
+  buildingLevel="surgery";buildGroup=surgeryRoom;
+  box(0,-.12,0,12,.24,14,0x42484b);
+  box(-6,1.8,0,.18,3.6,14,0x626b70);box(6,1.8,0,.18,3.6,14,0x59636a);
+  box(0,1.8,-7,12,3.6,.18,0x697076);box(0,1.8,7,12,3.6,.18,0x5d646b);
+  box(0,3.65,0,12,.12,14,0x282e32);
+  box(0,.58,-1.2,2.8,.24,1.6,0x9aa3a7);box(0,.75,-1.2,1.7,.16,1.1,0xc8cfd0);
+  const surgeryLight=new T.PointLight(0x9ec7d8,2.2,9);surgeryLight.position.set(0,3.1,-1.2);buildGroup.add(surgeryLight);
+  sign(0,2.6,6.84,2.8,.5,"地下手術室",Math.PI);
+  const photoData=[["A",-4.2,"A 簽署同意書"],["B",-1.4,"B 進入醫院"],["C",1.4,"C 接受手術"],["D",4.2,"D 記憶清除"]];
+  photoData.forEach(([id,x,label])=>{const photo=sign(x,2.05,-6.84,1.55,1.1,label,Math.PI);target(photo,"調查記憶照片 "+id,()=>window.SurgeryApp?.photo(id),SN.TARGETS["photo"+id]);});
+  const record=sign(-4.7,1.6,-.25,.95,.55,"機密手術紀錄");target(record,"閱讀手術紀錄",()=>window.SurgeryApp?.record(),SN.TARGETS.record);
+  const surgeryGraffiti=sign(0,2.1,6.84,3.2,.9,"先是選擇，再是抵達；接著分離，最後遺忘。");target(surgeryGraffiti,"查看牆面提示",()=>window.SurgeryApp?.graffiti(),SN.TARGETS.graffiti);
+  const consoleBox=box(4.55,.95,-.25,1.05,1.8,.75,0x38444a);target(consoleBox,"操作手術室控制台",()=>window.SurgeryApp?.console(),SN.TARGETS.console);
+  const drawerBox=box(4.55,.35,.15,.8,.32,.1,0x806846);target(drawerBox,"查看控制台抽屜",()=>window.SurgeryApp?.drawer(),SN.TARGETS.drawer);
+  const monitor=sign(4.7,2.1,-6.84,2,.95,"監視器｜NO.01 / NO.02",Math.PI);target(monitor,"查看監視器",()=>window.SurgeryApp?.monitor(),SN.TARGETS.monitor);
+  const memoProp=box(3.75,.35,-1.1,.4,.05,.5,0xe2d3a8);memoProp.visible=false;target(memoProp,"閱讀研究員備忘錄",()=>document.getElementById("surgery-read-memo").click(),SN.TARGETS.memo);
+  const passProp=box(4.9,.37,-1.1,.4,.06,.5,0xb8cfb4);passProp.visible=false;target(passProp,"取得研究區通行證",()=>document.getElementById("surgery-take-pass").click(),SN.TARGETS.pass);
+  const exitReader=box(5.72,1.35,4.25,.12,.55,.36,0x415955);target(exitReader,"手術室出口讀卡器",()=>window.SurgeryApp?.exit(),SN.TARGETS.exit);
+  const surgeryProps={memoProp,passProp,exitReader,surgeryLight};
+  buildGroup=wardRoom;buildingLevel="ward";
   buildGroup=wardRoom;buildingLevel="ward";
   let state={ended:false},nursingState={complete:false},surgeryState={complete:false},fragmentIds=[];
   window.Ward3D={sync(next,ids){
@@ -502,7 +524,7 @@
     if(next.elevatorCard)nursingProps.readerScreen.material=mat(0x8edbb7);
     if(next.complete){nursingProps.elevatorDoor.position.x=5.7;nursingProps.elevatorDoor.rotation.y=-1.15;}
     nextNearbyCheck=0;
-  },enterSurgeryRoom(){if(activeLevel==="surgery")return;closeNotebook();activeLevel="surgery";activeNavigation=SN;wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;nextNearbyCheck=0;},notifyPopup(popup){
+  },enterSurgeryRoom(){if(activeLevel==="surgery")return;introComplete=true;opening.started=false;document.getElementById("walk-instructions").hidden=true;document.getElementById("awakening-scene").hidden=true;closeNotebook();activeLevel="surgery";activeNavigation=SN;wardRoom.visible=false;nursingRoom.visible=false;surgeryRoom.visible=true;player.x=SN.START.x;player.z=SN.START.z;heading=0;yaw=0;pitch=-.28;avatar.root.position.set(player.x,0,player.z);avatar.root.rotation.x=0;keys.clear();document.exitPointerLock?.();canvas.setAttribute("aria-label","3D 地下手術室，WASD 或方向鍵移動，靠近場景物件按 E 互動");const label=document.querySelector(".scene-topline span");if(label)label.textContent="地下手術室 / 記憶實驗區";walk.textContent="面向南 · 手術室入口";prompt.textContent="探索四張照片、手術紀錄與控制台；靠近物件按 E。";nearbyKey="__level-switch__";nearbyTargets=[];nearbyEl.replaceChildren();const feedback=document.getElementById("scene-feedback");if(feedback)feedback.textContent="找回四段記憶。WASD 移動，拖曳畫面轉動鏡頭。";orient();canvas.focus({preventScroll:true});nextNearbyCheck=0;},syncSurgery(next){surgeryState=next;surgeryProps.memoProp.visible=next.videoPlayed&&!next.memoRead;surgeryProps.passProp.visible=next.videoPlayed&&!next.passTaken;surgeryProps.exitReader.material=mat(next.passTaken?0x8edbb7:0x415955);nextNearbyCheck=0;},notifyPopup(popup){
     showDialog(popup.title,popup.message,popup.kind||"important",popup.item);
   },updateDialog(message,title){updateDialog(message,title);}};
   const keys=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(0,0);

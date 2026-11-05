@@ -309,3 +309,6 @@ body.nursing-mode .nurse-feedback{clear:both;min-height:44px;padding:10px;margin
 .walk-instructions{background:linear-gradient(180deg,#10202070,#102020b3);backdrop-filter:blur(1px)}
 .awakening-scene{pointer-events:auto}
 .awakening-scene .awakening-skip{pointer-events:auto;cursor:pointer}
+
+/* 第三關預覽入口與操作面板 */
+#try-third-level{margin:10px}.surgery-station{position:fixed;z-index:10;top:78px;right:18px;width:min(520px,calc(100vw - 36px));max-height:calc(100vh - 96px);overflow-y:auto;margin:0;padding:16px;background:#172326f2;backdrop-filter:blur(12px)}.surgery-play-grid .nursing-card{display:block!important;margin:0 0 12px;padding:14px}.surgery-play-grid{display:block}.surgery-station .nursing-heading{display:block}.surgery-station .nurse-feedback{clear:both}@media(max-width:760px){.surgery-station{top:68px;right:8px;width:calc(100vw - 16px);max-height:calc(100vh - 78px);padding:12px}}
