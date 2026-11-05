@@ -1,0 +1,210 @@
+"use strict";
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+const Game = require("../game/game.js");
+const Level2 = require("../game/level2.js");
+
+function setup() {
+  const nodes = new Map();
+  const popups = [];
+  const nursingSceneEntries = [];
+  function el(id, dataset = {}) {
+    if (!nodes.has(id)) nodes.set(id, {
+      id, dataset, textContent: "", value: "", hidden: false,
+      children: [], events: {}, disabled: false,
+      addEventListener(type, fn) { this.events[type] = fn; },
+      replaceChildren() { this.children = []; },
+      append(child) { this.children.push(child); },
+      focus() {}, scrollIntoView() {}
+    });
+    return nodes.get(id);
+  }
+  const inspect = el("inspect-fragments", { inspect: "fragments" });
+  const inspections = [inspect, ...["calendar", "graffiti", "clock"].map(key => el("inspect-" + key, { inspect: key }))];
+  const parts = ["bed", "cabinet", "bin"].map(id => el("fragment-" + id, { fragment: id }));
+  const document = {
+    getElementById: el,
+    createElement: () => ({ textContent: "" }),
+    querySelectorAll: selector => selector === "[data-inspect]" ? inspections : parts,
+    body: { classList: { values: new Set(), add(value) { this.values.add(value); }, contains(value) { return this.values.has(value); } } },
+    documentElement: { classList: { values: new Set(), add(value) { this.values.add(value); }, contains(value) { return this.values.has(value); } } }
+  };
+  const window = { EscapeRoomGame: Game, NursingStationGame: Level2, Ward3D: {
+    sync() {},
+    enterNursingStation() { nursingSceneEntries.push(true); },
+    updateDialog() {},
+    notifyPopup(popup) { popups.push(popup); }
+  } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../game/app.js"), "utf8"),
+    { window, document, Set });
+  const click = id => el(id).events.click();
+  return { el, click, inspect, parts, popups, document, nursingSceneEntries, window };
+}
+
+test("收齊三片之前不顯示完整病歷，收齊後才能讀取", () => {
+  const { el, click, parts, popups } = setup();
+  click("inspect-fragments");
+  assert.match(el("feedback").textContent, /0\/3/);
+  assert.doesNotMatch(el("feedback").textContent, /NO\. 02 病人/);
+  parts[0].events.click();
+  click("inspect-fragments");
+  assert.match(el("feedback").textContent, /1\/3/);
+  parts[1].events.click();
+  parts[2].events.click();
+  assert.match(popups[0].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.match(popups[1].message, /藥物依序為：午夜前、午夜後、清晨/);
+  assert.match(popups[2].message, /若順序錯誤，記憶恢復程序將無法啟動/);
+  assert.match(popups[2].message, /真正的答案藏在時間的先後之中/);
+  assert.equal(popups[0].kind, "fragment");
+  assert.equal(popups[1].kind, "fragment");
+  assert.equal(popups[2].kind, "fragment");
+  click("inspect-fragments");
+  assert.match(el("feedback").textContent, /NO\. 02 病人/);
+});
+
+test("背包只顯示一個病歷進度，收集回饋顯示於收集區", () => {
+  const { el, parts } = setup();
+  parts.forEach(part => part.events.click());
+  assert.deepEqual(el("inventory").children.map(child => child.textContent), ["病歷碎片 3/3"]);
+  assert.match(el("fragment-feedback").textContent, /3\/3/);
+});
+
+test("排序與線索在操作區顯示回饋，道具仍可依序通關", () => {
+  const { el, click } = setup();
+  click("inspect-fragments");
+  assert.match(el("explore-feedback").textContent, /0\/3/);
+  click("open-bottle");
+  assert.match(el("bottle-feedback").textContent, /沒有拆卸工具/);
+  click("open-door");
+  assert.match(el("door-feedback").textContent, /需要門禁卡/);
+  ["C", "A", "B"].forEach((v, i) => el("order-" + (i + 1)).value = v);
+  el("order-form").events.submit({ preventDefault() {} });
+  assert.match(el("order-feedback").textContent, /順序不對/);
+  ["A", "B", "C"].forEach((v, i) => el("order-" + (i + 1)).value = v);
+  el("order-form").events.submit({ preventDefault() {} });
+  assert.match(el("order-feedback").textContent, /317/);
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("open-door");
+  assert.equal(el("ending").hidden, false);
+  assert.match(el("door-feedback").textContent, /第一關結束/);
+});
+
+test("日曆與病歷保留規格中的完整時間線索", () => {
+  const { el, click, parts } = setup();
+  click("inspect-calendar");
+  const calendar = el("explore-feedback").textContent;
+  assert.match(calendar, /2 月 1 日：午夜前/);
+  assert.match(calendar, /2 月 3 日：午夜後/);
+  assert.match(calendar, /2 月 7 日：清晨/);
+  parts.forEach(part => part.events.click());
+  click("inspect-fragments");
+  assert.match(el("explore-feedback").textContent, /若順序錯誤，記憶恢復程序將無法啟動/);
+  assert.match(el("explore-feedback").textContent, /請勿相信牆上的時間/);
+});
+
+test("病房畫面的感應器和下方按鈕都能刷卡", () => {
+  const { el, click } = setup();
+  click("scene-reader");
+  assert.equal(el("ending").hidden, true);
+  assert.match(el("door-feedback").textContent, /需要門禁卡/);
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader");
+  assert.equal(el("ending").hidden, false);
+});
+
+test("取得病歷碎片、拆卸工具與門禁卡時回報重要物品名稱", () => {
+  const { el, click, parts, popups } = setup();
+  parts[0].events.click();
+  assert.equal(popups[0].title, "取得重要物品");
+  assert.match(popups[0].item, /病歷碎片（1\/3）/);
+  assert.match(popups[0].message, /NO\. 02 病人於實驗前接受三次藥物測試/);
+  assert.equal(popups[0].kind, "fragment");
+
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool");
+  assert.equal(popups[1].title, "取得重要物品");
+  assert.equal(popups[1].item, "小型拆卸工具");
+  assert.match(popups[1].message, /紙條內容：\n「你已經找到第一個答案。/);
+  assert.match(popups[1].message, /就去護理站。記住，那裡的紀錄不一定是真相。」$/);
+
+  click("open-bottle");
+  assert.equal(popups[2].title, "取得重要物品");
+  assert.equal(popups[2].item, "護理站門禁卡");
+});
+
+test("第一關完成後可進護理站，第二關有病歷、錄音與日期輸入操作", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../game/index.html"), "utf8");
+  assert.match(html, /id="enter-nursing-station"/);
+  assert.match(html, /id="nursing-station"[^>]*hidden/);
+  for (const id of ["nurse-record-a", "nurse-record-b", "nurse-record-c", "play-nurse-tape", "nurse-date-form", "open-nurse-drawer", "read-nurse-file", "take-elevator-card", "use-elevator-card"]) {
+    assert.ok(html.includes(`id="${id}"`), `缺少第二關操作：${id}`);
+  }
+  assert.match(html, /id="nursing-station"[\s\S]*值班表[\s\S]*病歷[\s\S]*錄音帶/);
+});
+
+test("頁面操作可從第一關通關進入 3D 護理站並走完第二關", () => {
+  const { el, click, document, nursingSceneEntries } = setup();
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader");
+  assert.equal(el("enter-nursing-station").hidden, false);
+  click("enter-nursing-station");
+  assert.equal(el("game-layout").hidden, false);
+  assert.equal(el("nursing-station").hidden, true);
+  assert.equal(nursingSceneEntries.length, 1);
+  assert.equal(document.body.classList.contains("nursing-mode"), true);
+  assert.equal(document.documentElement.classList.contains("nursing-mode"), true);
+
+  const html = fs.readFileSync(path.join(__dirname, "../game/index.html"), "utf8");
+  assert.match(html, /nursing-navigation\.js/);
+  const css = fs.readFileSync(path.join(__dirname, "../game/style.css"), "utf8");
+  assert.match(css, /body\.nursing-mode\s+#ward-viewport\s*\{[^}]*position:\s*absolute/s);
+  assert.match(css, /body\.nursing-mode\s+\.nursing-station\s*\{[^}]*overflow-y:\s*auto/s);
+
+  click("nurse-record-a");
+  assert.match(el("nurse-feedback").textContent, /值班表不一致/);
+  assert.equal(el("cassette-panel").hidden, true);
+  click("nurse-record-b");
+  assert.equal(el("cassette-panel").hidden, false);
+  click("play-nurse-tape");
+  assert.match(el("nurse-tape-transcript").textContent, /二月十七日正式啟動/);
+  el("nurse-date").value = "0217";
+  el("nurse-date-form").events.submit({ preventDefault() {} });
+  assert.equal(el("nurse-drawer-panel").hidden, false);
+  click("open-nurse-drawer"); click("read-nurse-file");
+  assert.match(el("nurse-file-transcript").textContent, /YOU ARE NOT THE ORIGINAL/);
+  click("take-elevator-card"); click("use-elevator-card");
+  assert.equal(el("nursing-ending").hidden, false);
+});
+
+test("到電梯讀卡器會說明需要電梯卡，取得後才可刷卡", () => {
+  const { el, click, window } = setup();
+  el("pin").value = "317";
+  el("pin-form").events.submit({ preventDefault() {} });
+  click("take-tool"); click("open-bottle"); click("scene-reader"); click("enter-nursing-station");
+  window.Ward3D.openNursingPanel("nurse-elevator-panel", "地下研究區電梯");
+  assert.equal(el("nurse-elevator-panel").hidden, false);
+  assert.equal(el("use-elevator-card").disabled, true);
+  assert.match(el("elevator-card-feedback").textContent, /取得電梯卡/);
+  el("nurse-record-b").events.click(); el("play-nurse-tape").events.click();
+  el("nurse-date").value = "0217";
+  el("nurse-date-form").events.submit({ preventDefault() {} });
+  el("open-nurse-drawer").events.click(); el("take-elevator-card").events.click();
+  assert.equal(el("use-elevator-card").disabled, false);
+  const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
+  assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?openNursingPanel\("nurse-elevator-panel"/);
+  assert.match(scene, /elevatorTarget=target\(elevatorReader,[\s\S]*?if\(nursingState\.elevatorCard\)[\s\S]*?use-elevator-card/);
+});
+
+test("抽屜裡檔案與電梯卡的標籤不會擋住物件互動", () => {
+  const scene = fs.readFileSync(path.join(__dirname, "../game/scene.js"), "utf8");
+  assert.match(scene, /fileLabel\.userData\.target=fileTarget/);
+  assert.match(scene, /cardLabel\.userData\.target=cardTarget/);
+  assert.match(scene, /keypadParts\.forEach\(part=>part\.userData\.target=keypadTarget\)/);
+});
