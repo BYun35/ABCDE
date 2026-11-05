@@ -18,11 +18,11 @@
   const TARGETS = {
     schedule: { x: -4.2, z: -5.45 },
     recordA: { x: -1.35, z: -1.35 },
-    recordB: { x: .55, z: -1.35 },
+    recordB: { x: 0, z: -1.35 },
     recordC: { x: 1.35, z: -1.35 },
     recorder: { x: 3.15, z: -3.0 },
     keypad: { x: 4.15, z: -3.0 },
-    drawer: { x: -2.45, z: -1.2 },
+    drawer: { x: -2.45, z: -.57 },
     file: { x: -2.63, z: -.86 },
     elevatorCard: { x: -2.27, z: -.86 },
     elevatorReader: { x: 3.75, z: -5.65 }

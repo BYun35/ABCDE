@@ -60,10 +60,10 @@
     if (String(value).trim() === "0217") return reply(Object.assign({}, state, { drawerUnlocked: true }), "日期正確。桌子下方的隱藏抽屜解鎖了。");
     const dateAttempts = state.dateAttempts + 1;
     const message = dateAttempts === 1
-      ? "日期資料不完整。"
+      ? "輸入錯誤：實驗日期不正確。請輸入四位數月日（MMDD）。"
       : dateAttempts === 2
-        ? "請依 MMDD 格式輸入。"
-        : "日期錯誤。你仍可重播錄音並繼續嘗試。";
+        ? "日期仍不正確。請再聽一次錄音，確認實驗啟動的月日。"
+        : "日期仍不正確。請從錄音中找出實驗啟動日，再用 MMDD 格式輸入。";
     return reply(Object.assign({}, state, { dateAttempts }), message);
   }
 
@@ -79,12 +79,10 @@
 
   function takeElevatorCard(state) {
     if (!state.drawerOpen) return reply(state, "抽屜還沒打開，無法取得電梯卡。");
-    if (!state.fileRead) return reply(state, "請先閱讀實驗檔案，確認 NO. 02 的真實身分，再取得電梯卡。");
     return reply(Object.assign({}, state, { elevatorCard: true }), "你取得了地下研究區電梯卡。");
   }
 
   function useElevator(state) {
-    if (!state.fileRead) return reply(state, "請先閱讀實驗檔案，確認 NO. 02 的真實身分。");
     if (!state.elevatorCard) return reply(state, "電梯感應器需要電梯卡（地下研究區電梯卡）才能使用。");
     return reply(Object.assign({}, state, { complete: true }), "警告！NO. 02 已取得實驗資料，請立即啟動封鎖程序。第二關完成。");
   }
