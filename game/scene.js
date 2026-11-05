@@ -308,7 +308,7 @@
     label.position.set(0,.22,.124);g.add(label);
     target(g,"藥瓶 "+["A","B","C"][i],()=>{
       if(i===2&&I.action("bottle-C",state)==="open-bottle")click("open-bottle");
-      else inspect("bottles");
+      else inspect("bottle"+["A","B","C"][i]);
     },{x:g.position.x,z:g.position.z});bottles.push(g);
   });
   sign(-3.6,1.85,-5.88,1.9,.5,"藥物測試記錄");
