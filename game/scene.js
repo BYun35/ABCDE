@@ -655,7 +655,8 @@
     document.getElementById("awakening-text").textContent="頭部傳來一陣劇痛。你從病床上醒來，發現病房裡的設備早已停止運作。";
     tell("頭部傳來一陣劇痛。你從病床上醒來……");
   });
-  document.getElementById("lock-mouse").addEventListener("click",()=>{
+document.getElementById("skip-awakening").addEventListener("click",()=>finishOpening(true));
+    document.getElementById("lock-mouse").addEventListener("click",()=>{
     canvas.focus({preventScroll:true});
     try{
       const result=canvas.requestPointerLock?.();
