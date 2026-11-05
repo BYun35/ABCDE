@@ -18,6 +18,76 @@
   };
   const inventory = new Set();
 
+  function playTapeAudio() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      try {
+        const audio = new AudioContextClass();
+        audio.resume().catch(() => {});
+        const now = audio.currentTime;
+        const size = Math.floor(audio.sampleRate * 0.65);
+        const buffer = audio.createBuffer(1, size, audio.sampleRate);
+        const samples = buffer.getChannelData(0);
+        for (let i = 0; i < size; i++) samples[i] = (Math.random() * 2 - 1) * 0.22;
+        const hiss = audio.createBufferSource();
+        hiss.buffer = buffer;
+        const filter = audio.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 2600;
+        const volume = audio.createGain();
+        volume.gain.setValueAtTime(0.025, now);
+        volume.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+        hiss.connect(filter).connect(volume).connect(audio.destination);
+        hiss.start(now);
+        hiss.stop(now + 0.66);
+
+        const click = audio.createOscillator();
+        const clickVolume = audio.createGain();
+        click.type = "square";
+        click.frequency.setValueAtTime(780, now);
+        click.frequency.exponentialRampToValueAtTime(260, now + 0.09);
+        clickVolume.gain.setValueAtTime(0.07, now);
+        clickVolume.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        click.connect(clickVolume).connect(audio.destination);
+        click.start(now);
+        click.stop(now + 0.11);
+
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+          [0.18, 0.36, 0.54].forEach((delay, index) => {
+            const tone = audio.createOscillator();
+            const toneVolume = audio.createGain();
+            tone.type = "sine";
+            tone.frequency.value = [520, 440, 520][index];
+            toneVolume.gain.setValueAtTime(0.025, now + delay);
+            toneVolume.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.09);
+            tone.connect(toneVolume).connect(audio.destination);
+            tone.start(now + delay);
+            tone.stop(now + delay + 0.1);
+          });
+        }
+        window.setTimeout(() => audio.close().catch(() => {}), 900);
+      } catch (error) {
+        // 若瀏覽器拒絕 Web Audio，仍嘗試使用語音朗讀。
+      }
+    }
+
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+    const utterance = new SpeechSynthesisUtterance(
+      "原始個體的記憶不能保留，否則複製體將無法穩定。實驗必須在二月十七日正式啟動。零二號不得知道自己的真實身分。"
+    );
+    utterance.lang = "zh-TW";
+    utterance.rate = 0.88;
+    utterance.pitch = 0.86;
+    utterance.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const chineseVoice = voices.find(voice => voice.lang.toLowerCase() === "zh-tw")
+      || voices.find(voice => voice.lang.toLowerCase().startsWith("zh"));
+    if (chineseVoice) utterance.voice = chineseVoice;
+    window.speechSynthesis.speak(utterance);
+  }
+
   const feedback = document.getElementById("feedback");
   const inventoryEl = document.getElementById("inventory");
   const derivedCodeEl = document.getElementById("derived-code");
@@ -185,6 +255,7 @@
   document.getElementById("play-nurse-tape").addEventListener("click", () => {
     const result = Nursing.playTape(nursingState);
     nursingState = result.state;
+    if (nursingState.tapePlayed) playTapeAudio();
     document.getElementById("nurse-tape-transcript").textContent = result.message;
     renderNursingState(nursingState.tapePlayed ? "錄音機播放出一段醫師的談話。" : result.message);
   });
