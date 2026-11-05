@@ -18,3 +18,8 @@ assert.match(readme, /Esc/);
 assert.match(readme, /317/);
 assert.match(readme, /0217/);
 assert.match(readme, /電梯卡/);
+assert.match(readme, /第三關/);
+assert.match(readme, /4132/);
+assert.match(readme, /四張照片/);
+assert.match(readme, /研究員備忘錄/);
+assert.match(readme, /緊急出口/);
