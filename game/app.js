@@ -284,6 +284,7 @@
     say(result.message, "drawer-feedback");
     input.value = "";
     renderState();
+    if (state.drawerUnlocked) window.Ward3D?.closeInteractionDialog?.();
   });
 
   document.getElementById("take-tool").addEventListener("click", () => {
