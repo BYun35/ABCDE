@@ -64,6 +64,13 @@
     fragments: "拼合後的病歷：「NO. 02 病人於實驗前接受三次藥物測試。藥物依序為：午夜前、午夜後、清晨。若順序錯誤，記憶恢復程序將無法啟動。」\n\n紅筆圈起的文字：「請勿相信牆上的時間，真正的答案藏在時間的先後之中。」"
   };
 
+  window.WardClueApp = {
+    inspectBottle(letter) {
+      const message = clues["bottle" + letter];
+      if (message) say(message, "explore-feedback");
+    }
+  };
+
   function say(message, targetId) {
     feedback.textContent = message;
     const sceneFeedback = document.getElementById("scene-feedback");
